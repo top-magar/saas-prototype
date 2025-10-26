@@ -1,0 +1,303 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ============== TENANTS ==============
+model Tenant {
+  id                String    @id @default(uuid())
+  subdomain         String    @unique
+  name              String
+  tier              String    @default("starter")  // starter, professional, enterprise
+  status            String    @default("active")   // active, paused, suspended
+  
+  // Branding
+  logoUrl           String?
+  primaryColor      String    @default("#3B82F6")
+  
+  // Billing
+  monthlyBudget     Decimal   @db.Decimal(12, 2)
+  currentSpend      Decimal   @db.Decimal(12, 2) @default(0)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  users             User[]
+  products          Product[]
+  orders            Order[]
+  webhooks          Webhook[]
+  workflows         Workflow[]
+  auditLogs         AuditLog[]
+  
+  @@index([subdomain])
+  @@index([status])
+  @@map("tenants")
+}
+
+// ============== USERS & AUTH ==============
+model User {
+  id           String  @id @default(uuid())
+  tenantId     String? // Make this optional
+  tenant       Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  email        String  @unique
+  clerkUserId  String? @unique
+  name         String?
+  passwordHash String?
+
+  role         String   @default("user")
+  status       String   @default("active")
+
+  mfaEnabled   Boolean  @default(false)
+  mfaSecret    String?
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  sessions     Session[]
+  orders       Order[]
+  auditLogs    AuditLog[]
+  apiKeys      ApiKey[]
+
+  // This unique constraint is no longer valid if tenantId can be null
+  // @@unique([tenantId, email]) 
+  @@index([tenantId])
+  @@index([email])
+  @@map("users")
+}
+
+model Session {
+  id                String    @id @default(uuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  token             String    @unique
+  expiresAt         DateTime
+  
+  createdAt         DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+model ApiKey {
+  id                String    @id @default(uuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  key               String    @unique @default(cuid())
+  name              String
+  scopes            String[]  // read:products, write:orders, etc.
+  
+  lastUsedAt        DateTime?
+  createdAt         DateTime  @default(now())
+  expiresAt         DateTime?
+  
+  @@index([userId])
+  @@index([key])
+  @@map("api_keys")
+}
+
+// ============== PRODUCTS ==============
+model Product {
+  id                String    @id @default(uuid())
+  tenantId          String
+  tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  name              String
+  description       String?
+  sku               String
+  price             Decimal   @db.Decimal(10, 2)
+  quantity          Int       @default(0)
+  
+  imageUrl          String?
+  category          String?
+  tags              String[]
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  orderItems        OrderItem[]
+  
+  @@unique([tenantId, sku])
+  @@index([tenantId])
+  @@index([category])
+  @@map("products")
+}
+
+// ============== ORDERS ==============
+model Order {
+  id                String    @id @default(uuid())
+  tenantId          String
+  tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId            String?
+  user              User?     @relation(fields: [userId], references: [id])
+  
+  orderNumber       String
+  status            String    @default("pending")  // pending, confirmed, shipped, delivered, cancelled
+  
+  customerName      String?
+  customerEmail     String
+  customerPhone     String?
+  shippingAddress   String?
+  
+  subtotal          Decimal   @db.Decimal(10, 2)
+  tax               Decimal   @db.Decimal(10, 2) @default(0)
+  shippingCost      Decimal   @db.Decimal(10, 2) @default(0)
+  total             Decimal   @db.Decimal(10, 2)
+  
+  paymentMethod     String?   // esewa, khalti, cash, bank
+  paymentStatus     String    @default("pending")  // pending, completed, failed
+  paymentRef        String?   // Gateway transaction ID
+  
+  notes             String?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  items             OrderItem[]
+  payments          Payment[]
+  
+  @@unique([tenantId, orderNumber])
+  @@index([tenantId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id                String    @id @default(uuid())
+  orderId           String
+  order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId         String
+  product           Product   @relation(fields: [productId], references: [id])
+  
+  quantity          Int
+  price             Decimal   @db.Decimal(10, 2)
+  subtotal          Decimal   @db.Decimal(10, 2)
+  
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model Payment {
+  id                String    @id @default(uuid())
+  orderId           String
+  order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  amount            Decimal   @db.Decimal(10, 2)
+  method            String    // esewa, khalti, cash, bank_transfer
+  status            String    @default("pending")  // pending, completed, failed, refunded
+  
+  gatewayRef        String?
+  gatewayResponse   Json?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([orderId])
+  @@index([status])
+  @@map("payments")
+}
+
+// ============== WEBHOOKS ==============
+model Webhook {
+  id                String    @id @default(uuid())
+  tenantId          String
+  tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  url               String
+  events            String[]  // order.created, payment.completed, product.updated
+  secret            String    // For HMAC signature verification
+  
+  isActive          Boolean   @default(true)
+  retryCount        Int       @default(0)
+  maxRetries        Int       @default(5)
+  lastTriedAt       DateTime?
+  lastErrorMessage  String?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([tenantId])
+  @@map("webhooks")
+}
+
+// ============== WORKFLOWS (n8n Integration) ==============
+model Workflow {
+  id                String    @id @default(uuid())
+  tenantId          String
+  tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  name              String
+  description       String?
+  
+  triggers          String[]  // order.created, payment.completed
+  actions           Json      // n8n workflow definition
+  
+  isActive          Boolean   @default(true)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([tenantId])
+  @@map("workflows")
+}
+
+// ============== AUDIT LOGGING ==============
+model AuditLog {
+  id                String    @id @default(uuid())
+  tenantId          String
+  tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId            String?
+  user              User?     @relation(fields: [userId], references: [id])
+  
+  action            String    // product.create, order.update, user.delete
+  resource          String    // product, order, user
+  resourceId        String?
+  
+  changes           Json?     // Before/after values
+  
+  ipAddress         String?
+  userAgent         String?
+  status            String    @default("success")  // success, failure
+  
+  timestamp         DateTime  @default(now())
+  
+  @@index([tenantId])
+  @@index([userId])
+  @@index([action])
+  @@index([timestamp])
+  @@map("audit_logs")
+}
+
+// ============== ANALYTICS ==============
+model AnalyticsEvent {
+  id                String    @id @default(uuid())
+  tenantId          String
+  
+  eventType         String    // page_view, button_click, form_submit, purchase
+  eventName         String
+  properties        Json?     // Custom properties
+  
+  userId            String?
+  sessionId         String?
+  
+  timestamp         DateTime  @default(now())
+  
+  @@index([tenantId])
+  @@index([eventType])
+  @@index([timestamp])
+  @@map("analytics_events")
+}
