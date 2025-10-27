@@ -1,10 +1,13 @@
 'use client';
 
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useUser, UserButton, SignOutButton } from '@clerk/nextjs';
-import { cn } from '@/lib/utils';
+import { useUser } from '@clerk/nextjs';
 import { useTenant } from '@/lib/tenant-context';
+import { cn } from '@/lib/utils';
 import { navigationConfig, adminNavigationConfig } from '@/lib/navigation';
 import {
   Accordion,
@@ -13,119 +16,282 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useSidebarStore } from '@/hooks/use-sidebar-store';
-import { LogOut, Package } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Package, ChevronsLeft, ChevronsRight, SearchIcon, Key, Plug, FileText, Boxes, ListTree, UploadCloud, DownloadCloud, CreditCard, ShieldCheck, UsersRound, ScrollText, Settings2 } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
-const SidebarNav = () => {
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { NavItem, NavSection } from '@/lib/navigation';
+
+
+
+const SidebarNav = ({ isCollapsed }: { isCollapsed: boolean }) => {
   const pathname = usePathname();
   const { user } = useUser();
-  const isAdmin = user?.publicMetadata?.role === 'admin';
+  const userRoles = (user?.publicMetadata?.role as string[]) || []; // Assuming roles are an array of strings
+  const isAdmin = userRoles.includes('admin');
+  const [openAccordionItem, setOpenAccordionItem] = React.useState<string | undefined>(undefined);
+  const [dynamicBadges, setDynamicBadges] = React.useState<Record<string, string>>({});
 
-  const renderNavItem = (item: { href: string; name: string }) => (
-    <Link
-      key={item.name}
-      href={item.href}
-      className={cn(
-        'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary',
-        pathname === item.href && 'bg-muted text-primary'
-      )}
-    >
-      {item.name}
-    </Link>
-  );
+  // Dummy function to check user roles
+  const userHasAccess = (itemOrSection: NavItem | NavSection) => {
+    if (!itemOrSection.roles || itemOrSection.roles.length === 0) {
+      return true; // No specific roles required
+    }
+    return itemOrSection.roles.some(role => userRoles.includes(role));
+  };
 
-  const renderNavSection = (section: (typeof navigationConfig)[0]) => {
-    if (section.href) {
-      return (
-         <Link
-          key={section.title}
-          href={section.href}
+  // Simulate fetching dynamic badge data
+  React.useEffect(() => {
+    // In a real app, this would fetch data from an API
+    const fetchDynamicBadges = async () => {
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
+      setDynamicBadges({
+        lowStockProducts: '5',
+        pendingOrders: '3',
+      });
+    };
+    fetchDynamicBadges();
+  }, []);
+
+  React.useEffect(() => {
+    if (isCollapsed) {
+      setOpenAccordionItem(undefined); // Collapse all when sidebar is collapsed
+    } else {
+      // When expanded, open the accordion that contains the current active path
+      const activeSection = [...navigationConfig, ...(isAdmin ? adminNavigationConfig : [])].find(section =>
+        section.items && section.items.some(item => pathname.startsWith(item.href))
+      );
+      if (activeSection) {
+        setOpenAccordionItem(activeSection.title);
+      } else {
+        setOpenAccordionItem(undefined); // No active section, keep all closed
+      }
+    }
+  }, [isCollapsed, pathname, isAdmin]);
+
+  const filterNavigation = (config: NavSection[]) => {
+    return config.map(section => {
+      if (!userHasAccess(section)) {
+        return null; // User doesn't have access to this section
+      }
+
+      const filteredItems = section.items ? section.items.filter(item =>
+        userHasAccess(item)
+      ) : [];
+
+      if (section.href) {
+        return section; // Direct link section
+      }
+
+      if (filteredItems.length > 0) {
+        return { ...section, items: filteredItems };
+      }
+      return null;
+    }).filter(Boolean) as NavSection[];
+  };
+
+  const filteredNavigationConfig = filterNavigation(navigationConfig);
+  const filteredAdminNavigationConfig = filterNavigation(adminNavigationConfig);
+
+  const renderNavItem = (item: NavItem) => (
+    <Tooltip key={item.name} delayDuration={0}>
+      <TooltipTrigger asChild>
+        <Link
+          href={item.href}
           className={cn(
-            'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary',
-            pathname === section.href && 'bg-muted text-primary'
+            'flex items-center rounded-lg px-3 py-2 text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary',
+            isCollapsed ? 'gap-0' : 'gap-3', // Remove justify-center for items
+            pathname === item.href && 'bg-primary/10 text-primary font-semibold'
           )}
         >
-          <section.icon className="h-4 w-4" />
-          {section.title}
+          {item.icon && (
+            <motion.div
+              initial={{ scale: 1, opacity: 1 }}
+              animate={{ scale: isCollapsed ? 0.8 : 1, opacity: isCollapsed ? 0.7 : 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <item.icon className="h-5 w-5" />
+            </motion.div>
+          )}
+          <motion.span
+            initial={{ opacity: 1, width: 'auto' }}
+            animate={{ opacity: isCollapsed ? 0 : 1, width: isCollapsed ? 0 : 'auto' }}
+            transition={{ duration: 0.2 }}
+            className={cn('truncate', isCollapsed && 'sr-only')}
+          >
+            {item.name}
+          </motion.span>
+          {!isCollapsed && (item.badge || (item.dynamicBadgeKey && dynamicBadges[item.dynamicBadgeKey])) && (
+            <Badge variant="primary" className="ml-auto">{item.badge || dynamicBadges[item.dynamicBadgeKey!]}</Badge>
+          )}
         </Link>
-      )
+      </TooltipTrigger>
+      {isCollapsed && <TooltipContent side="right">{item.name}</TooltipContent>}
+    </Tooltip>
+  );
+
+  const renderNavSection = (section: NavSection) => {
+    const isActiveSection = section.href
+      ? pathname === section.href // Exact match for direct links
+      : section.items?.some(item => pathname.startsWith(item.href)); // Check if any sub-item is active
+
+    if (section.href && !section.items) { // Direct link section without sub-items
+      return (
+        <Tooltip key={section.title} delayDuration={0}>
+          <TooltipTrigger asChild>
+            <Link
+              href={section.href}
+              className={cn(
+                'flex items-center rounded-lg px-3 py-2 text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary',
+                isCollapsed ? 'gap-0' : 'gap-3', // Remove justify-center for sections without items
+                isActiveSection && 'bg-primary/10 text-primary font-semibold'
+              )}
+            >
+              <motion.div
+                initial={{ scale: 1, opacity: 1 }}
+                animate={{ scale: isCollapsed ? 0.8 : 1, opacity: isCollapsed ? 0.7 : 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                <section.icon className="h-5 w-5" />
+              </motion.div>
+              <motion.span
+                initial={{ opacity: 1, width: 'auto' }}
+                animate={{ opacity: isCollapsed ? 0 : 1, width: isCollapsed ? 0 : 'auto' }}
+                transition={{ duration: 0.2 }}
+                className={cn('truncate', isCollapsed && 'sr-only')}
+              >
+                {section.title}
+              </motion.span>
+            </Link>
+          </TooltipTrigger>
+          {isCollapsed && <TooltipContent side="right">{section.title}</TooltipContent>}
+        </Tooltip>
+      );
     }
 
+    // Section with sub-items (Accordion)
     return (
-      <AccordionItem value={section.title} key={section.title} className="border-b-0">
-        <AccordionTrigger className="py-2 text-base font-medium hover:no-underline text-muted-foreground hover:text-primary rounded-lg px-3 [&[data-state=open]>svg]:rotate-180">
-          <div className="flex items-center gap-3">
-            <section.icon className="h-4 w-4" />
-            {section.title}
-          </div>
-        </AccordionTrigger>
-        <AccordionContent className="pl-8 text-sm flex flex-col gap-1 pb-1">
-          {section.items.map(renderNavItem)}
-        </AccordionContent>
-      </AccordionItem>
+      <Accordion
+        type="single"
+        collapsible
+        value={isCollapsed ? undefined : openAccordionItem}
+        onValueChange={(value) => {
+          if (!isCollapsed) {
+            setOpenAccordionItem(value);
+          }
+        }}
+        key={section.title}
+      >
+        <AccordionItem value={section.title} className="border-none">
+          <Tooltip key={section.title} delayDuration={0}>
+            <TooltipTrigger asChild>
+              <AccordionTrigger
+                className={cn(
+                  'flex items-center rounded-lg px-3 py-2 text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary hover:no-underline',
+                  isCollapsed ? 'gap-0' : 'gap-3', // Remove justify-center for accordion triggers
+                  isActiveSection && 'bg-primary/10 text-primary font-semibold'
+                )}
+              >
+                <motion.div
+                  initial={{ scale: 1, opacity: 1 }}
+                  animate={{ scale: isCollapsed ? 0.8 : 1, opacity: isCollapsed ? 0.7 : 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <section.icon className="h-5 w-5" />
+                </motion.div>
+                <motion.span
+                  initial={{ opacity: 1, width: 'auto' }}
+                  animate={{ opacity: isCollapsed ? 0 : 1, width: isCollapsed ? 0 : 'auto' }}
+                  transition={{ duration: 0.2 }}
+                  className={cn('truncate flex-1 text-left', isCollapsed && 'sr-only')}
+                >
+                  {section.title}
+                </motion.span>
+              </AccordionTrigger>
+            </TooltipTrigger>
+            {isCollapsed && <TooltipContent side="right">{section.title}</TooltipContent>}
+          </Tooltip>
+          <AccordionContent className={cn('pt-1', isCollapsed ? 'pl-0' : 'pl-4')}>
+            <div className="flex flex-col gap-1 border-l border-muted-foreground/20 ml-2 pl-2">
+              {section.items?.map(renderNavItem)}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     );
   };
 
   return (
-    <nav className="grid items-start gap-2 text-sm font-medium">
-      <Accordion type="multiple" defaultValue={navigationConfig.map(s => s.title)}>
-        {navigationConfig.map(renderNavSection)}
-        {isAdmin && adminNavigationConfig.map(renderNavSection)}
-      </Accordion>
-    </nav>
+    <TooltipProvider delayDuration={0}>
+      <nav className="grid items-start gap-1 px-2">
+        {filteredNavigationConfig.map(renderNavSection)}
+        {isAdmin && filteredAdminNavigationConfig.length > 0 && <Separator className="my-4" />}
+        {isAdmin && filteredAdminNavigationConfig.map(renderNavSection)}
+      </nav>
+    </TooltipProvider>
   );
 };
 
 const SidebarContent = () => {
     const { tenant } = useTenant();
-    const { user } = useUser();
+    const { isCollapsed, toggleCollapse } = useSidebarStore();
 
     return (
         <div className="flex h-full max-h-screen flex-col gap-2">
-            <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+            <div className="flex h-14 items-center justify-center px-4 lg:px-6">
                 <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-                <Package className="h-6 w-6" />
-                <span>{tenant!.name}</span>
+                    <motion.div
+                        initial={{ scale: 1, opacity: 1 }}
+                        animate={{ scale: isCollapsed ? 0.8 : 1, opacity: isCollapsed ? 0.7 : 1 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <Package className="h-6 w-6" />
+                    </motion.div>
+                    <AnimatePresence>
+                        {!isCollapsed && (
+                            <motion.span
+                                initial={{ opacity: 0, width: 0 }}
+                                animate={{ opacity: 1, width: 'auto' }}
+                                exit={{ opacity: 0, width: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="truncate"
+                            >
+                                {tenant!.name}
+                            </motion.span>
+                        )}
+                    </AnimatePresence>
                 </Link>
-            </div>
-            <div className="flex-1 overflow-auto py-2">
-                <SidebarNav />
-            </div>
-             <div className="mt-auto p-4 border-t">
-              <div className="flex items-center gap-3 mb-4">
-                <UserButton afterSignOutUrl="/" />
-                <div className='flex flex-col'>
-                  <p className="text-sm font-medium">{user?.fullName || user?.primaryEmailAddress?.toString()}</p>
-                  <p className="text-xs text-muted-foreground">{tenant!.name} ({tenant!.tier})</p>
-                </div>
-              </div>
-              <SignOutButton redirectUrl="/">
-                <Button variant="ghost" className="w-full justify-start text-sm font-medium text-muted-foreground hover:text-foreground">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
+                <Button variant="ghost" size="icon" onClick={toggleCollapse} className={cn("hidden md:block", isCollapsed && "ml-auto")}>
+                    {isCollapsed ? <ChevronsRight className="h-5 w-5"/> : <ChevronsLeft className="h-5 w-5"/>}
                 </Button>
-              </SignOutButton>
             </div>
+            
+            <ScrollArea className="flex-1 overflow-auto py-4">
+                <SidebarNav isCollapsed={isCollapsed} />
+            </ScrollArea>
         </div>
     )
 }
 
 export const Sidebar = () => {
-  const { isOpen, onClose } = useSidebarStore();
+  const { isCollapsed } = useSidebarStore();
+
   return (
     <>
-      {/* Mobile Sidebar */}
-      <Sheet open={isOpen} onOpenChange={onClose}>
-        <SheetContent side="left" className="w-64 p-0">
-            <SidebarContent />
-        </SheetContent>
-      </Sheet>
-
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:fixed md:inset-y-0 md:z-50 md:block md:w-64">
+      <motion.aside
+        initial={false}
+        animate={{ width: isCollapsed ? 80 : 256 }}
+        transition={{ duration: 0.3 }}
+        className={cn(
+          "hidden border-r bg-background md:fixed md:inset-y-0 md:z-50 md:block",
+        )}
+      >
         <SidebarContent />
-      </aside>
+      </motion.aside>
     </>
   );
 };

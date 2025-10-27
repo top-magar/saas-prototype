@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(tenant);
   } catch (error) {
     console.error('Error creating tenant:', error);
-    if (error instanceof Error && 'code' in error && (error as any).code === 'P2002') {
+    type PrismaError = { code?: string };
+    if (error instanceof Error && (error as PrismaError).code === 'P2002') {
       return new NextResponse('This subdomain is already taken.', { status: 409 });
     }
     return new NextResponse('Internal Server Error', { status: 500 });

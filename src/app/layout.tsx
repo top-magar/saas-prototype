@@ -9,19 +9,25 @@ const geistSans = Geist({
 
 
 export const metadata = {
-  title: 'Nepal SaaS Platform',
+  title: 'Pasaal.Io',
   description: 'Multi-tenant SaaS platform built with Next.js',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import { ThemeProvider } from "@/components/providers/theme-provider"
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={geistSans.variable}>{children}</body>
+      <html lang="en" suppressHydrationWarning>
+        <body className={geistSans.className}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+          >
+            {children}
+          </ThemeProvider>
+        </body>
       </html>
     </ClerkProvider>
   );

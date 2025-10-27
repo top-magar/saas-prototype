@@ -3,14 +3,19 @@
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
-import { totalProfitData } from '@/lib/mock-data';
 
 const chartConfig = {
   totalSales: { label: 'Total Sales', color: 'hsl(var(--chart-2))' },
   totalRevenue: { label: 'Total Revenue', color: 'hsl(var(--chart-1))' },
 } satisfies ChartConfig;
 
-export function OverviewChart() {
+interface ChartData {
+  month: string;
+  totalSales: number;
+  totalRevenue: number;
+}
+
+export function OverviewChart({ data }: { data: ChartData[] }) {
   return (
     <Card>
       <CardHeader>
@@ -19,7 +24,7 @@ export function OverviewChart() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-          <BarChart accessibilityLayer data={totalProfitData}>
+          <BarChart accessibilityLayer data={data}>
             <CartesianGrid vertical={false} />
             <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} />
             <YAxis tickLine={false} axisLine={false} />

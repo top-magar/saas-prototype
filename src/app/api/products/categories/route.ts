@@ -3,13 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authorize } from '@/lib/auth';
 import { z } from 'zod';
 
-const productSchema = z.object({
-  name: z.string().min(1, "Product name is required"),
+const categorySchema = z.object({
+  name: z.string().min(1, "Category name is required"),
   description: z.string().optional(),
-  price: z.number().min(0, "Price must be a positive number"),
-  stock: z.number().min(0, "Stock must be a positive number"),
-  category: z.string().min(1, "Category is required"),
-  imageUrl: z.string().url("Invalid image URL").optional().or(z.literal("")),
 });
 
 export async function GET(req: NextRequest) {
@@ -21,16 +17,14 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Authorize the user before fetching data.
-    // Allows any user role ('admin', 'manager', 'user') to view products.
-    await authorize(tenantId, ['admin', 'manager', 'user']);
+    await authorize(tenantId, ['admin', 'manager', 'user']); // Allow users to view categories
 
-    const products = await prisma.product.findMany({
+    const categories = await prisma.category.findMany({
       where: { tenantId },
     });
-    return NextResponse.json(products);
+    return NextResponse.json(categories);
   } catch (error) {
-    console.error('[PRODUCTS_GET]', error);
+    console.error('[CATEGORIES_GET]', error);
     if (error instanceof Error && error.message.startsWith('Forbidden')) {
         return new NextResponse(error.message, { status: 403 });
     }
@@ -51,27 +45,21 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const validatedData = productSchema.parse(body);
+    const validatedData = categorySchema.parse(body);
 
-    // Authorize the user to create products
-    await authorize(tenantId, ['admin', 'manager']); // Only admin/manager can create products
+    await authorize(tenantId, ['admin', 'manager']); // Only admin/manager can create categories
 
-    const product = await prisma.product.create({
+    const category = await prisma.category.create({
       data: {
         tenantId,
         name: validatedData.name,
         description: validatedData.description,
-        price: validatedData.price,
-        stock: validatedData.stock,
-        category: validatedData.category,
-        imageUrl: validatedData.imageUrl || '/placeholder.svg', // Default image if not provided
-        status: validatedData.stock > 0 ? (validatedData.stock <= 10 ? "LOW_STOCK" : "IN_STOCK") : "OUT_OF_STOCK",
       },
     });
 
-    return NextResponse.json(product, { status: 201 });
+    return NextResponse.json(category, { status: 201 });
   } catch (error) {
-    console.error('[PRODUCTS_POST]', error);
+    console.error('[CATEGORIES_POST]', error);
     if (error instanceof z.ZodError) {
       return new NextResponse(JSON.stringify(error.errors), { status: 400 });
     }
@@ -88,32 +76,31 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const tenantId = searchParams.get('tenantId');
-  const productId = searchParams.get('productId'); // Assuming productId is passed as a search param
+  const categoryId = searchParams.get('categoryId'); // Assuming categoryId is passed as a search param
 
   if (!tenantId) {
     return new NextResponse('Tenant ID is required', { status: 400 });
   }
-  if (!productId) {
-    return new NextResponse('Product ID is required', { status: 400 });
+  if (!categoryId) {
+    return new NextResponse('Category ID is required', { status: 400 });
   }
 
   try {
     const body = await req.json();
-    const validatedData = productSchema.partial().parse(body); // Use partial for PATCH
+    const validatedData = categorySchema.partial().parse(body); // Use partial for PATCH
 
     await authorize(tenantId, ['admin', 'manager']);
 
-    const product = await prisma.product.update({
-      where: { id: productId, tenantId },
+    const category = await prisma.category.update({
+      where: { id: categoryId, tenantId },
       data: {
         ...validatedData,
-        status: validatedData.stock !== undefined ? (validatedData.stock > 0 ? (validatedData.stock <= 10 ? "LOW_STOCK" : "IN_STOCK") : "OUT_OF_STOCK") : undefined,
       },
     });
 
-    return NextResponse.json(product);
+    return NextResponse.json(category);
   } catch (error) {
-    console.error('[PRODUCTS_PATCH]', error);
+    console.error('[CATEGORIES_PATCH]', error);
     if (error instanceof z.ZodError) {
       return new NextResponse(JSON.stringify(error.errors), { status: 400 });
     }
@@ -130,25 +117,25 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const tenantId = searchParams.get('tenantId');
-  const productId = searchParams.get('productId'); // Assuming productId is passed as a search param
+  const categoryId = searchParams.get('categoryId'); // Assuming categoryId is passed as a search param
 
   if (!tenantId) {
     return new NextResponse('Tenant ID is required', { status: 400 });
   }
-  if (!productId) {
-    return new NextResponse('Product ID is required', { status: 400 });
+  if (!categoryId) {
+    return new NextResponse('Category ID is required', { status: 400 });
   }
 
   try {
     await authorize(tenantId, ['admin', 'manager']);
 
-    await prisma.product.delete({
-      where: { id: productId, tenantId },
+    await prisma.category.delete({
+      where: { id: categoryId, tenantId },
     });
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('[PRODUCTS_DELETE]', error);
+    console.error('[CATEGORIES_DELETE]', error);
     if (error instanceof Error && error.message.startsWith('Forbidden')) {
         return new NextResponse(error.message, { status: 403 });
     }
