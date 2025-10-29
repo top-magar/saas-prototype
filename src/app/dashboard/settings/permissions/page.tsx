@@ -110,7 +110,7 @@ export default function PermissionsPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <h1 className="text-lg font-semibold md:text-2xl">Permissions & Roles</h1>
+      <h1 className="text-xl font-semibold md:text-2xl">Permissions & Roles</h1>
 
       <Card>
         <CardHeader>
@@ -168,7 +168,7 @@ export default function PermissionsPage() {
         <CardContent className="grid gap-4">
           {permissions.map((category) => (
             <div key={category.id} className="grid gap-2">
-              <h3 className="text-lg font-semibold">{category.name}</h3>
+              <h3 className="text-base font-semibold">{category.name}</h3>
               {category.permissions.map((perm) => (
                 <div key={perm.id} className="flex items-center space-x-2">
                   <Checkbox

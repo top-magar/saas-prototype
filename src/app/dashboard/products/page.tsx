@@ -1,6 +1,5 @@
-"use client";
-
-import { useEffect, useState } from "react";
+"use client"
+import { useCallback, useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -34,56 +33,30 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
-import { Field, FieldLabel, FieldContent, FieldError } from "@/components/ui/field";
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SearchIcon, PlusIcon, EditIcon, Trash2Icon, MoreHorizontalIcon, Image as ImageIcon } from "lucide-react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { SearchIcon, PlusIcon, MoreHorizontalIcon } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useTenant } from "@/lib/tenant-context";
+import { ProductFormDialog } from "./product-form-dialog"; // Import the new dialog
+import { Checkbox } from "@radix-ui/react-checkbox";
+import Image from "next/image";
 
 interface Product {
   id: string;
   name: string;
-  imageUrl: string;
   description?: string;
-  category: string;
-  price: number;
-  stock: number;
-  status: "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
+  imageUrl?: string;
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   createdAt: string;
 }
-
-const productFormSchema = z.object({
-  name: z.string().min(1, "Product name is required"),
-  description: z.string().optional(),
-  price: z.coerce.number().min(0, "Price must be a positive number"),
-  stock: z.coerce.number().min(0, "Stock must be a positive number"),
-  category: z.string().min(1, "Category is required"),
-  imageUrl: z.string().url("Invalid image URL").optional().or(z.literal("")),
-});
-
-type ProductFormValues = z.infer<typeof productFormSchema>;
 
 const ITEMS_PER_PAGE = 5;
 
@@ -91,14 +64,14 @@ export default function ProductsPage() {
   const { tenant } = useTenant();
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterCategory, setFilterCategory] = useState("All");
+  const [filterCategory, setFilterCategory] = useState("All"); // This will need to be updated later for product options
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     if (!tenant?.id) return;
     setIsLoading(true);
     try {
@@ -110,17 +83,17 @@ export default function ProductsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [tenant?.id]);
 
   useEffect(() => {
     fetchProducts();
-  }, [tenant?.id]);
+  }, [tenant?.id, fetchProducts]);
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      filterCategory === "All" || product.category === filterCategory;
+    // Category filtering will need to be updated for product options
+    const matchesCategory = true; // Temporarily disable category filter
     return matchesSearch && matchesCategory;
   });
 
@@ -145,7 +118,7 @@ export default function ProductsPage() {
     }
   };
 
-  const handleOpenEditDialog = (product: Product) => {
+  const handleOpenDialog = (product: Product | null) => {
     setEditingProduct(product);
     setIsDialogOpen(true);
   };
@@ -180,7 +153,7 @@ export default function ProductsPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-        <h1 className="text-lg font-semibold md:text-2xl">Products</h1>
+        <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
         <Card>
           <CardHeader>
             <CardTitle>Product Catalog</CardTitle>
@@ -198,22 +171,35 @@ export default function ProductsPage() {
     );
   }
 
+  if (products.length === 0 && !isLoading) {
+    return (
+                <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+                  <h1 className="text-xl font-semibold md:text-2xl">Products</h1>        <Card>
+          <CardContent className="flex items-center justify-center p-8">
+            <Empty>
+              <EmptyHeader>
+                <EmptyTitle>No Products Found</EmptyTitle>
+                <EmptyDescription>
+                  You haven&apos;t added any products yet. Click the button below to add your first product.
+                </EmptyDescription>
+              </EmptyHeader>
+              <Button onClick={() => handleOpenDialog(null)}>
+                <PlusIcon className="mr-2 h-4 w-4" /> Add Product
+              </Button>
+            </Empty>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold md:text-2xl">Products</h1>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => setEditingProduct(null)}>
-              <PlusIcon className="mr-2 h-4 w-4" /> Add Product
-            </Button>
-          </DialogTrigger>
-          <ProductFormDialog
-            product={editingProduct}
-            onSaveSuccess={fetchProducts}
-            onClose={() => setIsDialogOpen(false)}
-          />
-        </Dialog>
+        <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
+        <Button onClick={() => handleOpenDialog(null)}>
+          <PlusIcon className="mr-2 h-4 w-4" /> Add Product
+        </Button>
       </div>
 
       <Card>
@@ -274,9 +260,6 @@ export default function ProductsPage() {
                 </TableHead>
                 <TableHead className="w-[80px]">Image</TableHead>
                 <TableHead>Product Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -292,18 +275,15 @@ export default function ProductsPage() {
                     />
                   </TableCell>
                   <TableCell>
-                    <img src={product.imageUrl} alt={product.name} className="h-10 w-10 object-cover rounded-md" />
+                    <Image src={product.imageUrl || "/placeholder.svg"} alt={product.name} width={40} height={40} className="h-10 w-10 object-cover rounded-md" />
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{product.category}</TableCell>
-                  <TableCell>${product.price.toFixed(2)}</TableCell>
-                  <TableCell>{product.stock}</TableCell>
                   <TableCell>
                     <Badge
                       variant={
-                        product.status === "IN_STOCK"
+                        product.status === "PUBLISHED"
                           ? "default"
-                          : product.status === "LOW_STOCK"
+                          : product.status === "DRAFT"
                           ? "secondary"
                           : "destructive"
                       }
@@ -322,7 +302,7 @@ export default function ProductsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => handleOpenEditDialog(product)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleOpenDialog(product)}>Edit</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleDeleteProduct(product.id)}>Delete</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -356,147 +336,16 @@ export default function ProductsPage() {
           </Pagination>
         </CardContent>
       </Card>
+      <ProductFormDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        product={editingProduct}
+        onSaveSuccess={() => {
+          setIsDialogOpen(false);
+          fetchProducts(); // Refresh data on success
+        }}
+      />
     </div>
   );
 }
-
-interface ProductFormDialogProps {
-  product: Product | null;
-  onSaveSuccess: () => void;
-  onClose: () => void;
-}
-
-const ProductFormDialog = ({ product, onSaveSuccess, onClose }: ProductFormDialogProps) => {
-  const { tenant } = useTenant();
-  const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productFormSchema),
-    defaultValues: {
-      name: product?.name || "",
-      description: product?.description || "",
-      price: product?.price || 0,
-      stock: product?.stock || 0,
-      category: product?.category || "Electronics",
-      imageUrl: product?.imageUrl || "",
-    },
-  });
-
-  const onSubmit = async (values: ProductFormValues) => {
-    if (!tenant?.id) {
-      toast.error("Tenant not found.");
-      return;
-    }
-
-    try {
-      if (product) {
-        // Update existing product
-        await axios.patch(`/api/products?tenantId=${tenant.id}&productId=${product.id}`, values);
-        toast.success("Product updated successfully.");
-      } else {
-        // Create new product
-        await axios.post(`/api/products?tenantId=${tenant.id}`, values);
-        toast.success("Product added successfully.");
-      }
-      onSaveSuccess();
-      onClose();
-    } catch (error) {
-      console.error("Failed to save product:", error);
-      toast.error("Failed to save product.");
-    }
-  };
-
-  return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>{product ? "Edit Product" : "Add Product"}</DialogTitle>
-        <DialogDescription>
-          {product ? "Edit the details of your product." : "Add a new product to your catalog."}
-        </DialogDescription>
-      </DialogHeader>
-      <form id="product-form" onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
-        <Field>
-          <FieldLabel>Name</FieldLabel>
-          <FieldContent>
-            <Controller
-              name="name"
-              control={form.control}
-              render={({ field }) => <Input {...field} />}
-            />
-            <FieldError>{form.formState.errors.name?.message}</FieldError>
-          </FieldContent>
-        </Field>
-        <Field>
-          <FieldLabel>Description</FieldLabel>
-          <FieldContent>
-            <Controller
-              name="description"
-              control={form.control}
-              render={({ field }) => <Textarea {...field} />}
-            />
-            <FieldError>{form.formState.errors.description?.message}</FieldError>
-          </FieldContent>
-        </Field>
-        <Field>
-          <FieldLabel>Price</FieldLabel>
-          <FieldContent>
-            <Controller
-              name="price"
-              control={form.control}
-              render={({ field }) => <Input type="number" {...field} />}
-            />
-            <FieldError>{form.formState.errors.price?.message}</FieldError>
-          </FieldContent>
-        </Field>
-        <Field>
-          <FieldLabel>Stock</FieldLabel>
-          <FieldContent>
-            <Controller
-              name="stock"
-              control={form.control}
-              render={({ field }) => <Input type="number" {...field} />}
-            />
-            <FieldError>{form.formState.errors.stock?.message}</FieldError>
-          </FieldContent>
-        </Field>
-        <Field>
-          <FieldLabel>Category</FieldLabel>
-          <FieldContent>
-            <Controller
-              name="category"
-              control={form.control}
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Electronics">Electronics</SelectItem>
-                    <SelectItem value="Books">Books</SelectItem>
-                    <SelectItem value="Home & Office">Home & Office</SelectItem>
-                    <SelectItem value="Apparel">Apparel</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FieldError>{form.formState.errors.category?.message}</FieldError>
-          </FieldContent>
-        </Field>
-        <Field>
-          <FieldLabel>Image URL</FieldLabel>
-          <FieldContent>
-            <Controller
-              name="imageUrl"
-              control={form.control}
-              render={({ field }) => <Input {...field} placeholder="https://example.com/image.jpg" />}
-            />
-            <FieldError>{form.formState.errors.imageUrl?.message}</FieldError>
-          </FieldContent>
-        </Field>
-      </form>
-      <DialogFooter>
-        <Button variant="outline" onClick={onClose}>Cancel</Button>
-        <Button type="submit" form="product-form" disabled={form.formState.isSubmitting}>Save Product</Button>
-      </DialogFooter>
-    </DialogContent>
-  );
-};
 

@@ -11,7 +11,7 @@ async function main() {
     create: {
       subdomain: 'demo',
       name: 'Demo Company',
-      tier: 'starter',
+      tier: "STARTER",
       monthlyBudget: 10000,
     },
   });

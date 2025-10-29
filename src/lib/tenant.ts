@@ -16,3 +16,45 @@ export async function getTenant() {
 
   return tenant;
 }
+
+interface CreateTenantAndAssociateUserParams {
+  clerkUserId: string;
+  name: string;
+  subdomain: string;
+  email: string;
+  userName: string;
+  primaryColor?: string;
+}
+
+export async function createTenantAndAssociateUser({
+  clerkUserId,
+  name,
+  subdomain,
+  email,
+  userName,
+  primaryColor,
+}: CreateTenantAndAssociateUserParams) {
+  return await prisma.$transaction(async (tx) => {
+    const newTenant = await tx.tenant.create({
+      data: {
+        name,
+        subdomain,
+        primaryColor: primaryColor || '#3B82F6',
+        monthlyBudget: 0,
+      },
+    });
+
+    await tx.user.upsert({
+      where: { clerkUserId },
+      update: { tenantId: newTenant.id },
+      create: {
+        clerkUserId,
+        tenantId: newTenant.id,
+        email,
+        name: userName,
+      },
+    });
+
+    return newTenant;
+  });
+}

@@ -80,7 +80,7 @@ export default function OrdersPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <h1 className="text-lg font-semibold md:text-2xl">Orders & Sales</h1>
+      <h1 className="text-xl font-semibold md:text-2xl">Orders & Sales</h1>
 
       <Card>
         <CardHeader>

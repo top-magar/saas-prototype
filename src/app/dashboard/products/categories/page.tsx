@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -58,7 +58,7 @@ export default function CategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     if (!tenant?.id) return;
     setIsLoading(true);
     try {
@@ -70,11 +70,11 @@ export default function CategoriesPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [tenant?.id]);
 
   useEffect(() => {
     fetchCategories();
-  }, [tenant?.id]);
+  }, [tenant?.id, fetchCategories]);
 
   const handleDeleteCategory = async (categoryId: string) => {
     if (!tenant?.id) return;
@@ -96,7 +96,7 @@ export default function CategoriesPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-        <h1 className="text-lg font-semibold md:text-2xl">Product Categories</h1>
+        <h1 className="text-xl font-semibold md:text-2xl">Product Categories</h1>
         <Card>
           <CardHeader>
             <CardTitle>Manage Categories</CardTitle>
@@ -117,7 +117,7 @@ export default function CategoriesPage() {
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold md:text-2xl">Product Categories</h1>
+        <h1 className="text-xl font-semibold md:text-2xl">Product Categories</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => setEditingCategory(null)}>

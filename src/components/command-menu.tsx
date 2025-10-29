@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useClerk } from '@clerk/nextjs';
-import { navigationConfig, adminNavigationConfig, NavItem, NavSection } from '@/lib/navigation';
+import { navigationConfig, adminNavigationConfig, NavItem } from '@/lib/navigation';
 
 export const CommandMenu = () => {
   const [open, setOpen] = React.useState(false);

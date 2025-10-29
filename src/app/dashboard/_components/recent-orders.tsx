@@ -48,9 +48,9 @@ export function RecentOrders({ data }: { data: Order[] }) {
           <Empty>
             <EmptyHeader>
               <EmptyTitle>No Orders Found</EmptyTitle>
-              <EmptyDescription>
-                When you start receiving orders, they will appear here.
-              </EmptyDescription>
+            <EmptyDescription>
+              You haven&apos;t received any orders yet. Start by adding products and sharing your store!
+            </EmptyDescription>
             </EmptyHeader>
           </Empty>
         </CardContent>

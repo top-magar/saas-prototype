@@ -7,12 +7,19 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum TenantTier {
+  FREE
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
 // ============== TENANTS ==============
 model Tenant {
   id                String    @id @default(uuid())
   subdomain         String    @unique
   name              String
-  tier              String    @default("starter")  // starter, professional, enterprise
+  tier              TenantTier @default(STARTER)  // starter, professional, enterprise
   status            String    @default("active")   // active, paused, suspended
   
   // Branding
@@ -29,7 +36,7 @@ model Tenant {
   // Relations
   users             User[]
   products          Product[]
-  orders            Order[]
+  orders            Order[] // Re-added Order relation
   webhooks          Webhook[]
   workflows         Workflow[]
   auditLogs         AuditLog[]
@@ -61,7 +68,7 @@ model User {
 
   // Relations
   sessions     Session[]
-  orders       Order[]
+  orders       Order[] // Re-added Order relation
   auditLogs    AuditLog[]
   apiKeys      ApiKey[]
 
@@ -105,33 +112,83 @@ model ApiKey {
   @@map("api_keys")
 }
 
-// ============== PRODUCTS ==============
 model Product {
-  id                String    @id @default(uuid())
-  tenantId          String
-  tenant            Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id          String    @id @default(uuid())
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   
-  name              String
-  description       String?
-  sku               String
-  price             Decimal   @db.Decimal(10, 2)
-  quantity          Int       @default(0)
+  name        String
+  description String?
+  imageUrl    String?
+  tags        String[]
+  status      String    @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
   
-  imageUrl          String?
-  category          String?
-  tags              String[]
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
   // Relations
-  orderItems        OrderItem[]
+  variants    ProductVariant[]
+  options     ProductOption[]
+  orderItems  OrderItem[] // Inverse relation to OrderItem
   
-  @@unique([tenantId, sku])
   @@index([tenantId])
-  @@index([category])
   @@map("products")
 }
+
+model ProductOption {
+  id        String @id @default(uuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  name      String // e.g., "Size", "Color"
+  
+  values    ProductOptionValue[]
+
+  @@unique([productId, name])
+  @@map("product_options")
+}
+
+model ProductOptionValue {
+  id        String        @id @default(uuid())
+  optionId  String
+  option    ProductOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  
+  value     String // e.g., "Small", "Red"
+  
+  variantValues ProductVariantOptionValue[]
+
+  @@unique([optionId, value])
+  @@map("product_option_values")
+}
+
+model ProductVariant {
+  id        String  @id @default(uuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  name      String  // e.g., "Small / Red"
+  sku       String?
+  price     Decimal @db.Decimal(10, 2)
+  quantity  Int     @default(0)
+
+  // Relations
+  optionValues ProductVariantOptionValue[]
+  orderItems   OrderItem[] // Inverse relation to OrderItem
+
+  @@unique([productId, sku])
+  @@map("product_variants")
+}
+
+model ProductVariantOptionValue {
+  variantId      String
+  variant        ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  optionValueId  String
+  optionValue    ProductOptionValue @relation(fields: [optionValueId], references: [id], onDelete: Cascade)
+
+  @@id([variantId, optionValueId])
+  @@map("product_variant_option_values")
+}
+
 
 // ============== ORDERS ==============
 model Order {
@@ -179,15 +236,21 @@ model OrderItem {
   id                String    @id @default(uuid())
   orderId           String
   order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId         String
-  product           Product   @relation(fields: [productId], references: [id])
+  
+  // CHANGED: Link to a variant, not a product
+  variantId         String
+  variant           ProductVariant @relation(fields: [variantId], references: [id])
   
   quantity          Int
   price             Decimal   @db.Decimal(10, 2)
   subtotal          Decimal   @db.Decimal(10, 2)
   
+  // Inverse relation to Product
+  product           Product   @relation(fields: [productId], references: [id])
+  productId         String
+
   @@index([orderId])
-  @@index([productId])
+  @@index([variantId])
   @@map("order_items")
 }
 

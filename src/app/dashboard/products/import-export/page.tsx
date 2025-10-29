@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { UploadIcon, DownloadIcon, FileTextIcon } from "lucide-react";
+import { UploadIcon, DownloadIcon } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 export default function ImportExportPage() {
@@ -70,7 +70,7 @@ export default function ImportExportPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <h1 className="text-lg font-semibold md:text-2xl">Product Import/Export</h1>
+      <h1 className="text-xl font-semibold md:text-2xl">Product Import/Export</h1>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>

@@ -28,8 +28,8 @@ export function FAQ() {
   return (
     <section className="container max-w-4xl py-20">
       <div className="text-center">
-        <h2 className="text-3xl font-bold tracking-tight">Frequently Asked Questions</h2>
-        <p className="mt-2 text-lg text-muted-foreground">
+        <h2 className="text-2xl font-bold tracking-tight">Frequently Asked Questions</h2>
+        <p className="mt-2 text-base text-muted-foreground">
           Get answers to the most common questions about our platform.
         </p>
       </div>

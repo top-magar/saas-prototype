@@ -1,8 +1,9 @@
-import { WebhookEvent } from "@clerk/nextjs/server";
+import { WebhookEvent, clerkClient } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
 import { Webhook } from "svix";
 
 import { prisma } from "@/lib/prisma";
+import { createTenantAndAssociateUser } from "@/lib/tenant";
 
 const webhookSecret: string = process.env.CLERK_WEBHOOK_SECRET || "";
 
@@ -38,7 +39,57 @@ export async function POST(req: Request) {
 
   const eventType = event.type;
 
-  if (eventType === "user.created" || eventType === "user.updated") {
+  if (eventType === "user.created") {
+    const { id, email_addresses, first_name, last_name, unsafe_metadata } = event.data;
+
+    if (!id) {
+      return new Response("Error: User ID not found in webhook data", {
+        status: 400,
+      });
+    }
+
+    const email = email_addresses[0]?.email_address;
+
+    if (!email) {
+      return new Response("Error: Email address not found in webhook data", {
+        status: 400,
+      });
+    }
+
+    const companyName = unsafe_metadata?.companyName as string | undefined;
+    const subdomain = unsafe_metadata?.subdomain as string | undefined;
+
+    if (!companyName || !subdomain) {
+      return new Response("Error: Organization Name or Subdomain not found in unsafe_metadata", {
+        status: 400,
+      });
+    }
+
+    try {
+      // Update user's publicMetadata with companyName and subdomain
+      await clerkClient.users.updateUserMetadata(id, {
+        publicMetadata: {
+          companyName,
+          subdomain,
+        },
+      });
+
+      // Create tenant and associate user
+      await createTenantAndAssociateUser({
+        clerkUserId: id,
+        name: companyName,
+        subdomain,
+        email,
+        userName: `${first_name || ""} ${last_name || ""}`.trim(),
+      });
+
+    } catch (error) {
+      console.error("Error in user.created webhook handler:", error);
+      return new Response("Error processing user.created event", {
+        status: 500,
+      });
+    }
+  } else if (eventType === "user.updated") {
     const { id, email_addresses, first_name, last_name } = event.data;
 
     if (!id) {
@@ -63,6 +114,7 @@ export async function POST(req: Request) {
       },
       create: {
         clerkUserId: id,
+        tenantId: null, // Tenant will be associated during creation
         email: email,
         name: `${first_name || ""} ${last_name || ""}`.trim(),
       },

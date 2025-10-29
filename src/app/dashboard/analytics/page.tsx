@@ -73,7 +73,7 @@ export default function AnalyticsPage() {
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold md:text-2xl">Analytics Overview</h1>
+        <h1 className="text-xl font-semibold md:text-2xl">Analytics Overview</h1>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select a time range" />
@@ -100,7 +100,7 @@ export default function AnalyticsPage() {
                 <CardDescription>+20.1% from last month</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$45,231.89</div>
+                <div className="text-xl font-bold">$45,231.89</div>
                 <p className="text-muted-foreground text-xs">
                   +20.1% from last month
                 </p>
@@ -143,7 +143,7 @@ export default function AnalyticsPage() {
                 <CardDescription>+180.1% from last month</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">+2,350</div>
+                <div className="text-xl font-bold">+2,350</div>
                 <p className="text-muted-foreground text-xs">
                   +180.1% from last month
                 </p>
@@ -180,7 +180,7 @@ export default function AnalyticsPage() {
                 <CardDescription>+5% from last month</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">4.8%</div>
+                <div className="text-xl font-bold">4.8%</div>
                 <p className="text-muted-foreground text-xs">
                   +5% from last month
                 </p>

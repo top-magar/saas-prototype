@@ -27,10 +27,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Field, FieldLabel, FieldContent, FieldDescription } from "@/components/ui/field";
-import { Switch } from "@/components/ui/switch";
+import { Field, FieldLabel, FieldContent } from "@/components/ui/field";
 import { Badge } from "@/components/ui/badge";
-import { PlusIcon, EditIcon, Trash2Icon, ZapIcon, ToggleRightIcon, ToggleLeftIcon } from "lucide-react";
+import { PlusIcon, EditIcon, Trash2Icon, ToggleRightIcon, ToggleLeftIcon } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Webhook {
@@ -92,7 +91,7 @@ export default function WebhooksPage() {
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold md:text-2xl">Webhooks</h1>
+        <h1 className="text-xl font-semibold md:text-2xl">Webhooks</h1>
         <Dialog>
           <DialogTrigger asChild>
             <Button>

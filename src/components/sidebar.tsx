@@ -17,8 +17,7 @@ import {
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { useSidebarStore } from '@/hooks/use-sidebar-store';
-import { Input } from '@/components/ui/input';
-import { Package, ChevronsLeft, ChevronsRight, SearchIcon, Key, Plug, FileText, Boxes, ListTree, UploadCloud, DownloadCloud, CreditCard, ShieldCheck, UsersRound, ScrollText, Settings2 } from 'lucide-react';
+import { Package, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -28,20 +27,43 @@ import { NavItem, NavSection } from '@/lib/navigation';
 
 
 
-const SidebarNav = ({ isCollapsed }: { isCollapsed: boolean }) => {
+interface Tenant {
+  id: string;
+  name: string;
+  slug: string;
+  tier: "FREE" | "STARTER" | "PRO" | "ENTERPRISE";
+  createdAt: string;
+  updatedAt: string;
+}
+
+const SidebarNav = ({ isCollapsed, tenant }: { isCollapsed: boolean; tenant: Tenant | null }) => {
   const pathname = usePathname();
   const { user } = useUser();
   const userRoles = (user?.publicMetadata?.role as string[]) || []; // Assuming roles are an array of strings
   const isAdmin = userRoles.includes('admin');
   const [openAccordionItem, setOpenAccordionItem] = React.useState<string | undefined>(undefined);
+
   const [dynamicBadges, setDynamicBadges] = React.useState<Record<string, string>>({});
 
-  // Dummy function to check user roles
-  const userHasAccess = (itemOrSection: NavItem | NavSection) => {
-    if (!itemOrSection.roles || itemOrSection.roles.length === 0) {
-      return true; // No specific roles required
+  const currentTenantTier = tenant?.tier || 'FREE'; // Default to FREE if tenant or tier is not available
+
+  // Dummy function to check user roles and tenant tiers
+  const userHasAccess = (itemOrSection: NavItem | NavSection, currentTenantTier: string) => {
+    // Check roles
+    if (itemOrSection.roles && itemOrSection.roles.length > 0) {
+      if (!itemOrSection.roles.some(role => userRoles.includes(role))) {
+        return false; // User does not have required role
+      }
     }
-    return itemOrSection.roles.some(role => userRoles.includes(role));
+
+    // Check tiers
+    if (itemOrSection.tiers && itemOrSection.tiers.length > 0) {
+      if (!itemOrSection.tiers.includes(currentTenantTier)) {
+        return false; // Current tenant tier does not have access
+      }
+    }
+
+    return true; // User has access
   };
 
   // Simulate fetching dynamic badge data
@@ -73,14 +95,14 @@ const SidebarNav = ({ isCollapsed }: { isCollapsed: boolean }) => {
     }
   }, [isCollapsed, pathname, isAdmin]);
 
-  const filterNavigation = (config: NavSection[]) => {
+  const filterNavigation = (config: NavSection[], currentTenantTier: string) => {
     return config.map(section => {
-      if (!userHasAccess(section)) {
+      if (!userHasAccess(section, currentTenantTier)) {
         return null; // User doesn't have access to this section
       }
 
       const filteredItems = section.items ? section.items.filter(item =>
-        userHasAccess(item)
+        userHasAccess(item, currentTenantTier)
       ) : [];
 
       if (section.href) {
@@ -94,8 +116,8 @@ const SidebarNav = ({ isCollapsed }: { isCollapsed: boolean }) => {
     }).filter(Boolean) as NavSection[];
   };
 
-  const filteredNavigationConfig = filterNavigation(navigationConfig);
-  const filteredAdminNavigationConfig = filterNavigation(adminNavigationConfig);
+  const filteredNavigationConfig = filterNavigation(navigationConfig, currentTenantTier);
+  const filteredAdminNavigationConfig = filterNavigation(adminNavigationConfig, currentTenantTier);
 
   const renderNavItem = (item: NavItem) => (
     <Tooltip key={item.name} delayDuration={0}>
@@ -103,7 +125,7 @@ const SidebarNav = ({ isCollapsed }: { isCollapsed: boolean }) => {
         <Link
           href={item.href}
           className={cn(
-            'flex items-center rounded-lg px-3 py-2 text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary',
+            'flex items-center rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary',
             isCollapsed ? 'gap-0' : 'gap-3', // Remove justify-center for items
             pathname === item.href && 'bg-primary/10 text-primary font-semibold'
           )}
@@ -146,7 +168,7 @@ const SidebarNav = ({ isCollapsed }: { isCollapsed: boolean }) => {
             <Link
               href={section.href}
               className={cn(
-                'flex items-center rounded-lg px-3 py-2 text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary',
+                'flex items-center rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary',
                 isCollapsed ? 'gap-0' : 'gap-3', // Remove justify-center for sections without items
                 isActiveSection && 'bg-primary/10 text-primary font-semibold'
               )}
@@ -191,7 +213,7 @@ const SidebarNav = ({ isCollapsed }: { isCollapsed: boolean }) => {
             <TooltipTrigger asChild>
               <AccordionTrigger
                 className={cn(
-                  'flex items-center rounded-lg px-3 py-2 text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary hover:no-underline',
+                  'flex items-center rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary hover:no-underline',
                   isCollapsed ? 'gap-0' : 'gap-3', // Remove justify-center for accordion triggers
                   isActiveSection && 'bg-primary/10 text-primary font-semibold'
                 )}
@@ -271,7 +293,7 @@ const SidebarContent = () => {
             </div>
             
             <ScrollArea className="flex-1 overflow-auto py-4">
-                <SidebarNav isCollapsed={isCollapsed} />
+                <SidebarNav isCollapsed={isCollapsed} tenant={tenant} />
             </ScrollArea>
         </div>
     )

@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Package } from 'lucide-react';
+import { Dialog } from '@/components/ui/dialog';
+import { PricingDialog } from '@/components/pricing-dialog';
 
 export function Header() {
   return (
@@ -13,6 +15,9 @@ export function Header() {
           </Link>
         </div>
         <nav className="flex flex-1 items-center space-x-4 justify-end">
+          <Dialog>
+            <PricingDialog trigger={<Button variant="ghost">Pricing</Button>} showPaymentMethods={false} />
+          </Dialog>
           <Button variant="ghost" asChild>
             <Link href="/sign-in">Log in</Link>
           </Button>

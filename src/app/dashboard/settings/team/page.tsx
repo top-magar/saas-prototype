@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldLabel, FieldContent } from "@/components/ui/field";
 import { Badge } from "@/components/ui/badge";
-import { PlusIcon, UserPlusIcon, EditIcon, Trash2Icon } from "lucide-react";
+import { UserPlusIcon, EditIcon, Trash2Icon } from "lucide-react";
 
 interface TeamMember {
   id: string;
@@ -91,7 +91,7 @@ export default function TeamMembersPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <h1 className="text-lg font-semibold md:text-2xl">Team Members</h1>
+      <h1 className="text-xl font-semibold md:text-2xl">Team Members</h1>
 
       <Card>
         <CardHeader>

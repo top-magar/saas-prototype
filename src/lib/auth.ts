@@ -27,11 +27,14 @@ export async function authorize(tenantId: string, allowedRoles: UserRole[]) {
       clerkUserId: user.id,
       tenantId: tenantId,
     },
+    include: {
+      tenant: true, // Include the tenant relation
+    },
   });
 
-  if (!dbUser) {
-    console.log(`[AUTHORIZE] Forbidden: User ${user.id} does not belong to tenant ${tenantId} in DB.`);
-    throw new Error('Forbidden: User does not belong to this tenant.');
+  if (!dbUser || !dbUser.tenant) {
+    console.log(`[AUTHORIZE] Forbidden: User ${user.id} does not belong to tenant ${tenantId} or tenant not found in DB.`);
+    throw new Error('Forbidden: User does not belong to this tenant or tenant not found.');
   }
 
   console.log(`[AUTHORIZE] User ${dbUser.clerkUserId} (DB ID: ${dbUser.id}) found. Role: ${dbUser.role}. Allowed roles: ${allowedRoles.join(', ')}`);

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client';
 
 import Link from 'next/link';
@@ -32,18 +33,16 @@ export function Hero() {
           Built for Businesses in Nepal
         </Badge>
       </motion.div>
-      <motion.h1
+              <motion.h1
+              variants={FADE_UP_ANIMATION_VARIANTS}
+              className="text-3xl md:text-5xl font-bold tracking-tight max-w-4xl"
+            >
+              {`Your Business`}&#39;s, Simplified. Powerful SaaS for Growth.
+            </motion.h1>      <motion.p
         variants={FADE_UP_ANIMATION_VARIANTS}
-        className="text-4xl md:text-6xl font-bold tracking-tight max-w-4xl"
+        className="mt-6 text-base text-muted-foreground max-w-2xl"
       >
-        The All-In-One Platform to Scale Your Business
-      </motion.h1>
-      <motion.p
-        variants={FADE_UP_ANIMATION_VARIANTS}
-        className="mt-6 text-lg text-muted-foreground max-w-2xl"
-      >
-        From inventory and orders to customers and analytics, manage every aspect
-        of your business with a single, powerful solution.
+        Effortlessly manage sales, inventory, and customer relationships. Gain insights to make smarter decisions and unlock your business's full potential.
       </motion.p>
       <motion.div
         variants={FADE_UP_ANIMATION_VARIANTS}

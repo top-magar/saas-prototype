@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { SearchIcon, PlayIcon, PauseIcon, EditIcon, ListChecksIcon, PlusIcon } from "lucide-react";
+import { SearchIcon, EditIcon, ListChecksIcon, PlusIcon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
 interface Workflow {
@@ -61,7 +61,7 @@ export default function WorkflowsPage() {
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold md:text-2xl">Workflows (Powered by Blaze)</h1>
+        <h1 className="text-xl font-semibold md:text-2xl">Workflows (Powered by Blaze)</h1>
         <Button>
           <PlusIcon className="mr-2 h-4 w-4" /> Create New Workflow
         </Button>

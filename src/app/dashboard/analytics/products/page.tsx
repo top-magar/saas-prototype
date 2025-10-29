@@ -27,7 +27,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Item, ItemGroup, ItemContent, ItemTitle, ItemDescription } from "@/components/ui/item";
 import { Progress } from "@/components/ui/progress";
 import { Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { PackageIcon } from "lucide-react";
 
 const productPerformanceData = [
   { month: "Jan", sales: 1200, units: 80 },
@@ -68,7 +67,7 @@ export default function ProductAnalyticsPage() {
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold md:text-2xl">Product Analytics</h1>
+        <h1 className="text-xl font-semibold md:text-2xl">Product Analytics</h1>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select a time range" />

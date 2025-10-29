@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel, FieldContent, FieldDescription } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function PlatformSettingsPage() {
@@ -35,7 +34,7 @@ export default function PlatformSettingsPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <h1 className="text-lg font-semibold md:text-2xl">Platform Settings</h1>
+      <h1 className="text-xl font-semibold md:text-2xl">Platform Settings</h1>
 
       <Card>
         <CardHeader>

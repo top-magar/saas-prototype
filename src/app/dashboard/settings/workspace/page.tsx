@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel, FieldContent, FieldDescription } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 
 export default function WorkspaceSettingsPage() {
   const [workspaceName, setWorkspaceName] = useState("My SaaS Workspace");
@@ -32,7 +31,7 @@ export default function WorkspaceSettingsPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <h1 className="text-lg font-semibold md:text-2xl">Workspace Settings</h1>
+      <h1 className="text-xl font-semibold md:text-2xl">Workspace Settings</h1>
 
       <Card>
         <CardHeader>

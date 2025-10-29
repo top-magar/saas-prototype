@@ -32,8 +32,8 @@ export function Features() {
   return (
     <section className="container py-20">
       <div className="text-center">
-        <h2 className="text-3xl font-bold tracking-tight">Everything You Need to Succeed</h2>
-        <p className="mt-2 text-lg text-muted-foreground">
+        <h2 className="text-2xl font-bold tracking-tight">Everything You Need to Succeed</h2>
+        <p className="mt-2 text-base text-muted-foreground">
           Powerful features designed to streamline your operations and fuel your growth.
         </p>
       </div>

@@ -1,11 +1,10 @@
 'use client';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { StatCard } from './_components/stat-card';
 import { OverviewChart } from './_components/overview-chart';
 import { RecentOrders } from './_components/recent-orders';
-import { Download, DollarSign, Users, CreditCard, AlertCircle, ShoppingCart, Package } from 'lucide-react';
+import { Download, DollarSign, Users, CreditCard, AlertCircle, Package } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -19,7 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { motion } from 'framer-motion';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 import { Pie, PieChart, Cell } from 'recharts';
-import { ButtonGroup, ButtonGroupText } from '@/components/ui/button-group';
+import { ButtonGroup } from '@/components/ui/button-group';
 
 interface ChartData {
   month: string;
@@ -162,8 +161,8 @@ export default function DashboardPage() {
     >
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Welcome, {user?.firstName} 👋</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-bold">Welcome, {user?.firstName} 👋</h1>
+          <p className="text-base text-muted-foreground">
             An overview of customer insights, sales performance, and revenue analytics.
           </p>
         </div>

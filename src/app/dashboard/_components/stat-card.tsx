@@ -19,7 +19,7 @@ export function StatCard({ title, value, icon, change, changeType }: StatCardPro
         {icon}
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        <div className="text-xl font-bold">{value}</div>
         <p className="text-xs text-muted-foreground flex items-center gap-1">
           <span className={cn('flex items-center gap-1', isIncrease ? 'text-green-500' : 'text-red-500')}>
             {isIncrease ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}

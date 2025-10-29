@@ -6,10 +6,9 @@ import { z } from 'zod';
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   description: z.string().optional(),
-  price: z.number().min(0, "Price must be a positive number"),
-  stock: z.number().min(0, "Stock must be a positive number"),
-  category: z.string().min(1, "Category is required"),
   imageUrl: z.string().url("Invalid image URL").optional().or(z.literal("")),
+  tags: z.array(z.string()).optional(),
+  status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).default("DRAFT"),
 });
 
 export async function GET(req: NextRequest) {
@@ -27,6 +26,22 @@ export async function GET(req: NextRequest) {
 
     const products = await prisma.product.findMany({
       where: { tenantId },
+      include: {
+        variants: {
+          include: {
+            optionValues: {
+              include: {
+                optionValue: true,
+              },
+            },
+          },
+        },
+        options: {
+          include: {
+            values: true,
+          },
+        },
+      },
     });
     return NextResponse.json(products);
   } catch (error) {
@@ -50,22 +65,16 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
-    const validatedData = productSchema.parse(body);
+    await authorize(tenantId, ['admin', 'manager']);
 
-    // Authorize the user to create products
-    await authorize(tenantId, ['admin', 'manager']); // Only admin/manager can create products
+    const body = await req.json();
+    const { name, description } = productSchema.parse(body);
 
     const product = await prisma.product.create({
       data: {
         tenantId,
-        name: validatedData.name,
-        description: validatedData.description,
-        price: validatedData.price,
-        stock: validatedData.stock,
-        category: validatedData.category,
-        imageUrl: validatedData.imageUrl || '/placeholder.svg', // Default image if not provided
-        status: validatedData.stock > 0 ? (validatedData.stock <= 10 ? "LOW_STOCK" : "IN_STOCK") : "OUT_OF_STOCK",
+        name,
+        description,
       },
     });
 
@@ -85,10 +94,10 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PATCH(req: NextRequest) {
+export async function PUT(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const tenantId = searchParams.get('tenantId');
-  const productId = searchParams.get('productId'); // Assuming productId is passed as a search param
+  const productId = searchParams.get('productId');
 
   if (!tenantId) {
     return new NextResponse('Tenant ID is required', { status: 400 });
@@ -98,22 +107,22 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
-    const validatedData = productSchema.partial().parse(body); // Use partial for PATCH
-
     await authorize(tenantId, ['admin', 'manager']);
+
+    const body = await req.json();
+    const { name, description } = productSchema.parse(body);
 
     const product = await prisma.product.update({
       where: { id: productId, tenantId },
       data: {
-        ...validatedData,
-        status: validatedData.stock !== undefined ? (validatedData.stock > 0 ? (validatedData.stock <= 10 ? "LOW_STOCK" : "IN_STOCK") : "OUT_OF_STOCK") : undefined,
+        name,
+        description,
       },
     });
 
     return NextResponse.json(product);
   } catch (error) {
-    console.error('[PRODUCTS_PATCH]', error);
+    console.error('[PRODUCTS_PUT]', error);
     if (error instanceof z.ZodError) {
       return new NextResponse(JSON.stringify(error.errors), { status: 400 });
     }
@@ -130,7 +139,7 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const tenantId = searchParams.get('tenantId');
-  const productId = searchParams.get('productId'); // Assuming productId is passed as a search param
+  const productId = searchParams.get('productId');
 
   if (!tenantId) {
     return new NextResponse('Tenant ID is required', { status: 400 });
@@ -142,8 +151,30 @@ export async function DELETE(req: NextRequest) {
   try {
     await authorize(tenantId, ['admin', 'manager']);
 
-    await prisma.product.delete({
-      where: { id: productId, tenantId },
+    // Delete product and its related data (variants, options, option values, variant option values)
+    // Prisma's cascade delete should handle most of this if configured in schema.prisma
+    // However, explicit deletion ensures all related records are removed.
+    await prisma.$transaction(async (tx) => {
+      // Delete ProductVariantOptionValue records first
+      await tx.productVariantOptionValue.deleteMany({
+        where: { variant: { productId: productId } },
+      });
+      // Delete ProductOptionValue records
+      await tx.productOptionValue.deleteMany({
+        where: { option: { productId: productId } },
+      });
+      // Delete ProductVariant records
+      await tx.productVariant.deleteMany({
+        where: { productId: productId },
+      });
+      // Delete ProductOption records
+      await tx.productOption.deleteMany({
+        where: { productId: productId },
+      });
+      // Finally, delete the Product
+      await tx.product.delete({
+        where: { id: productId, tenantId },
+      });
     });
 
     return new NextResponse(null, { status: 204 });

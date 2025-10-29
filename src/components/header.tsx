@@ -54,7 +54,7 @@ export const Header = () => {
                     <DropdownMenuItem onClick={() => router.push('/dashboard/settings/billing')}>Billing</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => router.push('/dashboard/settings/workspace')}>Settings</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => signOut(() => router.push('/'))}>Logout</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => signOut()}>Logout</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
             </div>
