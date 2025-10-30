@@ -10,14 +10,14 @@ import { SidebarInput } from "@/components/ui/sidebar"
 
 export function SidebarOptInForm() {
   return (
-    <Card className="gap-2 py-4 shadow-none">
-      <CardHeader className="px-4">
+    <Card className="gap-1 py-4 shadow-none mr-4 ml-4 mb-4 border-sidebar-border bg-sidebar-background">
+      <CardHeader className="">
         <CardTitle className="text-sm">Subscribe to our newsletter</CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs">
           Opt-in to receive updates and news about the sidebar.
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-4">
+      <CardContent className="">
         <form>
           <div className="grid gap-2.5">
             <SidebarInput type="email" placeholder="Email" />

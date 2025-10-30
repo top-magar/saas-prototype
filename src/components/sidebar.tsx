@@ -19,6 +19,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Separator } from '@/components/ui/separator';
+import { SidebarOptInForm } from './sidebar-opt-in-form';
 
 
 import { NavItem, NavSection } from '@/lib/navigation';
@@ -29,7 +30,7 @@ import { TenantTier } from '@/lib/types';
 
 
 const sidebarStrings = {
-  platformName: "SaaS Platform",
+  platformName: "Pasaal.io",
   freeTier: "FREE",
   betaBadge: "Beta",
 };
@@ -266,7 +267,7 @@ const SidebarContent = () => {
                         <Package className="h-4 w-4" />
                     </div>
                     {!isCollapsed && (
-                        <span className="truncate">
+                        <span className="truncate uppercase font-bold">
                             {sidebarStrings.platformName}
                         </span>
                     )}
@@ -277,6 +278,7 @@ const SidebarContent = () => {
             <ScrollArea className="flex-1 overflow-auto py-4">
                 <SidebarNav isCollapsed={isCollapsed} />
             </ScrollArea>
+            {!isCollapsed && <SidebarOptInForm className="mt-4 mb-4" />}
         </div>
     )
 }
