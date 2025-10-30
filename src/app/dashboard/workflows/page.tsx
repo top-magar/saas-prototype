@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { SearchIcon, EditIcon, ListChecksIcon, PlusIcon } from "lucide-react";
+import { Search, Pencil, ListChecks, Plus } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
 interface Workflow {
@@ -63,12 +63,11 @@ export default function WorkflowsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">Workflows (Powered by Blaze)</h1>
         <Button>
-          <PlusIcon className="mr-2 h-4 w-4" /> Create New Workflow
-        </Button>
+                      <Plus className="mr-2 h-4 w-4" /> Create New Workflow        </Button>
       </div>
 
       <div className="relative">
-        <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search workflows..."
           className="pl-9"
@@ -104,10 +103,10 @@ export default function WorkflowsPage() {
               </div>
               <div className="flex justify-end gap-2 mt-4">
                 <Button variant="outline" size="icon-sm" onClick={() => handleEditWorkflow(workflow.id)}>
-                  <EditIcon className="h-4 w-4" />
+                  <Pencil className="h-4 w-4" />
                 </Button>
                 <Button variant="outline" size="icon-sm" onClick={() => handleViewRuns(workflow.id)}>
-                  <ListChecksIcon className="h-4 w-4" />
+                  <ListChecks className="h-4 w-4" />
                 </Button>
               </div>
             </CardContent>

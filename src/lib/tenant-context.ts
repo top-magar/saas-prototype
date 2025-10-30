@@ -1,9 +1,11 @@
 import { createContext, useContext } from 'react';
+import { TenantTier } from './types';
 
 export interface Tenant {
   id: string;
   name: string;
   subdomain: string;
+  tier: TenantTier;
 }
 
 export interface TenantContextType {

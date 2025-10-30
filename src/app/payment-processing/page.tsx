@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 export default function PaymentProcessingPage() {
   const searchParams = useSearchParams();
@@ -17,7 +17,7 @@ export default function PaymentProcessingPage() {
       <Card className="w-full max-w-md text-center">
         <CardHeader>
           {isSuccess ? (
-            <CheckCircle2 className="mx-auto h-16 w-16 text-green-500" />
+            <CheckCircle className="mx-auto h-16 w-16 text-green-500" />
           ) : (
             <XCircle className="mx-auto h-16 w-16 text-yellow-500" />
           )}

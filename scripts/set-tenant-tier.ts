@@ -29,7 +29,7 @@ async function main() {
     }
 
     await prisma.tenant.update({
-      where: { id: user.tenantId },
+      where: { id: user.tenantId! },
       data: { tier: newTier as TenantTier },
     });
 

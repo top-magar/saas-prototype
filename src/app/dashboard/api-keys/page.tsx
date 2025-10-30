@@ -28,7 +28,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { CopyIcon, PlusIcon, Trash2Icon, EditIcon } from "lucide-react";
+import { Copy, Plus, Trash, Pencil } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Field, FieldLabel, FieldContent } from "@/components/ui/field";
 
@@ -111,7 +111,7 @@ export default function ApiKeysPage() {
         <Dialog>
           <DialogTrigger asChild>
             <Button>
-              <PlusIcon className="mr-2 h-4 w-4" /> Generate New Key
+              <Plus className="mr-2 h-4 w-4" /> Generate New Key
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -146,7 +146,7 @@ export default function ApiKeysPage() {
                             className="absolute right-1 top-1/2 -translate-y-1/2"
                             onClick={() => copyToClipboard(generatedKey)}
                           >
-                            <CopyIcon className="h-4 w-4" />
+                            <Copy className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>Copy to clipboard</TooltipContent>
@@ -206,7 +206,7 @@ export default function ApiKeysPage() {
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="outline" size="icon-sm" disabled={key.status === "Revoked"}>
-                        <EditIcon className="h-4 w-4" />
+                        <Pencil className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="destructive"
@@ -214,7 +214,7 @@ export default function ApiKeysPage() {
                         onClick={() => revokeKey(key.id)}
                         disabled={key.status === "Revoked"}
                       >
-                        <Trash2Icon className="h-4 w-4" />
+                        <Trash className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>

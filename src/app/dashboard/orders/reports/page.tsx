@@ -25,7 +25,7 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { Bar, BarChart, Line, LineChart, Pie, PieChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts";
-import { DownloadIcon } from "lucide-react";
+import { Download } from "lucide-react";
 
 const salesByProductData = [
   { product: "Laptop", sales: 50000 },
@@ -216,7 +216,7 @@ export default function OrderReportsPage() {
 
       <div className="flex justify-end">
         <Button variant="outline">
-          <DownloadIcon className="mr-2 h-4 w-4" /> Export Report
+          <Download className="mr-2 h-4 w-4" /> Export Report
         </Button>
       </div>
     </div>

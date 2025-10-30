@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { SearchIcon, PlugIcon, SettingsIcon, PowerOffIcon } from "lucide-react";
+import { Search, Plus, Settings, LogOut } from "lucide-react";
 import { ItemMedia } from "@/components/ui/item"; // Assuming ItemMedia can be used standalone or with ItemGroup
 
 interface Integration {
@@ -28,35 +28,35 @@ const allIntegrations: Integration[] = [
     name: "Stripe",
     description: "Process payments and manage subscriptions.",
     status: "Connected",
-    icon: PlugIcon,
+    icon: Plus,
   },
   {
     id: "2",
     name: "Mailchimp",
     description: "Sync customer data for email marketing campaigns.",
     status: "Disconnected",
-    icon: PlugIcon,
+    icon: Plus,
   },
   {
     id: "3",
     name: "Slack",
     description: "Receive notifications about important events.",
     status: "Config Required",
-    icon: PlugIcon,
+    icon: Plus,
   },
   {
     id: "4",
     name: "Google Analytics",
     description: "Track website traffic and user behavior.",
     status: "Connected",
-    icon: PlugIcon,
+    icon: Plus,
   },
   {
     id: "5",
     name: "Zapier",
     description: "Automate workflows between your apps.",
     status: "Disconnected",
-    icon: PlugIcon,
+    icon: Plus,
   },
 ];
 
@@ -92,7 +92,7 @@ export default function IntegrationsPage() {
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <h1 className="text-xl font-semibold md:text-2xl">Integrations</h1>
       <div className="relative">
-        <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search integrations..."
           className="pl-9"
@@ -129,10 +129,10 @@ export default function IntegrationsPage() {
                 {integration.status === "Connected" && (
                   <>
                     <Button variant="outline" size="icon-sm" onClick={() => handleConfigure(integration.id)}>
-                      <SettingsIcon className="h-4 w-4" />
+                      <Settings className="h-4 w-4" />
                     </Button>
                     <Button variant="destructive" size="icon-sm" onClick={() => handleDisconnect(integration.id)}>
-                      <PowerOffIcon className="h-4 w-4" />
+                      <LogOut className="h-4 w-4" />
                     </Button>
                   </>
                 )}

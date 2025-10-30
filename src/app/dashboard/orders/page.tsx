@@ -34,7 +34,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { SearchIcon } from "lucide-react";
+import { Search } from "lucide-react";
 
 interface Order {
   id: string;
@@ -90,7 +90,7 @@ export default function OrdersPage() {
         <CardContent>
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
             <div className="relative w-full md:w-1/3">
-              <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search orders..."
                 className="pl-9"
@@ -155,8 +155,8 @@ export default function OrdersPage() {
           <Pagination className="mt-4">
             <PaginationContent>
               <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
+                onClick={currentPage === 1 ? undefined : () => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                className={currentPage === 1 ? "opacity-50 pointer-events-none" : ""}
               />
               {Array.from({ length: totalPages }, (_, i) => (
                 <PaginationItem key={i + 1}>
@@ -169,8 +169,8 @@ export default function OrdersPage() {
                 </PaginationItem>
               ))}
               <PaginationNext
-                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
+                onClick={currentPage === totalPages ? undefined : () => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                className={currentPage === totalPages ? "opacity-50 pointer-events-none" : ""}
               />
             </PaginationContent>
           </Pagination>

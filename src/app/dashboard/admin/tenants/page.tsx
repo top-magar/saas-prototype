@@ -34,7 +34,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { SearchIcon, EyeIcon, BanIcon, CheckCircleIcon } from "lucide-react";
+import { Search, Eye, Ban, CheckCircle } from "lucide-react";
 
 interface Tenant {
   id: string;
@@ -101,7 +101,7 @@ export default function AllTenantsPage() {
         <CardContent>
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
             <div className="relative w-full md:w-1/3">
-              <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search tenants..."
                 className="pl-9"
@@ -156,15 +156,15 @@ export default function AllTenantsPage() {
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="outline" size="icon-sm" onClick={() => handleViewDetails(tenant.id)}>
-                        <EyeIcon className="h-4 w-4" />
+                        <Eye className="h-4 w-4" />
                       </Button>
                       {tenant.status === "Active" ? (
                         <Button variant="destructive" size="icon-sm" onClick={() => handleSuspendTenant(tenant.id)}>
-                          <BanIcon className="h-4 w-4" />
+                          <Ban className="h-4 w-4" />
                         </Button>
                       ) : (
                         <Button variant="default" size="icon-sm" onClick={() => handleActivateTenant(tenant.id)}>
-                          <CheckCircleIcon className="h-4 w-4" />
+                          <CheckCircle className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
@@ -177,8 +177,8 @@ export default function AllTenantsPage() {
           <Pagination className="mt-4">
             <PaginationContent>
               <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
+                onClick={currentPage === 1 ? undefined : () => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                className={currentPage === 1 ? "opacity-50 pointer-events-none" : ""}
               />
               {Array.from({ length: totalPages }, (_, i) => (
                 <PaginationItem key={i + 1}>
@@ -191,8 +191,8 @@ export default function AllTenantsPage() {
                 </PaginationItem>
               ))}
               <PaginationNext
-                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
+                onClick={currentPage === totalPages ? undefined : () => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                className={currentPage === totalPages ? "opacity-50 pointer-events-none" : ""}
               />
             </PaginationContent>
           </Pagination>

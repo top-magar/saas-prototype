@@ -22,10 +22,11 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
-import { Banknote, Check, CreditCard, Wallet } from "lucide-react";
+import { Banknote, Check, CreditCard, DollarSign } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
 import { toast } from "sonner";
+import { TenantTier } from "@/lib/types";
 
 const pricingTiers = [
   {
@@ -85,11 +86,11 @@ const pricingTiers = [
 
 type PricingDialogProps = {
   trigger: React.ReactNode;
-  currentPlan?: "FREE" | "STARTER" | "PRO" | "ENTERPRISE"; // Use enum values
+  currentPlan?: TenantTier; // Use enum values
   showPaymentMethods?: boolean;
 };
 
-export function PricingDialog({ trigger, currentPlan = "FREE", showPaymentMethods = false }: PricingDialogProps) {
+export function PricingDialog({ trigger, currentPlan = TenantTier.FREE, showPaymentMethods = false }: PricingDialogProps) {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("esewa");
   const { isSignedIn } = useUser();
   const router = useRouter();
@@ -150,7 +151,7 @@ export function PricingDialog({ trigger, currentPlan = "FREE", showPaymentMethod
                 onValueChange={setSelectedPaymentMethod}
                 className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-md"
               >
-                <PaymentMethodRadio id="esewa" value="esewa" icon={Wallet} label="eSewa" />
+                <PaymentMethodRadio id="esewa" value="esewa" icon={DollarSign} label="eSewa" />
                 <PaymentMethodRadio id="khalti" value="khalti" icon={CreditCard} label="Khalti" />
                 <PaymentMethodRadio id="fonepay" value="fonepay" icon={Banknote} label="Fonepay" />
               </RadioGroup>

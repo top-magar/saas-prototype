@@ -1,27 +1,27 @@
+
 import {
-  BarChart2,
+  BarChart,
   LayoutDashboard,
   Package,
-  ShoppingCart,
+  Briefcase,
   Workflow,
-  Key,
-  Plug,
-  Boxes,
-  ListTree,
-  UploadCloud,
+  Keyboard,
+  Plus,
+  Archive,
+  List,
+  Upload,
   CreditCard,
-  ShieldCheck,
-  UsersRound,
-  Settings2,
-  DollarSign,
-  User,
-  FileStack,
-  ClipboardList,
-  Receipt,
-  FileBarChart,
+  Check,
   Users,
   Settings,
+  ArrowUp,
+  User,
+  Layers,
+  Clipboard,
+  BookOpen,
 } from 'lucide-react';
+
+import { navigationStrings } from "./i18n/en";
 
 export type NavItem = {
   name: string;
@@ -45,60 +45,60 @@ export type NavSection = {
 // Main navigation for all users
 export const navigationConfig: NavSection[] = [
   {
-    title: 'Dashboard',
+    title: navigationStrings.dashboard,
     icon: LayoutDashboard,
     items: [
-      { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-      { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart2 },
-      { name: 'Revenue', href: '/dashboard/analytics/revenue', tiers: ['PRO', 'ENTERPRISE'], icon: DollarSign },
-      { name: 'Customer Insights', href: '/dashboard/analytics/customers', tiers: ['PRO', 'ENTERPRISE'], icon: User },
-      { name: 'Product Analytics', href: '/dashboard/analytics/products', tiers: ['PRO', 'ENTERPRISE'], icon: Package },
-      { name: 'Custom Reports', href: '/dashboard/analytics/custom-reports', tiers: ['PRO', 'ENTERPRISE'], icon: FileStack },
+      { name: navigationStrings.overview, href: '/dashboard', icon: LayoutDashboard },
+      { name: navigationStrings.analytics, href: '/dashboard/analytics', icon: BarChart },
+      { name: navigationStrings.revenue, href: '/dashboard/analytics/revenue', tiers: ['PRO', 'ENTERPRISE'], icon: ArrowUp },
+      { name: navigationStrings.customerInsights, href: '/dashboard/analytics/customers', tiers: ['PRO', 'ENTERPRISE'], icon: User },
+      { name: navigationStrings.productAnalytics, href: '/dashboard/analytics/products', tiers: ['PRO', 'ENTERPRISE'], icon: Package },
+      { name: navigationStrings.customReports, href: '/dashboard/analytics/custom-reports', tiers: ['PRO', 'ENTERPRISE'], icon: Layers },
     ],
   },
   {
-    title: 'Products',
+    title: navigationStrings.products,
     icon: Package,
     items: [
-      { name: 'All Products', href: '/dashboard/products', icon: Boxes },
-      { name: 'Categories', href: '/dashboard/products/categories', icon: ListTree },
-      { name: 'Inventory', href: '/dashboard/products/inventory', dynamicBadgeKey: 'lowStockProducts', icon: Package },
-      { name: 'Import/Export', href: '/dashboard/products/import-export', tiers: ['PRO', 'ENTERPRISE'], icon: UploadCloud },
+      { name: navigationStrings.allProducts, href: '/dashboard/products', icon: Archive },
+      { name: navigationStrings.categories, href: '/dashboard/products/categories', icon: List },
+      { name: navigationStrings.inventory, href: '/dashboard/products/inventory', dynamicBadgeKey: 'lowStockProducts', icon: Package },
+      { name: navigationStrings.importExport, href: '/dashboard/products/import-export', tiers: ['PRO', 'ENTERPRISE'], icon: Upload },
     ],
   },
   {
-    title: 'Orders',
-    icon: ShoppingCart,
+    title: navigationStrings.orders,
+    icon: Briefcase,
     items: [
-      { name: 'All Orders', href: '/dashboard/orders', icon: ClipboardList },
-      { name: 'Invoices', href: '/dashboard/orders/invoices', tiers: ['PRO', 'ENTERPRISE'], icon: Receipt },
-      { name: 'Reports', href: '/dashboard/orders/reports', tiers: ['PRO', 'ENTERPRISE'], icon: FileBarChart },
+      { name: navigationStrings.allOrders, href: '/dashboard/orders', icon: Clipboard },
+      { name: navigationStrings.invoices, href: '/dashboard/orders/invoices', tiers: ['PRO', 'ENTERPRISE'], icon: BookOpen },
+      { name: navigationStrings.reports, href: '/dashboard/orders/reports', tiers: ['PRO', 'ENTERPRISE'], icon: BarChart },
     ],
   },
   {
-    title: 'Customers',
-    icon: Users,
+    title: navigationStrings.customers,
+    icon: User,
     href: '/dashboard/customers',
   },
   {
-    title: 'Automation',
+    title: navigationStrings.automation,
     icon: Workflow,
     items: [
-      { name: 'Workflows', href: '/dashboard/workflows', badge: 'Beta', tiers: ['PRO', 'ENTERPRISE'], icon: Workflow },
-      { name: 'Webhooks', href: '/dashboard/webhooks', tiers: ['PRO', 'ENTERPRISE'], icon: Plug },
-      { name: 'API Keys', href: '/dashboard/api-keys', tiers: ['PRO', 'ENTERPRISE'], icon: Key },
-      { name: 'Integrations', href: '/dashboard/integrations', tiers: ['PRO', 'ENTERPRISE'], icon: CreditCard },
+      { name: navigationStrings.workflows, href: '/dashboard/workflows', badge: navigationStrings.beta, tiers: ['PRO', 'ENTERPRISE'], icon: Workflow },
+      { name: navigationStrings.webhooks, href: '/dashboard/webhooks', tiers: ['PRO', 'ENTERPRISE'], icon: Plus },
+      { name: navigationStrings.apiKeys, href: '/dashboard/api-keys', tiers: ['PRO', 'ENTERPRISE'], icon: Keyboard },
+      { name: navigationStrings.integrations, href: '/dashboard/integrations', tiers: ['PRO', 'ENTERPRISE'], icon: CreditCard },
     ],
   },
   {
-    title: 'Settings',
+    title: navigationStrings.settings,
     icon: Settings,
     items: [
-      { name: 'Workspace', href: '/dashboard/settings/workspace', icon: Settings },
-      { name: 'Billing', href: '/dashboard/settings/billing', icon: CreditCard },
-      { name: 'Permissions', href: '/dashboard/settings/permissions', roles: ['admin'], tiers: ['PRO', 'ENTERPRISE'], icon: ShieldCheck },
-      { name: 'Team', href: '/dashboard/settings/team', roles: ['admin', 'manager'], tiers: ['PRO', 'ENTERPRISE'], icon: UsersRound },
-      { name: 'Profile', href: '/dashboard/settings/profile', icon: User },
+      { name: navigationStrings.workspace, href: '/dashboard/settings/workspace', icon: Settings },
+      { name: navigationStrings.billing, href: '/dashboard/settings/billing', icon: CreditCard },
+      { name: navigationStrings.permissions, href: '/dashboard/settings/permissions', roles: ['admin'], tiers: ['PRO', 'ENTERPRISE'], icon: Check },
+      { name: navigationStrings.team, href: '/dashboard/settings/team', roles: ['admin', 'manager'], tiers: ['PRO', 'ENTERPRISE'], icon: Users },
+      { name: navigationStrings.profile, href: '/dashboard/settings/profile', icon: User },
     ],
   },
 ];
@@ -106,13 +106,13 @@ export const navigationConfig: NavSection[] = [
 // Navigation specific to admin users
 export const adminNavigationConfig: NavSection[] = [
   {
-    title: 'Admin',
-    icon: Users,
+    title: navigationStrings.admin,
+    icon: User,
     roles: ['admin'],
     items: [
-      { name: 'All Tenants', href: '/dashboard/admin/tenants', roles: ['admin'], icon: UsersRound },
-      { name: 'System Logs', href: '/dashboard/admin/logs', roles: ['admin'], icon: ClipboardList },
-      { name: 'Platform Settings', href: '/dashboard/admin/settings', roles: ['admin'], icon: Settings2 },
+      { name: navigationStrings.allTenants, href: '/dashboard/admin/tenants', roles: ['admin'], icon: Users },
+      { name: navigationStrings.systemLogs, href: '/dashboard/admin/logs', roles: ['admin'], icon: Clipboard },
+      { name: navigationStrings.platformSettings, href: '/dashboard/admin/settings', roles: ['admin'], icon: Settings },
     ],
   },
 ];

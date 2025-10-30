@@ -26,7 +26,7 @@ import {
 import { Item, ItemGroup, ItemMedia, ItemContent, ItemTitle, ItemDescription } from "@/components/ui/item";
 import { Badge } from "@/components/ui/badge";
 import { Pie, PieChart, Cell } from "recharts";
-import { UserIcon, ShoppingCartIcon, RefreshCcwIcon } from "lucide-react";
+import { User, ShoppingCart, RefreshCcw } from "lucide-react";
 
 const customerSegmentationData = [
   { name: "New Customers", value: 400, color: "hsl(var(--chart-1))" },
@@ -55,10 +55,10 @@ const customerSegmentationConfig = {
 };
 
 const recentActivities = [
-  { id: 1, customer: "Alice Smith", activity: "Placed new order", time: "2 hours ago", icon: ShoppingCartIcon },
-  { id: 2, customer: "Bob Johnson", activity: "Signed up for newsletter", time: "1 day ago", icon: UserIcon },
-  { id: 3, customer: "Charlie Brown", activity: "Renewed subscription", time: "3 days ago", icon: RefreshCcwIcon },
-  { id: 4, customer: "Diana Prince", activity: "Viewed product page", time: "5 days ago", icon: UserIcon },
+  { id: 1, customer: "Alice Smith", activity: "Placed new order", time: "2 hours ago", icon: ShoppingCart },
+  { id: 2, customer: "Bob Johnson", activity: "Signed up for newsletter", time: "1 day ago", icon: User },
+  { id: 3, customer: "Charlie Brown", activity: "Renewed subscription", time: "3 days ago", icon: RefreshCcw },
+  { id: 4, customer: "Diana Prince", activity: "Viewed product page", time: "5 days ago", icon: User },
 ];
 
 export default function CustomerAnalyticsPage() {

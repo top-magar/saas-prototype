@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('[CATEGORIES_POST]', error);
     if (error instanceof z.ZodError) {
-      return new NextResponse(JSON.stringify(error.errors), { status: 400 });
+      return new NextResponse(JSON.stringify(error.issues), { status: 400 });
     }
     if (error instanceof Error && error.message.startsWith('Forbidden')) {
         return new NextResponse(error.message, { status: 403 });
@@ -102,7 +102,7 @@ export async function PATCH(req: NextRequest) {
   } catch (error) {
     console.error('[CATEGORIES_PATCH]', error);
     if (error instanceof z.ZodError) {
-      return new NextResponse(JSON.stringify(error.errors), { status: 400 });
+      return new NextResponse(JSON.stringify(error.issues), { status: 400 });
     }
     if (error instanceof Error && error.message.startsWith('Forbidden')) {
         return new NextResponse(error.message, { status: 403 });

@@ -67,7 +67,7 @@ export async function POST(req: Request) {
 
     try {
       // Update user's publicMetadata with companyName and subdomain
-      await clerkClient.users.updateUserMetadata(id, {
+      await (await clerkClient()).users.updateUserMetadata(id, {
         publicMetadata: {
           companyName,
           subdomain,

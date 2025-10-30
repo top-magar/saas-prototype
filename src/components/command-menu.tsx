@@ -36,7 +36,7 @@ export const CommandMenu = () => {
     const items: (NavItem & { sectionTitle?: string })[] = [];
     [...navigationConfig, ...adminNavigationConfig].forEach(section => {
       if (section.href) {
-        items.push({ ...section, name: section.title, sectionTitle: section.title });
+        items.push({ ...section, name: section.title, sectionTitle: section.title, href: section.href! });
       } else if (section.items) {
         section.items.forEach(item => items.push({ ...item, sectionTitle: section.title }));
       }

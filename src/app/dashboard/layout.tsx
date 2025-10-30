@@ -5,13 +5,16 @@ import { useEffect, useState } from 'react';
 import { SignedIn } from "@clerk/nextjs";
 import { TenantProvider } from "@/components/TenantProvider";
 import { useTenant } from "@/lib/tenant-context";
-import { Sidebar } from "@/components/sidebar";
-import { Header } from '@/components/header';
+import dynamic from 'next/dynamic';
+
+const Sidebar = dynamic(() => import("@/components/sidebar").then(mod => mod.Sidebar), { ssr: false });
+const Header = dynamic(() => import('@/components/header').then(mod => mod.Header), { ssr: false });
+
 import { useSidebarStore } from "@/hooks/use-sidebar-store";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { MenuIcon } from "lucide-react";
+import { Menu } from "lucide-react";
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { tenant, isLoading } = useTenant();
@@ -34,7 +37,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-muted/40">
+    <div className="flex min-h-screen bg-muted/40 relative">
       {/* Desktop Sidebar */}
       <div className="hidden md:block">
         <Sidebar />
@@ -44,7 +47,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetTrigger asChild className="md:hidden fixed top-4 left-4 z-40">
           <Button variant="outline" size="icon">
-            <MenuIcon className="h-5 w-5" />
+            <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="p-0 w-64">
@@ -52,14 +55,16 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </SheetContent>
       </Sheet>
 
+
+
       <div className={cn(
         "flex flex-col flex-1 transition-all duration-300 ease-in-out h-screen overflow-hidden",
-        isCollapsed ? "md:ml-20" : "md:ml-64",
+        isCollapsed ? "md:ml-[81px]" : "md:ml-[257px]",
         "ml-0" // Reset ml for mobile, handled by sheet
       )}>
         <Header />
-        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto scroll-smooth">
-            <div className="container mx-auto py-8">
+        <main className="flex-1 overflow-auto scroll-smooth">
+            <div className="container mx-auto py-8 px-4 md:px-6 lg:px-8">
                 {children}
             </div>
         </main>

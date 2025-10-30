@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { StatCard } from './_components/stat-card';
 import { OverviewChart } from './_components/overview-chart';
 import { RecentOrders } from './_components/recent-orders';
-import { Download, DollarSign, Users, CreditCard, AlertCircle, Package } from 'lucide-react';
+import { Download, ArrowUp, User, CreditCard, AlertTriangle, Package } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -206,7 +206,7 @@ export default function DashboardPage() {
               <StatCard
                 title="Total Sales"
                 value={data.stats.totalSales.toLocaleString()}
-                icon={<DollarSign className="h-5 w-5 text-muted-foreground" />}
+                icon={<ArrowUp className="h-5 w-5 text-muted-foreground" />}
                 change={20.1}
                 changeType={'increase'}
               />
@@ -224,7 +224,7 @@ export default function DashboardPage() {
               <StatCard
                 title="Active Customers"
                 value={data.stats.activeCustomers.toLocaleString()}
-                icon={<Users className="h-5 w-5 text-muted-foreground" />}
+                icon={<User className="h-5 w-5 text-muted-foreground" />}
                 change={10.2}
                 changeType={'increase'}
               />
@@ -233,7 +233,7 @@ export default function DashboardPage() {
               <StatCard
                 title="Refund Requests"
                 value={data.stats.refundRequests.toLocaleString()}
-                icon={<AlertCircle className="h-5 w-5 text-muted-foreground" />}
+                icon={<AlertTriangle className="h-5 w-5 text-muted-foreground" />}
                 change={5.0}
                 changeType={'decrease'}
               />

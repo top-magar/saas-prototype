@@ -31,37 +31,70 @@ async function main() {
   });
 
   // Create demo products
-  const products = [
+  const productsData = [
     {
-      name: 'Laptop Computer',
-      sku: 'LAPTOP-001',
-      price: 50000,
-      quantity: 5,
-      category: 'Electronics',
+      product: {
+        name: 'Laptop Computer',
+        description: 'Powerful laptop for all your computing needs.',
+        imageUrl: '/images/laptop.jpg',
+        tags: ['electronics', 'computer'],
+        status: 'PUBLISHED',
+      },
+      variant: {
+        sku: 'LAPTOP-001',
+        price: 50000,
+        quantity: 5,
+      },
     },
     {
-      name: 'Wireless Mouse',
-      sku: 'MOUSE-001',
-      price: 1500,
-      quantity: 50,
-      category: 'Accessories',
+      product: {
+        name: 'Wireless Mouse',
+        description: 'Ergonomic wireless mouse.',
+        imageUrl: '/images/mouse.jpg',
+        tags: ['accessories', 'computer'],
+        status: 'PUBLISHED',
+      },
+      variant: {
+        sku: 'MOUSE-001',
+        price: 1500,
+        quantity: 50,
+      },
     },
     {
-      name: 'USB-C Cable',
-      sku: 'CABLE-001',
-      price: 800,
-      quantity: 100,
-      category: 'Accessories',
+      product: {
+        name: 'USB-C Cable',
+        description: 'High-speed USB-C charging and data cable.',
+        imageUrl: '/images/cable.jpg',
+        tags: ['accessories', 'cables'],
+        status: 'PUBLISHED',
+      },
+      variant: {
+        sku: 'CABLE-001',
+        price: 800,
+        quantity: 100,
+      },
     },
   ];
 
-  for (const product of products) {
-    await prisma.product.upsert({
-      where: { tenantId_sku: { tenantId: tenant.id, sku: product.sku } },
-      update: {},
-      create: {
+  for (const item of productsData) {
+    const product = await prisma.product.create({
+      data: {
         tenantId: tenant.id,
-        ...product,
+        name: item.product.name,
+        description: item.product.description,
+        imageUrl: item.product.imageUrl,
+        tags: item.product.tags,
+        status: item.product.status,
+      },
+    });
+
+    await prisma.productVariant.create({
+      data: {
+        productId: product.id,
+        name: `${item.product.name} - ${item.variant.sku}`,
+        sku: item.variant.sku,
+        price: item.variant.price,
+        quantity: item.variant.quantity,
       },
     });
   }
@@ -69,7 +102,7 @@ async function main() {
   console.log('✅ Database seeded with demo data!');
   console.log(`Tenant: ${tenant.name} (${tenant.subdomain})`);
   console.log(`User: ${user.email}`);
-  console.log(`Products: ${products.length}`);
+  console.log(`Products: ${productsData.length}`);
 }
 
 main()

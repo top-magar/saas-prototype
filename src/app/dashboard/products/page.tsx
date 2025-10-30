@@ -41,7 +41,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SearchIcon, PlusIcon, MoreHorizontalIcon } from "lucide-react";
+import { Search, Plus, MoreHorizontal } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useTenant } from "@/lib/tenant-context";
@@ -68,7 +68,7 @@ export default function ProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchProducts = useCallback(async () => {
@@ -118,7 +118,7 @@ export default function ProductsPage() {
     }
   };
 
-  const handleOpenDialog = (product: Product | null) => {
+  const handleOpenDialog = (product: Product | undefined) => {
     setEditingProduct(product);
     setIsDialogOpen(true);
   };
@@ -183,8 +183,8 @@ export default function ProductsPage() {
                   You haven&apos;t added any products yet. Click the button below to add your first product.
                 </EmptyDescription>
               </EmptyHeader>
-              <Button onClick={() => handleOpenDialog(null)}>
-                <PlusIcon className="mr-2 h-4 w-4" /> Add Product
+              <Button onClick={() => handleOpenDialog(undefined)}>
+                <Plus className="mr-2 h-4 w-4" /> Add Product
               </Button>
             </Empty>
           </CardContent>
@@ -197,8 +197,8 @@ export default function ProductsPage() {
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
-        <Button onClick={() => handleOpenDialog(null)}>
-          <PlusIcon className="mr-2 h-4 w-4" /> Add Product
+        <Button onClick={() => handleOpenDialog(undefined)}>
+          <Plus className="mr-2 h-4 w-4" /> Add Product
         </Button>
       </div>
 
@@ -210,7 +210,7 @@ export default function ProductsPage() {
         <CardContent>
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
             <div className="relative w-full md:w-1/3">
-              <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search products..."
                 className="pl-9"
@@ -236,7 +236,7 @@ export default function ProductsPage() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline">
                       Bulk Actions ({selectedProducts.length})
-                      <MoreHorizontalIcon className="ml-2 h-4 w-4" />
+                      <MoreHorizontal className="ml-2 h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -297,7 +297,7 @@ export default function ProductsPage() {
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
                           <span className="sr-only">Open menu</span>
-                          <MoreHorizontalIcon className="h-4 w-4" />
+                          <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -315,8 +315,8 @@ export default function ProductsPage() {
           <Pagination className="mt-4">
             <PaginationContent>
               <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
+                onClick={currentPage === 1 ? undefined : () => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                className={currentPage === 1 ? "opacity-50 pointer-events-none" : ""}
               />
               {Array.from({ length: totalPages }, (_, i) => (
                 <PaginationItem key={i + 1}>
@@ -329,8 +329,8 @@ export default function ProductsPage() {
                 </PaginationItem>
               ))}
               <PaginationNext
-                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
+                onClick={currentPage === totalPages ? undefined : () => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                className={currentPage === totalPages ? "opacity-50 pointer-events-none" : ""}
               />
             </PaginationContent>
           </Pagination>

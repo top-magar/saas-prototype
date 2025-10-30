@@ -80,9 +80,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
-    console.error('[PRODUCTS_POST]', error);
     if (error instanceof z.ZodError) {
-      return new NextResponse(JSON.stringify(error.errors), { status: 400 });
+      return new NextResponse(JSON.stringify(error.issues), { status: 400 });
     }
     if (error instanceof Error && error.message.startsWith('Forbidden')) {
         return new NextResponse(error.message, { status: 403 });
@@ -124,7 +123,7 @@ export async function PUT(req: NextRequest) {
   } catch (error) {
     console.error('[PRODUCTS_PUT]', error);
     if (error instanceof z.ZodError) {
-      return new NextResponse(JSON.stringify(error.errors), { status: 400 });
+      return new NextResponse(JSON.stringify(error.issues), { status: 400 });
     }
     if (error instanceof Error && error.message.startsWith('Forbidden')) {
         return new NextResponse(error.message, { status: 403 });

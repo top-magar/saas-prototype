@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldLabel, FieldContent } from "@/components/ui/field";
 import { Badge } from "@/components/ui/badge";
-import { UserPlusIcon, EditIcon, Trash2Icon } from "lucide-react";
+import { UserPlus, Pencil, Trash } from "lucide-react";
 
 interface TeamMember {
   id: string;
@@ -103,7 +103,7 @@ export default function TeamMembersPage() {
             <Dialog>
               <DialogTrigger asChild>
                 <Button>
-                  <UserPlusIcon className="mr-2 h-4 w-4" /> Invite Member
+                  <UserPlus className="mr-2 h-4 w-4" /> Invite Member
                 </Button>
               </DialogTrigger>
               <DialogContent>
@@ -186,14 +186,14 @@ export default function TeamMembersPage() {
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="outline" size="icon-sm">
-                        <EditIcon className="h-4 w-4" />
+                        <Pencil className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="destructive"
                         size="icon-sm"
                         onClick={() => handleRemoveMember(member.id)}
                       >
-                        <Trash2Icon className="h-4 w-4" />
+                        <Trash className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>

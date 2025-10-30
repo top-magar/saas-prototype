@@ -29,7 +29,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Field, FieldLabel, FieldContent, FieldError } from "@/components/ui/field";
-import { PlusIcon, EditIcon, Trash2Icon } from "lucide-react";
+import { Plus, Pencil, Trash } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -121,7 +121,7 @@ export default function CategoriesPage() {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => setEditingCategory(null)}>
-              <PlusIcon className="mr-2 h-4 w-4" /> Add Category
+              <Plus className="mr-2 h-4 w-4" /> Add Category
             </Button>
           </DialogTrigger>
           <CategoryFormDialog
@@ -156,14 +156,14 @@ export default function CategoriesPage() {
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="outline" size="icon-sm" onClick={() => handleOpenEditDialog(category)}>
-                        <EditIcon className="h-4 w-4" />
+                        <Pencil className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="destructive"
                         size="icon-sm"
                         onClick={() => handleDeleteCategory(category.id)}
                       >
-                        <Trash2Icon className="h-4 w-4" />
+                        <Trash className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>

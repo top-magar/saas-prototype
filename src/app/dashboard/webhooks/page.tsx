@@ -29,7 +29,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel, FieldContent } from "@/components/ui/field";
 import { Badge } from "@/components/ui/badge";
-import { PlusIcon, EditIcon, Trash2Icon, ToggleRightIcon, ToggleLeftIcon } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Plus, Pencil, Trash } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Webhook {
@@ -95,7 +96,7 @@ export default function WebhooksPage() {
         <Dialog>
           <DialogTrigger asChild>
             <Button>
-              <PlusIcon className="mr-2 h-4 w-4" /> Add Webhook
+              <Plus className="mr-2 h-4 w-4" /> Add Webhook
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -190,20 +191,20 @@ export default function WebhooksPage() {
                         onClick={() => handleToggleStatus(webhook.id)}
                       >
                         {webhook.status === "Active" ? (
-                          <ToggleRightIcon className="h-4 w-4" />
+                          <Switch className="h-4 w-4" />
                         ) : (
-                          <ToggleLeftIcon className="h-4 w-4" />
+                          <Switch className="h-4 w-4" />
                         )}
                       </Button>
                       <Button variant="outline" size="icon-sm">
-                        <EditIcon className="h-4 w-4" />
+                        <Pencil className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="destructive"
                         size="icon-sm"
                         onClick={() => handleDeleteWebhook(webhook.id)}
                       >
-                        <Trash2Icon className="h-4 w-4" />
+                        <Trash className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>

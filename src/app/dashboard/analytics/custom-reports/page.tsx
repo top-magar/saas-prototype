@@ -21,7 +21,7 @@ import { Field, FieldLabel, FieldContent, FieldDescription } from "@/components/
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { PlusIcon, EditIcon, Trash2Icon } from "lucide-react";
+import { Plus, Pencil, Trash } from "lucide-react";
 
 const savedReports = [
   { id: 1, name: "Monthly Sales Summary", type: "Sales", created: "2023-10-01", status: "Active" },
@@ -39,7 +39,7 @@ export default function CustomReportsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">Custom Reports</h1>
         <Button>
-          <PlusIcon className="mr-2 h-4 w-4" /> Create New Report
+          <Plus className="mr-2 h-4 w-4" /> Create New Report
         </Button>
       </div>
 
@@ -123,10 +123,10 @@ export default function CustomReportsPage() {
                     <TableCell>
                       <div className="flex gap-2">
                         <Button variant="outline" size="icon-sm">
-                          <EditIcon className="h-4 w-4" />
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         <Button variant="destructive" size="icon-sm">
-                          <Trash2Icon className="h-4 w-4" />
+                          <Trash className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>

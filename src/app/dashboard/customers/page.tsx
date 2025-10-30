@@ -34,7 +34,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { SearchIcon, UserPlusIcon } from "lucide-react";
+import { Search, UserPlus } from "lucide-react";
 
 interface Customer {
   id: string;
@@ -83,7 +83,7 @@ export default function CustomersPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">Customers</h1>
         <Button>
-          <UserPlusIcon className="mr-2 h-4 w-4" /> Add Customer
+          <UserPlus className="mr-2 h-4 w-4" /> Add Customer
         </Button>
       </div>
 
@@ -95,7 +95,7 @@ export default function CustomersPage() {
         <CardContent>
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
             <div className="relative w-full md:w-1/3">
-              <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search customers..."
                 className="pl-9"
@@ -161,8 +161,8 @@ export default function CustomersPage() {
           <Pagination className="mt-4">
             <PaginationContent>
               <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
+                onClick={currentPage === 1 ? undefined : () => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                className={currentPage === 1 ? "opacity-50 pointer-events-none" : ""}
               />
               {Array.from({ length: totalPages }, (_, i) => (
                 <PaginationItem key={i + 1}>
@@ -175,8 +175,8 @@ export default function CustomersPage() {
                 </PaginationItem>
               ))}
               <PaginationNext
-                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
+                onClick={currentPage === totalPages ? undefined : () => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                className={currentPage === totalPages ? "opacity-50 pointer-events-none" : ""}
               />
             </PaginationContent>
           </Pagination>

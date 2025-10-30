@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { PlusIcon, SaveIcon } from "lucide-react";
+import { Plus, Check } from "lucide-react";
 
 interface UserPermission {
   id: string;
@@ -155,7 +155,7 @@ export default function PermissionsPage() {
             </TableBody>
           </Table>
           <Button className="mt-4">
-            <PlusIcon className="mr-2 h-4 w-4" /> Add New User
+            <Plus className="mr-2 h-4 w-4" /> Add New User
           </Button>
         </CardContent>
       </Card>
@@ -187,7 +187,7 @@ export default function PermissionsPage() {
             </div>
           ))}
           <Button className="mt-4" onClick={handleSavePermissions}>
-            <SaveIcon className="mr-2 h-4 w-4" /> Save Permissions
+            <Check className="mr-2 h-4 w-4" /> Save Permissions
           </Button>
         </CardContent>
       </Card>

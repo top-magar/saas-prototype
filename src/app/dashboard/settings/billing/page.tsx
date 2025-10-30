@@ -17,27 +17,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { FileTextIcon } from "lucide-react";
+import { FileText } from "lucide-react";
 import { useTenant } from "@/lib/tenant-context";
 import { Dialog } from "@/components/ui/dialog";
 import { PricingDialog } from "@/components/pricing-dialog";
+import { TenantTier } from "@/lib/types";
 
 interface Invoice {
   id: string;
@@ -73,7 +57,7 @@ export default function BillingAndPlansPage() {
             <Dialog>
               <PricingDialog
                 trigger={<Button variant="outline">Change Plan</Button>}
-                currentPlan={tenant?.tier || "FREE"}
+                currentPlan={tenant?.tier || TenantTier.FREE}
                 showPaymentMethods={true}
               />
             </Dialog>
@@ -111,7 +95,7 @@ export default function BillingAndPlansPage() {
                   <TableCell>
                     <Button variant="outline" size="sm" asChild>
                       <a href={invoice.pdfLink} target="_blank" rel="noopener noreferrer">
-                        <FileTextIcon className="mr-2 h-4 w-4" /> PDF
+                        <FileText className="mr-2 h-4 w-4" /> PDF
                       </a>
                     </Button>
                   </TableCell>

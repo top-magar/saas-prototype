@@ -40,6 +40,7 @@ model Tenant {
   webhooks          Webhook[]
   workflows         Workflow[]
   auditLogs         AuditLog[]
+  categories        Category[]
   
   @@index([subdomain])
   @@index([status])
@@ -123,6 +124,9 @@ model Product {
   tags        String[]
   status      String    @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
   
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -363,4 +367,19 @@ model AnalyticsEvent {
   @@index([eventType])
   @@index([timestamp])
   @@map("analytics_events")
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name      String   @unique(map: "Category_tenantId_name_key") // Unique per tenant
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products  Product[] // Inverse relation to Product
+
+  @@index([tenantId])
+  @@map("categories")
 }

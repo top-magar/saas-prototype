@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { UploadIcon, DownloadIcon } from "lucide-react";
+import { Upload, Download } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 export default function ImportExportPage() {
@@ -98,7 +98,7 @@ export default function ImportExportPage() {
               <FieldDescription className="text-green-500">Import complete!</FieldDescription>
             )}
             <Button onClick={handleImport} disabled={!importFile || (importProgress > 0 && importProgress < 100)}>
-              <UploadIcon className="mr-2 h-4 w-4" /> Import Products
+              <Upload className="mr-2 h-4 w-4" /> Import Products
             </Button>
           </CardContent>
         </Card>
@@ -147,7 +147,7 @@ export default function ImportExportPage() {
               <FieldDescription className="text-green-500">Export ready for download!</FieldDescription>
             )}
             <Button onClick={handleExport} disabled={exportProgress > 0 && exportProgress < 100}>
-              <DownloadIcon className="mr-2 h-4 w-4" /> Export Products
+              <Download className="mr-2 h-4 w-4" /> Export Products
             </Button>
           </CardContent>
         </Card>

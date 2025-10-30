@@ -34,7 +34,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { SearchIcon, EditIcon, EyeIcon, PlusIcon } from "lucide-react";
+import { Search, Pencil, Eye, Plus } from "lucide-react";
 
 interface ProductInventory {
   id: string;
@@ -102,8 +102,7 @@ export default function InventoryPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">Product Inventory</h1>
         <Button>
-          <PlusIcon className="mr-2 h-4 w-4" /> Add Product
-        </Button>
+                      <Plus className="mr-2 h-4 w-4" /> Add Product        </Button>
       </div>
 
       <Card>
@@ -114,7 +113,7 @@ export default function InventoryPage() {
         <CardContent>
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
             <div className="relative w-full md:w-1/3">
-              <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search products..."
                 className="pl-9"
@@ -174,10 +173,10 @@ export default function InventoryPage() {
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="outline" size="icon-sm">
-                        <EyeIcon className="h-4 w-4" />
+                        <Eye className="h-4 w-4" />
                       </Button>
                       <Button variant="outline" size="icon-sm">
-                        <EditIcon className="h-4 w-4" />
+                        <Pencil className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -189,8 +188,8 @@ export default function InventoryPage() {
           <Pagination className="mt-4">
             <PaginationContent>
               <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
+                onClick={currentPage === 1 ? undefined : () => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                className={currentPage === 1 ? "opacity-50 pointer-events-none" : ""}
               />
               {Array.from({ length: totalPages }, (_, i) => (
                 <PaginationItem key={i + 1}>
@@ -203,8 +202,8 @@ export default function InventoryPage() {
                 </PaginationItem>
               ))}
               <PaginationNext
-                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
+                onClick={currentPage === totalPages ? undefined : () => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                className={currentPage === totalPages ? "opacity-50 pointer-events-none" : ""}
               />
             </PaginationContent>
           </Pagination>
