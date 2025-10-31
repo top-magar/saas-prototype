@@ -9,7 +9,7 @@ const geistSans = Geist({
 
 
 export const metadata = {
-  title: 'Pasaal.Io',
+  title: 'PASAAL.IO - Multi-tenant SaaS Platform',
   description: 'Multi-tenant SaaS platform built with Next.js',
 };
 

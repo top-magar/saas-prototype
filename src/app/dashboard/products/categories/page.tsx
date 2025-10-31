@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Card,
   CardContent,
@@ -33,9 +33,11 @@ import { Plus, Pencil, Trash } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import axios from "axios";
 import { toast } from "sonner";
 import { useTenant } from "@/lib/tenant-context";
+import { deleteCategory, updateCategory, createCategory } from "@/lib/api";
+import { useApi } from "@/hooks/use-api";
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
 
 interface Category {
   id: string;
@@ -53,35 +55,16 @@ type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 
 export default function CategoriesPage() {
   const { tenant } = useTenant();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { data: categories, isLoading, isError, mutate } = useApi(tenant ? `/products/categories?tenantId=${tenant.id}` : null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchCategories = useCallback(async () => {
-    if (!tenant?.id) return;
-    setIsLoading(true);
-    try {
-      const response = await axios.get(`/api/products/categories?tenantId=${tenant.id}`);
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Failed to fetch categories:", error);
-      toast.error("Failed to load categories.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [tenant?.id]);
-
-  useEffect(() => {
-    fetchCategories();
-  }, [tenant?.id, fetchCategories]);
 
   const handleDeleteCategory = async (categoryId: string) => {
     if (!tenant?.id) return;
     try {
-      await axios.delete(`/api/products/categories?tenantId=${tenant.id}&categoryId=${categoryId}`);
+      await deleteCategory(tenant.id, categoryId);
       toast.success("Category deleted successfully.");
-      fetchCategories(); // Re-fetch categories after deletion
+      mutate(); // Re-fetch categories after deletion
     } catch (error) {
       console.error("Failed to delete category:", error);
       toast.error("Failed to delete category.");
@@ -113,6 +96,48 @@ export default function CategoriesPage() {
       </div>
     );
   }
+  
+  if (isError) {
+      toast.error("Failed to load categories.");
+  }
+
+  if (!categories || categories.length === 0) {
+    return (
+      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <div className="flex items-center justify-between">
+            <h1 className="text-xl font-semibold md:text-2xl">Product Categories</h1>
+            <Button onClick={() => setIsDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" /> Add Category
+            </Button>
+        </div>
+        <Card>
+          <CardContent className="flex items-center justify-center p-8">
+            <Empty>
+              <EmptyHeader>
+                <EmptyTitle>No Categories Found</EmptyTitle>
+                <EmptyDescription>
+                  You haven&apos;t added any categories yet. Get started by adding your first one.
+                </EmptyDescription>
+              </EmptyHeader>
+              <Button onClick={() => setIsDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" /> Add Category
+              </Button>
+            </Empty>
+          </CardContent>
+        </Card>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <CategoryFormDialog
+            category={null}
+            onSaveSuccess={() => {
+                setIsDialogOpen(false);
+                mutate();
+            }}
+            onClose={() => setIsDialogOpen(false)}
+          />
+        </Dialog>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
@@ -126,7 +151,10 @@ export default function CategoriesPage() {
           </DialogTrigger>
           <CategoryFormDialog
             category={editingCategory}
-            onSaveSuccess={fetchCategories}
+            onSaveSuccess={() => {
+                setIsDialogOpen(false);
+                mutate();
+            }}
             onClose={() => setIsDialogOpen(false)}
           />
         </Dialog>
@@ -148,7 +176,7 @@ export default function CategoriesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.map((category) => (
+              {categories?.map((category: Category) => (
                 <TableRow key={category.id}>
                   <TableCell className="font-medium">{category.name}</TableCell>
                   <TableCell>{category.description}</TableCell>
@@ -202,11 +230,11 @@ const CategoryFormDialog = ({ category, onSaveSuccess, onClose }: CategoryFormDi
     try {
       if (category) {
         // Update existing category
-        await axios.patch(`/api/products/categories?tenantId=${tenant.id}&categoryId=${category.id}`, values);
+        await updateCategory(tenant.id, category.id, values);
         toast.success("Category updated successfully.");
       } else {
         // Create new category
-        await axios.post(`/api/products/categories?tenantId=${tenant.id}`, values);
+        await createCategory(tenant.id, values);
         toast.success("Category added successfully.");
       }
       onSaveSuccess();

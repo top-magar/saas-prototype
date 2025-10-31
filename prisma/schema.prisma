@@ -120,23 +120,41 @@ model Product {
   
   name        String
   description String?
-  imageUrl    String?
+  slug        String    @unique // For SEO-friendly URLs
   tags        String[]
   status      String    @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
   
-  categoryId  String?
-  category    Category? @relation(fields: [categoryId], references: [id])
+  // categoryId  String?
+  // category    Category? @relation(fields: [categoryId], references: [id])
+  categories  Category[] // Many-to-many relation
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   // Relations
+  media       Media[] // Product can have multiple images/videos
   variants    ProductVariant[]
   options     ProductOption[]
   orderItems  OrderItem[] // Inverse relation to OrderItem
   
   @@index([tenantId])
   @@map("products")
+}
+
+model Media {
+  id        String    @id @default(uuid())
+  productId String
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  url       String
+  altText   String?
+  order     Int       @default(0) // For reordering media
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([productId])
+  @@map("media")
 }
 
 model ProductOption {
@@ -378,7 +396,7 @@ model Category {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  products  Product[] // Inverse relation to Product
+  products  Product[] // Many-to-many inverse relation to Product
 
   @@index([tenantId])
   @@map("categories")

@@ -1,5 +1,6 @@
 "use client"
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -41,66 +42,99 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Search, Plus, MoreHorizontal } from "lucide-react";
-import axios from "axios";
+import { Checkbox } from "@/components/ui/checkbox"; // Corrected Import
+import { Search, Plus, MoreHorizontal, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { useTenant } from "@/lib/tenant-context";
-import { ProductFormDialog } from "./product-form-dialog"; // Import the new dialog
-import { Checkbox } from "@radix-ui/react-checkbox";
-import Image from "next/image";
+import { ProductFormDialog } from "./product-form-dialog";
+import { deleteProduct, bulkDeleteProducts } from "@/lib/api";
+import { useApi } from "@/hooks/use-api";
 
+// Interface definitions (assuming they are correct as provided)
+interface ProductMedia {
+  id?: string;
+  url: string;
+  altText?: string;
+  order?: number;
+}
+interface ProductOptionValue {
+  id?: string;
+  value: string;
+}
+interface ProductOption {
+  id?: string;
+  name: string;
+  values: ProductOptionValue[];
+}
+interface ProductVariant {
+  id?: string;
+  sku?: string;
+  price: number;
+  stock: number;
+  optionValues: { optionName: string; value: string }[];
+}
+interface Category {
+  id: string;
+  name: string;
+}
 interface Product {
   id: string;
   name: string;
+  slug: string;
   description?: string;
-  imageUrl?: string;
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   createdAt: string;
+  media: ProductMedia[];
+  options: ProductOption[];
+  variants: ProductVariant[];
+  categories: Category[];
 }
 
 const ITEMS_PER_PAGE = 5;
 
 export default function ProductsPage() {
   const { tenant } = useTenant();
-  const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterCategory, setFilterCategory] = useState("All"); // This will need to be updated later for product options
+  const [filterCategory, setFilterCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
+  const [sortColumn, setSortColumn] = useState<keyof Product | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const fetchProducts = useCallback(async () => {
-    if (!tenant?.id) return;
-    setIsLoading(true);
-    try {
-      const response = await axios.get(`/api/products?tenantId=${tenant.id}`);
-      setProducts(response.data);
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-      toast.error("Failed to load products.");
-    } finally {
-      setIsLoading(false);
+  const { data: products, isLoading: isLoadingProducts, isError: isErrorProducts, mutate: mutateProducts } = useApi(tenant ? `/products?tenantId=${tenant.id}&searchTerm=${searchTerm}&categoryId=${filterCategory === "All" ? "" : filterCategory}` : null);
+  const { data: categories, isLoading: isLoadingCategories, isError: isErrorCategories } = useApi(tenant ? `/products/categories?tenantId=${tenant.id}` : null);
+
+  const isLoading = isLoadingProducts || isLoadingCategories;
+
+  const handleSort = (column: keyof Product) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
     }
-  }, [tenant?.id]);
+  };
 
-  useEffect(() => {
-    fetchProducts();
-  }, [tenant?.id, fetchProducts]);
+  const sortedProducts = useMemo(() => {
+    if (!products) return [];
+    if (sortColumn) {
+      return [...products].sort((a, b) => {
+        const aValue = a[sortColumn];
+        const bValue = b[sortColumn];
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+    return products;
+  }, [products, sortColumn, sortDirection]);
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    // Category filtering will need to be updated for product options
-    const matchesCategory = true; // Temporarily disable category filter
-    return matchesSearch && matchesCategory;
-  });
-
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const totalPages = sortedProducts ? Math.ceil(sortedProducts.length / ITEMS_PER_PAGE) : 0;
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+  const currentProducts = sortedProducts ? sortedProducts.slice(startIndex, endIndex) : [];
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -118,7 +152,7 @@ export default function ProductsPage() {
     }
   };
 
-  const handleOpenDialog = (product: Product | undefined) => {
+  const handleOpenDialog = (product?: Product) => {
     setEditingProduct(product);
     setIsDialogOpen(true);
   };
@@ -126,9 +160,9 @@ export default function ProductsPage() {
   const handleDeleteProduct = async (productId: string) => {
     if (!tenant?.id) return;
     try {
-      await axios.delete(`/api/products?tenantId=${tenant.id}&productId=${productId}`);
+      await deleteProduct(tenant.id, productId);
       toast.success("Product deleted successfully.");
-      fetchProducts(); // Re-fetch products after deletion
+      mutateProducts();
     } catch (error) {
       console.error("Failed to delete product:", error);
       toast.error("Failed to delete product.");
@@ -138,12 +172,10 @@ export default function ProductsPage() {
   const handleBulkDelete = async () => {
     if (!tenant?.id || selectedProducts.length === 0) return;
     try {
-      await Promise.all(selectedProducts.map(productId =>
-        axios.delete(`/api/products?tenantId=${tenant.id}&productId=${productId}`)
-      ));
+      await bulkDeleteProducts(tenant.id, selectedProducts);
       toast.success(`${selectedProducts.length} products deleted successfully.`);
       setSelectedProducts([]);
-      fetchProducts(); // Re-fetch products after bulk deletion
+      mutateProducts();
     } catch (error) {
       console.error("Failed to bulk delete products:", error);
       toast.error("Failed to bulk delete products.");
@@ -153,7 +185,7 @@ export default function ProductsPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-        <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
+        <h1 className="text-xl font-semibold md:text-2l">Products</h1>
         <Card>
           <CardHeader>
             <CardTitle>Product Catalog</CardTitle>
@@ -171,24 +203,43 @@ export default function ProductsPage() {
     );
   }
 
-  if (products.length === 0 && !isLoading) {
+  if (isErrorProducts || isErrorCategories) {
+      toast.error("Failed to load products or categories.");
+  }
+  
+  if (!products || products.length === 0) {
     return (
-                <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-                  <h1 className="text-xl font-semibold md:text-2xl">Products</h1>        <Card>
+      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <div className="flex items-center justify-between">
+            <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
+            <Button onClick={() => handleOpenDialog()}>
+                <Plus className="mr-2 h-4 w-4" /> Add Product
+            </Button>
+        </div>
+        <Card>
           <CardContent className="flex items-center justify-center p-8">
             <Empty>
               <EmptyHeader>
                 <EmptyTitle>No Products Found</EmptyTitle>
                 <EmptyDescription>
-                  You haven&apos;t added any products yet. Click the button below to add your first product.
+                  You haven&apos;t added any products yet. Get started by adding your first one.
                 </EmptyDescription>
               </EmptyHeader>
-              <Button onClick={() => handleOpenDialog(undefined)}>
+              <Button onClick={() => handleOpenDialog()}>
                 <Plus className="mr-2 h-4 w-4" /> Add Product
               </Button>
             </Empty>
           </CardContent>
         </Card>
+        <ProductFormDialog
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            product={editingProduct}
+            onSaveSuccess={() => {
+              setIsDialogOpen(false);
+              mutateProducts();
+            }}
+        />
       </div>
     );
   }
@@ -197,7 +248,7 @@ export default function ProductsPage() {
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
-        <Button onClick={() => handleOpenDialog(undefined)}>
+        <Button onClick={() => handleOpenDialog()}>
           <Plus className="mr-2 h-4 w-4" /> Add Product
         </Button>
       </div>
@@ -225,10 +276,11 @@ export default function ProductsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">All Categories</SelectItem>
-                  <SelectItem value="Electronics">Electronics</SelectItem>
-                  <SelectItem value="Books">Books</SelectItem>
-                  <SelectItem value="Home & Office">Home & Office</SelectItem>
-                  <SelectItem value="Apparel">Apparel</SelectItem>
+                  {categories?.map((category: Category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {selectedProducts.length > 0 && (
@@ -242,7 +294,6 @@ export default function ProductsPage() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuItem onClick={handleBulkDelete}>Delete Selected</DropdownMenuItem>
-                    {/* Add more bulk actions here */}
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
@@ -259,9 +310,25 @@ export default function ProductsPage() {
                   />
                 </TableHead>
                 <TableHead className="w-[80px]">Image</TableHead>
-                <TableHead>Product Name</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created At</TableHead>
+                <TableHead onClick={() => handleSort('name')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Product Name
+                    {sortColumn === 'name' && (sortDirection === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead>Categories</TableHead>
+                <TableHead onClick={() => handleSort('status')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Status
+                    {sortColumn === 'status' && (sortDirection === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead onClick={() => handleSort('createdAt')} className="cursor-pointer">
+                  <div className="flex items-center">
+                    Created At
+                    {sortColumn === 'createdAt' && (sortDirection === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />)}
+                  </div>
+                </TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -275,9 +342,16 @@ export default function ProductsPage() {
                     />
                   </TableCell>
                   <TableCell>
-                    <Image src={product.imageUrl || "/placeholder.svg"} alt={product.name} width={40} height={40} className="h-10 w-10 object-cover rounded-md" />
+                    <Image src={product.media[0]?.url || "/placeholder.svg"} alt={product.name} width={40} height={40} className="h-10 w-10 object-cover rounded-md" />
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell>
+                    {product.categories.map(cat => (
+                      <Badge key={cat.id} variant="secondary" className="mr-1">
+                        {cat.name}
+                      </Badge>
+                    ))}
+                  </TableCell>
                   <TableCell>
                     <Badge
                       variant={
@@ -291,7 +365,7 @@ export default function ProductsPage() {
                       {product.status.replace(/_/g, ' ')}
                     </Badge>
                   </TableCell>
-                  <TableCell>{product.createdAt}</TableCell>
+                  <TableCell>{new Date(product.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -315,8 +389,8 @@ export default function ProductsPage() {
           <Pagination className="mt-4">
             <PaginationContent>
               <PaginationPrevious
-                onClick={currentPage === 1 ? undefined : () => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                className={currentPage === 1 ? "opacity-50 pointer-events-none" : ""}
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                className={currentPage === 1 ? "opacity-50 pointer-events-none" : "cursor-pointer"}
               />
               {Array.from({ length: totalPages }, (_, i) => (
                 <PaginationItem key={i + 1}>
@@ -329,8 +403,8 @@ export default function ProductsPage() {
                 </PaginationItem>
               ))}
               <PaginationNext
-                onClick={currentPage === totalPages ? undefined : () => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                className={currentPage === totalPages ? "opacity-50 pointer-events-none" : ""}
+                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                className={currentPage === totalPages ? "opacity-50 pointer-events-none" : "cursor-pointer"}
               />
             </PaginationContent>
           </Pagination>
@@ -342,10 +416,9 @@ export default function ProductsPage() {
         product={editingProduct}
         onSaveSuccess={() => {
           setIsDialogOpen(false);
-          fetchProducts(); // Refresh data on success
+          mutateProducts(); // Refresh data on success
         }}
       />
     </div>
   );
 }
-

@@ -3,16 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(req: NextRequest) {
-  // Log all request headers for debugging session/cookie issues
-  console.log('--- Incoming API Request Headers ---');
-  for (const [key, value] of req.headers.entries()) {
-    console.log(`${key}: ${value}`);
-  }
-
-  console.log('DATABASE_URL seen by API:', process.env.DATABASE_URL);
   try {
     const user = await currentUser();
-    console.log('Clerk currentUser() result:', user);
 
     if (!user) {
       return new NextResponse('Unauthorized', { status: 401 });

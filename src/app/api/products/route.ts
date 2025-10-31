@@ -2,48 +2,59 @@ import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { authorize } from '@/lib/auth';
 import { z } from 'zod';
+import { productService } from '@/lib/services/product.service';
 
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   description: z.string().optional(),
-  imageUrl: z.string().url("Invalid image URL").optional().or(z.literal("")),
+  // imageUrl: z.string().url("Invalid image URL").optional().or(z.literal("")),
   tags: z.array(z.string()).optional(),
   status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).default("DRAFT"),
+  categoryIds: z.array(z.string()).optional(),
+  mediaUrls: z.array(z.object({
+    url: z.string().url("Invalid image URL"),
+    altText: z.string().optional(),
+    order: z.number().int().optional(),
+  })).optional(),
+  options: z.array(z.object({
+    name: z.string(),
+    values: z.array(z.string()),
+  })).optional(),
+  variants: z.array(z.object({
+    sku: z.string().optional(),
+    price: z.number().positive("Price must be positive"),
+    stock: z.number().int().min(0, "Stock cannot be negative"),
+    optionValues: z.array(z.object({
+      optionName: z.string(),
+      value: z.string(),
+    })),
+  })).optional(),
 });
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const tenantId = searchParams.get('tenantId');
+  const productId = searchParams.get('productId');
+  const searchTerm = searchParams.get('searchTerm') || undefined;
+  const categoryId = searchParams.get('categoryId') || undefined;
 
   if (!tenantId) {
     return new NextResponse('Tenant ID is required', { status: 400 });
   }
 
   try {
-    // Authorize the user before fetching data.
-    // Allows any user role ('admin', 'manager', 'user') to view products.
     await authorize(tenantId, ['admin', 'manager', 'user']);
 
-    const products = await prisma.product.findMany({
-      where: { tenantId },
-      include: {
-        variants: {
-          include: {
-            optionValues: {
-              include: {
-                optionValue: true,
-              },
-            },
-          },
-        },
-        options: {
-          include: {
-            values: true,
-          },
-        },
-      },
-    });
-    return NextResponse.json(products);
+    if (productId) {
+      const product = await productService.getProduct(productId, tenantId);
+      if (!product) {
+        return new NextResponse('Product not found', { status: 404 });
+      }
+      return NextResponse.json(product);
+    } else {
+      const products = await productService.listProducts(tenantId, searchTerm, categoryId);
+      return NextResponse.json(products);
+    }
   } catch (error) {
     console.error('[PRODUCTS_GET]', error);
     if (error instanceof Error && error.message.startsWith('Forbidden')) {
@@ -65,17 +76,15 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    await authorize(tenantId, ['admin', 'manager']);
+    const { userId } = await authorize(tenantId, ['admin', 'manager']);
 
     const body = await req.json();
-    const { name, description } = productSchema.parse(body);
+    const productData = productSchema.parse(body);
 
-    const product = await prisma.product.create({
-      data: {
-        tenantId,
-        name,
-        description,
-      },
+    const product = await productService.createProduct({
+      tenantId,
+      userId,
+      ...productData,
     });
 
     return NextResponse.json(product, { status: 201 });
@@ -106,20 +115,18 @@ export async function PUT(req: NextRequest) {
   }
 
   try {
-    await authorize(tenantId, ['admin', 'manager']);
+    const { userId } = await authorize(tenantId, ['admin', 'manager']);
 
     const body = await req.json();
-    const { name, description } = productSchema.parse(body);
+    const productData = productSchema.partial().parse(body);
 
-    const product = await prisma.product.update({
-      where: { id: productId, tenantId },
-      data: {
-        name,
-        description,
-      },
+    const updatedProduct = await productService.updateProduct(productId, {
+      tenantId,
+      userId,
+      ...productData,
     });
 
-    return NextResponse.json(product);
+    return NextResponse.json(updatedProduct);
   } catch (error) {
     console.error('[PRODUCTS_PUT]', error);
     if (error instanceof z.ZodError) {
@@ -148,33 +155,9 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    await authorize(tenantId, ['admin', 'manager']);
+    const { userId } = await authorize(tenantId, ['admin', 'manager']);
 
-    // Delete product and its related data (variants, options, option values, variant option values)
-    // Prisma's cascade delete should handle most of this if configured in schema.prisma
-    // However, explicit deletion ensures all related records are removed.
-    await prisma.$transaction(async (tx) => {
-      // Delete ProductVariantOptionValue records first
-      await tx.productVariantOptionValue.deleteMany({
-        where: { variant: { productId: productId } },
-      });
-      // Delete ProductOptionValue records
-      await tx.productOptionValue.deleteMany({
-        where: { option: { productId: productId } },
-      });
-      // Delete ProductVariant records
-      await tx.productVariant.deleteMany({
-        where: { productId: productId },
-      });
-      // Delete ProductOption records
-      await tx.productOption.deleteMany({
-        where: { productId: productId },
-      });
-      // Finally, delete the Product
-      await tx.product.delete({
-        where: { id: productId, tenantId },
-      });
-    });
+    await productService.deleteProduct(productId, tenantId, userId);
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {

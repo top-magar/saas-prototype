@@ -32,6 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Pencil, Trash } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface Webhook {
   id: string;
@@ -68,8 +69,10 @@ export default function WebhooksPage() {
       setNewWebhookName("");
       setNewWebhookUrl("");
       setNewWebhookEvent("");
-      console.log("Adding new webhook:", newWebhook);
+      toast.success("Webhook added successfully.");
       // In a real app, this would involve an API call to add the webhook
+    } else {
+      toast.error("Please fill out all fields.");
     }
   };
 
@@ -81,11 +84,12 @@ export default function WebhooksPage() {
           : webhook
       )
     );
+    toast.success("Webhook status updated.");
   };
 
   const handleDeleteWebhook = (id: string) => {
     setWebhooks(webhooks.filter((webhook) => webhook.id !== id));
-    console.log("Deleting webhook:", id);
+    toast.success("Webhook deleted successfully.");
     // In a real app, this would involve an API call to delete the webhook
   };
 

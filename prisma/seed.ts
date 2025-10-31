@@ -82,11 +82,22 @@ async function main() {
         tenantId: tenant.id,
         name: item.product.name,
         description: item.product.description,
-        imageUrl: item.product.imageUrl,
+        slug: item.product.name.toLowerCase().replace(/ /g, '-'), // Generate slug
         tags: item.product.tags,
         status: item.product.status,
       },
     });
+
+    // Create Media record for the product
+    if (item.product.imageUrl) {
+      await prisma.media.create({
+        data: {
+          productId: product.id,
+          url: item.product.imageUrl,
+          altText: item.product.name, // Use product name as alt text
+        },
+      });
+    }
 
     await prisma.productVariant.create({
       data: {
