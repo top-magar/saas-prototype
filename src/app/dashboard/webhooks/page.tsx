@@ -184,18 +184,11 @@ export default function WebhooksPage() {
                   </TableCell>
                   <TableCell>{webhook.lastTriggered}</TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon-sm"
-                        onClick={() => handleToggleStatus(webhook.id)}
-                      >
-                        {webhook.status === "Active" ? (
-                          <Switch className="h-4 w-4" />
-                        ) : (
-                          <Switch className="h-4 w-4" />
-                        )}
-                      </Button>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={webhook.status === "Active"}
+                        onCheckedChange={() => handleToggleStatus(webhook.id)}
+                      />
                       <Button variant="outline" size="icon-sm">
                         <Pencil className="h-4 w-4" />
                       </Button>
