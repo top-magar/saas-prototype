@@ -1,61 +1,91 @@
-'use client';
+"use client";
+import { motion } from 'framer-motion';
+import { BentoGrid, BentoGridItem } from '@/components/ui/bento-grid';
+import { Package, ShoppingCart, Workflow, BarChart3, Shield, Zap } from 'lucide-react';
 
-import { motion, Variants } from 'framer-motion';
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Package, ShoppingCart, Workflow } from 'lucide-react';
-
-// Define the features array ONCE, outside the component.
 const features = [
   {
-    icon: <Package className="h-8 w-8 text-primary" />,
-    title: 'Product & Inventory Management',
-    description: 'Easily add products, track stock levels in real-time, and manage categories to keep your inventory organized and efficient.',
+    title: "Product & Inventory Management",
+    description: "Easily add products, track stock levels in real-time, and manage categories to keep your inventory organized and efficient.",
+    header: <FeatureHeader icon={Package} />,
+    icon: <Package className="h-4 w-4 text-neutral-500" />,
+    className: "md:col-span-2",
   },
   {
-    icon: <ShoppingCart className="h-8 w-8 text-primary" />,
-    title: 'Orders & Sales Hub',
-    description: 'A centralized dashboard to manage all your orders, generate invoices, track payments, and get a complete view of your customer data.',
+    title: "Orders & Sales Hub",
+    description: "A centralized dashboard to manage all your orders, generate invoices, track payments, and get a complete view of your customer data.",
+    header: <FeatureHeader icon={ShoppingCart} />,
+    icon: <ShoppingCart className="h-4 w-4 text-neutral-500" />,
+    className: "md:col-span-1",
   },
   {
-    icon: <Workflow className="h-8 w-8 text-primary" />,
-    title: 'Powerful Automation',
-    description: 'Automate repetitive tasks with custom workflows. Integrate with your favorite tools using webhooks and a robust API.',
+    title: "Powerful Automation",
+    description: "Automate repetitive tasks with custom workflows. Integrate with your favorite tools using webhooks and a robust API.",
+    header: <FeatureHeader icon={Workflow} />,
+    icon: <Workflow className="h-4 w-4 text-neutral-500" />,
+    className: "md:col-span-1",
+  },
+  {
+    title: "Advanced Analytics",
+    description: "Get deep insights into your business performance with comprehensive analytics and reporting tools.",
+    header: <FeatureHeader icon={BarChart3} />,
+    icon: <BarChart3 className="h-4 w-4 text-neutral-500" />,
+    className: "md:col-span-2",
   },
 ];
 
-export function Features() {
-  const FADE_IN_ANIMATION_VARIANTS: Variants = {
-    hidden: { opacity: 0, y: 10 },
-    show: { opacity: 1, y: 0, transition: { type: 'spring' } },
-  };
-
+function FeatureHeader({ icon: Icon }: { icon: any }) {
   return (
-    <section className="container py-20">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold tracking-tight">Everything You Need to Succeed</h2>
-        <p className="mt-2 text-base text-muted-foreground">
-          Powerful features designed to streamline your operations and fuel your growth.
-        </p>
+    <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-neutral-200 dark:from-neutral-900 dark:to-neutral-800 to-neutral-100 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 opacity-50" />
+      <div className="relative z-10 flex items-center justify-center w-full h-full">
+        <Icon className="h-12 w-12 text-primary" />
       </div>
-      <div className="mt-12 grid gap-8 md:grid-cols-3">
-        {features.map((feature, i) => (
-          <motion.div
-            key={feature.title}
-            initial="hidden"
-            whileInView="show"
-            variants={FADE_IN_ANIMATION_VARIANTS}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.1 }}
-          >
-            <Card className="h-full">
-              <CardHeader>
-                {feature.icon}
-                <CardTitle className="mt-4">{feature.title}</CardTitle>
-                <CardDescription className="mt-2">{feature.description}</CardDescription>
-              </CardHeader>
-            </Card>
-          </motion.div>
-        ))}
+    </div>
+  );
+}
+
+export function Features() {
+  return (
+    <section className="py-20 bg-neutral-50 dark:bg-neutral-950">
+      <div className="container mx-auto px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+            Everything You Need to{" "}
+            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Succeed
+            </span>
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Powerful features designed to streamline your operations and fuel your growth.
+          </p>
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          viewport={{ once: true }}
+        >
+          <BentoGrid className="max-w-4xl mx-auto">
+            {features.map((item, i) => (
+              <BentoGridItem
+                key={i}
+                title={item.title}
+                description={item.description}
+                header={item.header}
+                icon={item.icon}
+                className={item.className}
+              />
+            ))}
+          </BentoGrid>
+        </motion.div>
       </div>
     </section>
   );

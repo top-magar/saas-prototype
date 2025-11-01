@@ -1,23 +1,22 @@
 import { SignedIn, SignedOut } from "@clerk/nextjs";
-import { redirect } from "next/navigation";
+import { RedirectToSignIn } from "@clerk/nextjs";
 import { Header } from '@/components/landing/header';
 import { Hero } from '@/components/landing/hero';
 import { Features } from '@/components/landing/features';
 import { FAQ } from '@/components/landing/faq';
 import { Footer } from '@/components/landing/footer';
+import { redirect } from "next/navigation";
 
 export default function Home() {
   return (
     <>
       <SignedIn>
-        {/* This correctly redirects already-signed-in users to the dashboard */}
-        {redirect("/dashboard")}
+        <RedirectToDashboard />
       </SignedIn>
       <SignedOut>
-        {/* This will render the new landing page for signed-out users */}
         <div className="flex min-h-screen flex-col">
           <Header />
-          <main className="flex-1">
+          <main className="flex-1 pt-16">
             <Hero />
             <Features />
             <FAQ />
@@ -27,4 +26,9 @@ export default function Home() {
       </SignedOut>
     </>
   );
+}
+
+function RedirectToDashboard() {
+  redirect("/dashboard");
+  return null;
 }
