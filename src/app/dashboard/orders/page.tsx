@@ -45,16 +45,16 @@ interface Order {
 }
 
 const allOrders: Order[] = [
-  { id: "ORD001", customer: "Alice Smith", status: "Delivered", amount: 120.00, date: "2023-10-20" },
-  { id: "ORD002", customer: "Bob Johnson", status: "Processing", amount: 75.50, date: "2023-10-22" },
-  { id: "ORD003", customer: "Charlie Brown", status: "Shipped", amount: 200.00, date: "2023-10-21" },
-  { id: "ORD004", customer: "Diana Prince", status: "Pending", amount: 50.00, date: "2023-10-23" },
-  { id: "ORD005", customer: "Eve Adams", status: "Delivered", amount: 150.25, date: "2023-10-19" },
-  { id: "ORD006", customer: "Frank White", status: "Cancelled", amount: 30.00, date: "2023-10-18" },
-  { id: "ORD007", customer: "Grace Lee", status: "Processing", amount: 99.99, date: "2023-10-24" },
-  { id: "ORD008", customer: "Harry Kim", status: "Shipped", amount: 180.00, date: "2023-10-23" },
-  { id: "ORD009", customer: "Ivy Wang", status: "Pending", amount: 65.00, date: "2023-10-25" },
-  { id: "ORD010", customer: "Jack Black", status: "Delivered", amount: 300.00, date: "2023-10-17" },
+  { id: "ORD001", customer: "Alice Smith", status: "Delivered", amount: 14400.00, date: "2023-10-20" },
+  { id: "ORD002", customer: "Bob Johnson", status: "Processing", amount: 9060.00, date: "2023-10-22" },
+  { id: "ORD003", customer: "Charlie Brown", status: "Shipped", amount: 24000.00, date: "2023-10-21" },
+  { id: "ORD004", customer: "Diana Prince", status: "Pending", amount: 6000.00, date: "2023-10-23" },
+  { id: "ORD005", customer: "Eve Adams", status: "Delivered", amount: 18030.00, date: "2023-10-19" },
+  { id: "ORD006", customer: "Frank White", status: "Cancelled", amount: 3600.00, date: "2023-10-18" },
+  { id: "ORD007", customer: "Grace Lee", status: "Processing", amount: 11999.00, date: "2023-10-24" },
+  { id: "ORD008", customer: "Harry Kim", status: "Shipped", amount: 21600.00, date: "2023-10-23" },
+  { id: "ORD009", customer: "Ivy Wang", status: "Pending", amount: 7800.00, date: "2023-10-25" },
+  { id: "ORD010", customer: "Jack Black", status: "Delivered", amount: 36000.00, date: "2023-10-17" },
 ];
 
 const ITEMS_PER_PAGE = 5;
@@ -142,7 +142,7 @@ export default function OrdersPage() {
                       {order.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>${order.amount.toFixed(2)}</TableCell>
+                  <TableCell>NPR {order.amount.toFixed(2)}</TableCell>
                   <TableCell>{order.date}</TableCell>
                   <TableCell>
                     <Button variant="outline" size="sm">View</Button>

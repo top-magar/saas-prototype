@@ -55,7 +55,7 @@ export const Sidebar = () => {
       initial={false}
       animate={isCollapsed ? 'collapsed' : 'expanded'}
       variants={sidebarVariants}
-      className="hidden border-r bg-background md:fixed md:inset-y-0 md:z-50 md:block shadow-sm ring-1 ring-gray-200"
+      className="hidden border-r bg-background md:fixed md:inset-y-0 md:z-50 md:block shadow-sm"
     >
       <SidebarContent />
     </motion.aside>

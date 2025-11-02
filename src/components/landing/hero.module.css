@@ -1,0 +1,83 @@
+.hero {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, hsl(var(--primary) / 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, hsl(var(--primary) / 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, hsl(var(--primary) / 0.04) 0%, transparent 60%);
+  pointer-events: none;
+  animation: float 20s ease-in-out infinite;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, hsl(var(--primary) / 0.02), transparent);
+  animation: rotate 30s linear infinite;
+  pointer-events: none;
+}
+
+.title {
+  background: linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--primary)) 50%, hsl(var(--muted-foreground)) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+}
+
+.ctaButton {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border: 2px solid hsl(var(--primary));
+  box-shadow: 0 4px 20px hsl(var(--primary) / 0.25);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.ctaButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, hsl(var(--primary-foreground) / 0.2), transparent);
+  transition: left 0.6s;
+}
+
+.ctaButton:hover {
+  background: hsl(var(--background));
+  color: hsl(var(--primary));
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px hsl(var(--primary) / 0.4);
+}
+
+.ctaButton:hover::before {
+  left: 100%;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(1deg); }
+  66% { transform: translateY(5px) rotate(-1deg); }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -184,7 +184,7 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
             <motion.div variants={itemVariants}>
               <StatCard
                 title="Total Revenue"
-                value={`$${data.stats.totalRevenue.toLocaleString()}`}
+                value={`NPR ${data.stats.totalRevenue.toLocaleString()}`}
                 icon={<CreditCard className="h-5 w-5 text-muted-foreground" />}
                 change={15.5}
                 changeType={'increase'}
@@ -279,7 +279,7 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
               </div>
               <div className="text-right">
                 <p className="text-sm font-bold">{product.percent}%</p>
-                <p className="text-xs text-muted-foreground">${product.earnings.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">NPR {product.earnings.toLocaleString()}</p>
               </div>
             </div>
           ))}

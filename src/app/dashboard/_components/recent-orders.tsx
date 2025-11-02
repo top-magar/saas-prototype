@@ -90,7 +90,7 @@ export function RecentOrders({ data }: { data: Order[] }) {
                 <TableCell>{order.product}</TableCell>
                 <TableCell>{order.customer}</TableCell>
                 <TableCell>{order.date}</TableCell>
-                <TableCell>${order.amount.toFixed(2)}</TableCell>
+                <TableCell>NPR {order.amount.toFixed(2)}</TableCell>
                 <TableCell>
                   <Badge
                     variant="outline"

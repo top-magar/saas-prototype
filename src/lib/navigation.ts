@@ -47,9 +47,13 @@ export const navigationConfig: NavSection[] = [
   {
     title: navigationStrings.dashboard,
     icon: LayoutDashboard,
+    href: '/dashboard',
+  },
+  {
+    title: navigationStrings.analytics,
+    icon: BarChart,
     items: [
-      { name: navigationStrings.overview, href: '/dashboard', icon: LayoutDashboard },
-      { name: navigationStrings.analytics, href: '/dashboard/analytics', icon: BarChart },
+      { name: navigationStrings.overview, href: '/dashboard/analytics', icon: BarChart },
       { name: navigationStrings.revenue, href: '/dashboard/analytics/revenue', tiers: ['PRO', 'ENTERPRISE'], icon: ArrowUp },
       { name: navigationStrings.customerInsights, href: '/dashboard/analytics/customers', tiers: ['PRO', 'ENTERPRISE'], icon: User },
       { name: navigationStrings.productAnalytics, href: '/dashboard/analytics/products', tiers: ['PRO', 'ENTERPRISE'], icon: Package },
@@ -77,7 +81,7 @@ export const navigationConfig: NavSection[] = [
   },
   {
     title: navigationStrings.customers,
-    icon: User,
+    icon: Users,
     href: '/dashboard/customers',
   },
   {
@@ -94,11 +98,11 @@ export const navigationConfig: NavSection[] = [
     title: navigationStrings.settings,
     icon: Settings,
     items: [
-      { name: navigationStrings.workspace, href: '/dashboard/settings/workspace', icon: Settings },
-      { name: navigationStrings.billing, href: '/dashboard/settings/billing', icon: CreditCard },
-      { name: navigationStrings.permissions, href: '/dashboard/settings/permissions', roles: ['admin'], tiers: ['PRO', 'ENTERPRISE'], icon: Check },
-      { name: navigationStrings.team, href: '/dashboard/settings/team', roles: ['admin', 'manager'], tiers: ['PRO', 'ENTERPRISE'], icon: Users },
       { name: navigationStrings.profile, href: '/dashboard/settings/profile', icon: User },
+      { name: navigationStrings.workspace, href: '/dashboard/settings/workspace', icon: Settings },
+      { name: navigationStrings.team, href: '/dashboard/settings/team', roles: ['admin', 'manager'], tiers: ['PRO', 'ENTERPRISE'], icon: Users },
+      { name: navigationStrings.permissions, href: '/dashboard/settings/permissions', roles: ['admin'], tiers: ['PRO', 'ENTERPRISE'], icon: Check },
+      { name: navigationStrings.billing, href: '/dashboard/settings/billing', icon: CreditCard },
     ],
   },
 ];
@@ -107,7 +111,7 @@ export const navigationConfig: NavSection[] = [
 export const adminNavigationConfig: NavSection[] = [
   {
     title: navigationStrings.admin,
-    icon: User,
+    icon: Settings,
     roles: ['admin'],
     items: [
       { name: navigationStrings.allTenants, href: '/dashboard/admin/tenants', roles: ['admin'], icon: Users },

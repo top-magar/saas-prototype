@@ -1,32 +1,38 @@
 "use client";
 import Link from 'next/link';
-import { Package, Twitter, Github, Linkedin, Mail } from 'lucide-react';
+import Image from 'next/image';
+import { Twitter, Github, Linkedin, Mail, Heart, ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
+import styles from './footer.module.css';
 
 const footerLinks = {
   product: [
     { name: 'Features', href: '#features' },
     { name: 'Pricing', href: '#pricing' },
-    { name: 'Documentation', href: '#docs' },
-    { name: 'API Reference', href: '#api' },
+    { name: 'Integrations', href: '#integrations' },
+    { name: 'API Docs', href: '#api' },
+    { name: 'Changelog', href: '#changelog' },
   ],
   company: [
     { name: 'About Us', href: '#about' },
     { name: 'Careers', href: '#careers' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Press Kit', href: '#press' },
     { name: 'Blog', href: '#blog' },
+    { name: 'Partners', href: '#partners' },
   ],
   support: [
     { name: 'Help Center', href: '#help' },
     { name: 'Community', href: '#community' },
-    { name: 'Status', href: '#status' },
+    { name: 'Contact Us', href: '#contact' },
+    { name: 'System Status', href: '#status' },
     { name: 'Security', href: '#security' },
   ],
   legal: [
     { name: 'Privacy Policy', href: '#privacy' },
     { name: 'Terms of Service', href: '#terms' },
     { name: 'Cookie Policy', href: '#cookies' },
+    { name: 'GDPR', href: '#gdpr' },
   ],
 };
 
@@ -34,129 +40,125 @@ const socialLinks = [
   { name: 'Twitter', href: '#', icon: Twitter },
   { name: 'GitHub', href: '#', icon: Github },
   { name: 'LinkedIn', href: '#', icon: Linkedin },
-  { name: 'Email', href: 'mailto:hello@saasplatform.com', icon: Mail },
+  { name: 'Email', href: 'mailto:hello@pasaal.io', icon: Mail },
 ];
 
 export function Footer() {
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <footer className="bg-neutral-50 dark:bg-neutral-950 border-t border-border/50">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
+    <footer className={`${styles.footer} relative overflow-hidden`}>
+      {/* Back to top button */}
+      <motion.button
+        onClick={scrollToTop}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        className="absolute top-8 right-8 bg-primary text-primary-foreground p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+      >
+        <ArrowUp className="w-5 h-5" />
+      </motion.button>
+
+      <div className="container mx-auto px-4 py-20">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-16">
           {/* Brand Section */}
-          <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center space-x-2 mb-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="lg:col-span-2"
+          >
+            <Link href="/" className="flex items-center space-x-3 mb-6 group">
               <div className="relative">
-                <Package className="h-8 w-8 text-primary" />
+                <Image src="/logo.svg" alt="Pasaal.io Logo" width={40} height={40} className="group-hover:scale-110 transition-transform duration-300" />
                 <div className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full animate-pulse" />
               </div>
-              <span className="font-bold text-xl bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              <span className={`font-bold text-2xl ${styles.gradientText}`}>
                 PASAAL.IO
               </span>
             </Link>
-            <p className="text-muted-foreground mb-6 max-w-sm">
-              Manage your business with ease. Built for the modern entrepreneur in Nepal and beyond.
+            <p className={`${styles.textSecondary} mb-8 max-w-sm text-lg leading-relaxed`}>
+              Empowering businesses across Nepal with intelligent automation and comprehensive management solutions.
             </p>
             
             {/* Social Links */}
-            <div className="flex space-x-4">
-              {socialLinks.map((social) => {
+            <div className="flex space-x-3">
+              {socialLinks.map((social, index) => {
                 const Icon = social.icon;
                 return (
-                  <Button
+                  <motion.div
                     key={social.name}
-                    variant="ghost"
-                    size="sm"
-                    asChild
-                    className="hover:bg-primary/10 hover:text-primary transition-colors"
+                    initial={{ opacity: 0, scale: 0 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                    viewport={{ once: true }}
                   >
-                    <Link href={social.href} aria-label={social.name}>
-                      <Icon className="h-4 w-4" />
-                    </Link>
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      asChild
+                      className="hover:bg-primary/20 hover:text-primary transition-all duration-300 hover:scale-110"
+                    >
+                      <Link href={social.href} aria-label={social.name}>
+                        <Icon className="h-5 w-5" />
+                      </Link>
+                    </Button>
+                  </motion.div>
                 );
               })}
             </div>
-          </div>
+          </motion.div>
           
           {/* Links Sections */}
-          <div>
-            <h4 className="font-semibold mb-4 text-foreground">Product</h4>
-            <ul className="space-y-3">
-              {footerLinks.product.map((link) => (
-                <li key={link.name}>
-                  <Link 
-                    href={link.href} 
-                    className="text-muted-foreground hover:text-primary transition-colors duration-200"
+          {Object.entries(footerLinks).map(([category, links], categoryIndex) => (
+            <motion.div
+              key={category}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: categoryIndex * 0.1 }}
+              viewport={{ once: true }}
+            >
+              <h4 className="font-bold mb-6 text-foreground text-lg capitalize">{category}</h4>
+              <ul className="space-y-4">
+                {links.map((link, linkIndex) => (
+                  <motion.li 
+                    key={link.name}
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: linkIndex * 0.05 }}
+                    viewport={{ once: true }}
                   >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-semibold mb-4 text-foreground">Company</h4>
-            <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  <Link 
-                    href={link.href} 
-                    className="text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-semibold mb-4 text-foreground">Support</h4>
-            <ul className="space-y-3">
-              {footerLinks.support.map((link) => (
-                <li key={link.name}>
-                  <Link 
-                    href={link.href} 
-                    className="text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-semibold mb-4 text-foreground">Legal</h4>
-            <ul className="space-y-3">
-              {footerLinks.legal.map((link) => (
-                <li key={link.name}>
-                  <Link 
-                    href={link.href} 
-                    className="text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+                    <Link 
+                      href={link.href} 
+                      className={`${styles.textSecondary} hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block`}
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
         </div>
         
         {/* Bottom Section */}
         <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="mt-12 pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4"
+          className="pt-8 border-t-2 border-border/30 flex flex-col md:flex-row justify-between items-center gap-6"
         >
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} SaaS Platform Nepal. All rights reserved.
+          <p className={`text-base ${styles.textSecondary} flex items-center gap-2`}>
+            © {new Date().getFullYear()} Pasaal.io. All rights reserved.
           </p>
-          <p className="text-sm text-muted-foreground">
-            Made with ❤️ in Nepal
+          <p className={`text-base ${styles.textSecondary} flex items-center gap-2`}>
+            Made with <Heart className="w-4 h-4 text-red-500 animate-pulse" /> in Nepal 🇳🇵
           </p>
         </motion.div>
       </div>
