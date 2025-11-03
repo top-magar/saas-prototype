@@ -19,7 +19,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLe
 import { Pie, PieChart, Cell } from 'recharts';
 import { ButtonGroup } from '@/components/ui/button-group';
 import dynamic from 'next/dynamic';
-import { Header } from '@/components/header';
+
 import { InteractiveBarChart } from './_components/interactive-bar-chart';
 
 const OverviewChart = dynamic(() => import('./_components/overview-chart').then(mod => mod.OverviewChart), {

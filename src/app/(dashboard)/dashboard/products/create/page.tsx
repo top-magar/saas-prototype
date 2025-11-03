@@ -1,3 +1,4 @@
+'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -6,8 +7,28 @@ import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { createProduct } from '@/app/actions/products'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function CreateProductPage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const router = useRouter();
+
+  const handleSubmit = async (formData: FormData) => {
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      await createProduct(formData);
+      router.push('/dashboard/products');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create product');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center gap-4">
@@ -24,11 +45,16 @@ export default function CreateProductPage() {
         <CardHeader>
           <CardTitle>Product Details</CardTitle>
           <CardDescription>
-            Create a new product. This form works without JavaScript.
+            Create a new product for your store.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={createProduct} className="space-y-4">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+          <form action={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="name">Product Name *</Label>
               <Input 
@@ -36,6 +62,7 @@ export default function CreateProductPage() {
                 name="name" 
                 required 
                 placeholder="Enter product name"
+                disabled={isLoading}
               />
             </div>
             
@@ -46,6 +73,7 @@ export default function CreateProductPage() {
                 name="description" 
                 placeholder="Enter product description"
                 rows={4}
+                disabled={isLoading}
               />
             </div>
             
@@ -56,6 +84,7 @@ export default function CreateProductPage() {
                 name="status" 
                 defaultValue="DRAFT"
                 className="w-full p-2 border rounded-md"
+                disabled={isLoading}
               >
                 <option value="DRAFT">Draft</option>
                 <option value="PUBLISHED">Published</option>
@@ -64,9 +93,11 @@ export default function CreateProductPage() {
             </div>
 
             <div className="flex gap-2">
-              <Button type="submit">Create Product</Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? 'Creating...' : 'Create Product'}
+              </Button>
               <Link href="/dashboard/products">
-                <Button type="button" variant="outline">Cancel</Button>
+                <Button type="button" variant="outline" disabled={isLoading}>Cancel</Button>
               </Link>
             </div>
           </form>

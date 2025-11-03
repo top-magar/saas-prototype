@@ -17,7 +17,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 import { Separator } from '@/components/ui/separator';
 import { TenantTier } from '@/lib/types';
 
-export const SidebarNav = React.memo(({ isCollapsed }: { isCollapsed: boolean }) => {
+export const SidebarNav = React.memo(() => {
   const pathname = usePathname();
   const { user } = useUser();
   const userRoles = React.useMemo(() => (user?.publicMetadata?.role as string[]) || [], [user?.publicMetadata?.role]);
@@ -85,101 +85,44 @@ export const SidebarNav = React.memo(({ isCollapsed }: { isCollapsed: boolean })
   const filteredNavigationConfig = React.useMemo(() => filterNavigation(navigationConfig), [filterNavigation]);
   const filteredAdminNavigationConfig = React.useMemo(() => filterNavigation(adminNavigationConfig), [filterNavigation]);
 
-  React.useEffect(() => {
-    if (isCollapsed) {
-      setOpenAccordionItem(undefined); // Collapse all when sidebar is collapsed
-    }
-  }, [isCollapsed]);
 
-  const renderNavItem = (item: NavItem, isPopover = false) => (
-    <motion.div key={item.name} whileHover={{ scale: 1 }} transition={{ duration: 0.2 }} className="relative relative">
-      {pathname === item.href && (
-        <motion.div
-          layoutId="active-sidebar-link"
-          className="absolute inset-0 bg-primary/10 rounded-lg"
-          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-        />
-      )}
-      <Link
-        href={item.href}
-        prefetch={false}
-        className={cn(
-          'relative z-10 flex items-center rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary no-underline',
-          (isCollapsed && !isPopover) ? 'gap-0' : 'gap-3',
-          pathname === item.href && 'text-primary font-semibold'
+
+  const renderNavItem = (item: NavItem) => (
+    <Link key={item.name} href={item.href} className="no-underline">
+      <div className={cn(
+        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent',
+        pathname === item.href ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
+      )}>
+        {item.icon && <item.icon className="h-4 w-4" />}
+        <span className="truncate">{item.name}</span>
+        {(item.badge || (item.dynamicBadgeKey && dynamicBadges[item.dynamicBadgeKey])) && (
+          <Badge variant="secondary" className="ml-auto">
+            {item.badge || dynamicBadges[item.dynamicBadgeKey!]}
+          </Badge>
         )}
-        onMouseEnter={(e) => {
-          const link = e.currentTarget;
-          link.setAttribute('data-prefetch', 'true');
-        }}
-      >
-        {item.icon && (
-          <div className={cn('transition-transform duration-300 ease-in-out', isCollapsed && 'scale-90')}>
-            <item.icon className="h-3.5 w-3.5" />
-          </div>
-        )}
-        <span className={cn('truncate', (isCollapsed && !isPopover) && 'sr-only')}>
-          {item.name}
-        </span>
-        {!isCollapsed && (item.badge || (item.dynamicBadgeKey && dynamicBadges[item.dynamicBadgeKey])) && (
-          <Badge variant="default" className="ml-auto">{item.badge || dynamicBadges[item.dynamicBadgeKey!]}</Badge>
-        )}
-      </Link>
-    </motion.div>
+      </div>
+    </Link>
   );
 
   const renderNavSection = (section: NavSection) => {
     const isActiveSection = section.href
-      ? pathname === section.href // Exact match for direct links
-      : section.items?.some(item => pathname.startsWith(item.href)); // Check if any sub-item is active
+      ? pathname === section.href
+      : section.items?.some(item => pathname.startsWith(item.href));
 
-    if (section.href && !section.items) { // Direct link section without sub-items
+    if (section.href && !section.items) {
       return (
-        <Link key={section.title}
-          href={section.href}
-          className={cn(
-            'flex items-center rounded-lg px-3 py-2 text-base text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary no-underline font-normal',
-            isCollapsed ? 'gap-0' : 'gap-3', // Remove justify-center for sections without items
-            isActiveSection && ''
-          )}
-        >
-          <div className={cn('transition-transform duration-300 ease-in-out', isCollapsed && 'scale-90')}>
+        <Link key={section.title} href={section.href} className="no-underline">
+          <div className={cn(
+            'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent',
+            isActiveSection ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
+          )}>
             <section.icon className="h-4 w-4" />
+            <span className="truncate">{section.title}</span>
           </div>
-          <span
-            className={cn('truncate', isCollapsed && 'sr-only')}
-          >
-            {section.title}
-          </span>
         </Link>
       );
     }
 
-    if (isCollapsed) {
-      return (
-        <HoverCard key={section.title} openDelay={100} closeDelay={50}>
-          <HoverCardTrigger asChild>
-            <div
-              className={cn(
-                'flex items-center rounded-lg px-3 py-2 text-base text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary',
-                isActiveSection && '',
-                'gap-3' // Always have gap for the popover trigger
-              )}
-            >
-              <section.icon className="h-4 w-4" />
-            </div>
-          </HoverCardTrigger>
-          <HoverCardContent side="right" className="w-48 p-2">
-            <div className="flex flex-col gap-1">
-              <p className="text-sm font-semibold p-2">{section.title}</p>
-              {section.items?.map(item => renderNavItem(item, true))}
-            </div>
-          </HoverCardContent>
-        </HoverCard>
-      );
-    }
-
-    // Section with sub-items (Accordion)
     return (
       <Accordion
         type="single"
@@ -189,43 +132,18 @@ export const SidebarNav = React.memo(({ isCollapsed }: { isCollapsed: boolean })
         key={section.title}
       >
         <AccordionItem value={section.title} className="border-none">
-          <AccordionTrigger
-            className={cn(
-              'flex items-center rounded-lg px-3 py-2 text-base text-muted-foreground transition-all hover:bg-muted/50 hover:text-primary hover:no-underline font-normal',
-              isCollapsed ? 'gap-0' : 'gap-3', // Remove justify-center for accordion triggers
-              isActiveSection && ''
-            )}
-          >
-            <div className={cn('transition-transform duration-300 ease-in-out', isCollapsed && 'scale-90')}>
-              <section.icon className="h-4 w-4" />
-            </div>
-            <span
-              className={cn('truncate flex-1 text-left', isCollapsed && 'sr-only')}
-            >
-              {section.title}
-            </span>
+          <AccordionTrigger className={cn(
+            'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent hover:no-underline',
+            isActiveSection ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
+          )}>
+            <section.icon className="h-4 w-4" />
+            <span className="truncate flex-1 text-left">{section.title}</span>
           </AccordionTrigger>
-          <AnimatePresence initial={false}>
-            {openAccordionItem === section.title && !isCollapsed && (
-              <motion.div
-                key="content"
-                initial="collapsed"
-                animate="expanded"
-                exit="collapsed"
-                variants={{
-                  expanded: { opacity: 1, height: 'auto' },
-                  collapsed: { opacity: 0, height: 0 },
-                }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-              >
-                <AccordionContent className={cn('pt-1', isCollapsed ? 'pl-0' : 'pl-4')}>
-                  <div className="flex flex-col gap-1 border-l border-muted-foreground/20 ml-2 pl-2">
-                    {section.items?.map((item) => renderNavItem(item, false))}
-                  </div>
-                </AccordionContent>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <AccordionContent className="pl-6">
+            <div className="flex flex-col gap-1">
+              {section.items?.map(renderNavItem)}
+            </div>
+          </AccordionContent>
         </AccordionItem>
       </Accordion>
     );

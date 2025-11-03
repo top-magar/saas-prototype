@@ -14,10 +14,10 @@ const productSchema = z.object({
   status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).default("DRAFT"),
 })
 
-export async function createProduct(prevState: any, formData: FormData) {
+export async function createProduct(formData: FormData) {
   const user = await currentUser()
   if (!user) {
-    return { error: 'Unauthorized. Please sign in.' }
+    throw new Error('Unauthorized. Please sign in.')
   }
 
   const tenantId = (user.publicMetadata?.tenantId as string) || 
@@ -40,7 +40,6 @@ export async function createProduct(prevState: any, formData: FormData) {
     }), { maxAttempts: 2, delay: 500 })
 
     revalidatePath('/dashboard/products')
-    return { success: true, message: 'Product created successfully' }
   } catch (error) {
     ErrorLogger.logServerError(error as Error, { 
       action: 'createProduct', 
@@ -49,15 +48,13 @@ export async function createProduct(prevState: any, formData: FormData) {
     })
     
     if (error instanceof z.ZodError) {
-      return { 
-        error: true, 
-        message: error.issues[0].message,
-        field: error.issues[0].path[0] as string
-      }
+      throw new Error(error.issues[0].message)
     }
     
-    return { error: true, message: 'Failed to create product. Please try again.' }
+    throw new Error('Failed to create product. Please try again.')
   }
+  
+  redirect('/dashboard/products')
 }
 
 export async function updateProduct(productId: string, formData: FormData) {

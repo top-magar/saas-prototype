@@ -1,5 +1,13 @@
 import { PrismaClient } from '@prisma/client';
-import { generateSlug } from '../utils'; // Assuming a utility for slug generation
+
+const generateSlug = (text: string): string => {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9 -]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
+};
 
 const prisma = new PrismaClient();
 
