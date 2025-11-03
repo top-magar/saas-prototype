@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Zap, Play } from 'lucide-react';
+import { OptimizedImage } from '@/components/optimized-image';
 import styles from './hero.module.css';
 
 export function Hero() {
@@ -101,10 +102,14 @@ export function Hero() {
           >
             <div className="relative rounded-2xl border-2 border-border bg-card p-4 shadow-2xl hover:shadow-3xl transition-all duration-500">
               <div className="relative overflow-hidden rounded-xl">
-                <img
-                  src="/imgi_553_f14b67236072273.68e4a15273d9d.png"
+                <OptimizedImage
+                  src="/images/dashboard/dashboard-preview.png"
                   alt="Pasaal.io Dashboard - Real Business Management"
+                  width={1200}
+                  height={800}
+                  priority
                   className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
                 />
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <div className="bg-white/90 rounded-full p-4 transform scale-90 group-hover:scale-100 transition-transform">

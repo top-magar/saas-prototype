@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
-import { Banknote, Check, CreditCard, DollarSign } from "lucide-react";
+import { Banknote, Check, CreditCard, DollarSign, Star, Zap, Shield } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
 import { toast } from "sonner";
@@ -31,56 +31,70 @@ import { TenantTier } from "@/lib/types";
 const pricingTiers = [
   {
     name: "Free",
-    price: "$0",
+    price: "NPR 0",
     frequency: "/month",
-    description: "Get started with our basic features.",
-    features: ["1 User", "1 Project", "Basic Analytics", "Community Support"],
+    description: "Perfect for getting started with basic features.",
+    features: ["Up to 10 products", "Basic dashboard", "Email support", "5GB storage"],
     buttonText: "Current Plan",
     tierId: "FREE",
+    savings: null,
   },
   {
     name: "Starter",
-    price: "$29",
+    price: "NPR 2,999",
     frequency: "/month",
-    description: "For new businesses getting started.",
+    description: "Ideal for small businesses and startups.",
     features: [
-      "Up to 50 products",
-      "Basic order management",
-      "Standard analytics",
-      "Email support",
+      "Up to 100 products",
+      "Advanced analytics",
+      "Inventory management",
+      "Priority email support",
+      "50GB storage",
+      "Basic automation",
     ],
-    buttonText: "Upgrade to Starter",
+    buttonText: "Start Free Trial",
     tierId: "STARTER",
+    savings: "Save 20% annually",
   },
   {
     name: "Pro",
-    price: "$79",
+    price: "NPR 7,999",
     frequency: "/month",
-    description: "For growing businesses that need more power.",
+    description: "Best for growing businesses that need advanced features.",
     features: [
-      "Up to 1,000 products",
-      "Advanced analytics",
-      "Automation & API access",
-      "Team management (5 users)",
-      "Priority chat support",
+      "Unlimited products",
+      "Advanced analytics & reports",
+      "Multi-location support",
+      "Team collaboration (10 users)",
+      "API access & integrations",
+      "24/7 chat support",
+      "500GB storage",
+      "Advanced automation",
     ],
-    buttonText: "Upgrade to Pro",
+    buttonText: "Start Free Trial",
     highlight: true,
     tierId: "PRO",
+    savings: "Save 25% annually",
+    popular: true,
   },
   {
     name: "Enterprise",
-    price: "Contact Us",
+    price: "Custom",
     frequency: "",
-    description: "Tailored solutions for your enterprise needs.",
+    description: "Tailored solutions for large organizations.",
     features: [
-      "Custom Solutions",
-      "Dedicated Support",
-      "On-premise Deployment",
-      "SLA",
+      "Everything in Pro",
+      "Custom integrations",
+      "Dedicated account manager",
+      "On-premise deployment",
+      "Custom SLA",
+      "Advanced security",
+      "Unlimited storage",
+      "White-label options",
     ],
     buttonText: "Contact Sales",
     tierId: "ENTERPRISE",
+    savings: null,
   },
 ];
 
@@ -143,18 +157,45 @@ export function PricingDialog({ trigger, currentPlan = TenantTier.FREE, showPaym
             </DialogDescription>
           </DialogHeader>
 
-          {showPaymentMethods && isSignedIn && ( // Only show payment methods if signed in and explicitly allowed
-            <div className="mb-8 flex flex-col items-center gap-4">
-              <h3 className="text-base font-semibold">Select Payment Method</h3>
-              <RadioGroup
-                defaultValue="esewa"
-                onValueChange={setSelectedPaymentMethod}
-                className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-md"
-              >
-                <PaymentMethodRadio id="esewa" value="esewa" icon={DollarSign} label="eSewa" />
-                <PaymentMethodRadio id="khalti" value="khalti" icon={CreditCard} label="Khalti" />
-                <PaymentMethodRadio id="fonepay" value="fonepay" icon={Banknote} label="Fonepay" />
-              </RadioGroup>
+          {showPaymentMethods && isSignedIn && (
+            <div className="mb-8">
+              <div className="bg-muted/50 rounded-lg p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Shield className="h-5 w-5 text-green-600" />
+                  <h3 className="text-base font-semibold">Secure Payment Methods</h3>
+                </div>
+                <RadioGroup
+                  defaultValue="esewa"
+                  onValueChange={setSelectedPaymentMethod}
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+                >
+                  <PaymentMethodRadio 
+                    id="esewa" 
+                    value="esewa" 
+                    icon={DollarSign} 
+                    label="eSewa" 
+                    description="Digital wallet"
+                  />
+                  <PaymentMethodRadio 
+                    id="khalti" 
+                    value="khalti" 
+                    icon={CreditCard} 
+                    label="Khalti" 
+                    description="Mobile payment"
+                  />
+                  <PaymentMethodRadio 
+                    id="fonepay" 
+                    value="fonepay" 
+                    icon={Banknote} 
+                    label="FonePay" 
+                    description="Bank transfer"
+                  />
+                </RadioGroup>
+                <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1">
+                  <Shield className="h-3 w-3" />
+                  All payments are secured with 256-bit SSL encryption
+                </p>
+              </div>
             </div>
           )}
 
@@ -176,15 +217,30 @@ export function PricingDialog({ trigger, currentPlan = TenantTier.FREE, showPaym
 
 // --- Helper Components for Cleaner Code ---
 
-const PaymentMethodRadio = ({ id, value, icon: Icon, label }: { id: string, value: string, icon: React.ElementType, label: string }) => (
+const PaymentMethodRadio = ({ 
+  id, 
+  value, 
+  icon: Icon, 
+  label, 
+  description 
+}: { 
+  id: string, 
+  value: string, 
+  icon: React.ElementType, 
+  label: string,
+  description?: string 
+}) => (
   <div>
     <RadioGroupItem value={value} id={id} className="peer sr-only" />
     <Label
       htmlFor={id}
-      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+      className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-card p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-all"
     >
-      <Icon className="mb-2 h-6 w-6" />
-      {label}
+      <Icon className="mb-2 h-8 w-8 text-primary" />
+      <span className="font-medium">{label}</span>
+      {description && (
+        <span className="text-xs text-muted-foreground mt-1">{description}</span>
+      )}
     </Label>
   </div>
 );
@@ -192,44 +248,88 @@ const PaymentMethodRadio = ({ id, value, icon: Icon, label }: { id: string, valu
 const PricingCard = ({ tier, isCurrent, onSelect }: { tier: (typeof pricingTiers)[0], isCurrent: boolean, onSelect: () => void }) => (
   <Card
     className={cn(
-      "flex flex-col",
-      isCurrent && "ring-2 ring-primary",
-      tier.highlight && !isCurrent && "border-primary"
+      "flex flex-col relative transition-all duration-200 hover:shadow-lg",
+      isCurrent && "ring-2 ring-primary shadow-lg",
+      tier.highlight && !isCurrent && "border-primary shadow-md scale-105",
+      tier.popular && "border-2 border-primary"
     )}
   >
-    <CardHeader className="relative">
+    <CardHeader className="relative pb-4">
       {isCurrent && (
-        <Badge variant="default" className="absolute -top-3 left-1/2 -translate-x-1/2">Current Plan</Badge>
+        <Badge variant="default" className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-600">
+          <Check className="w-3 h-3 mr-1" />
+          Current Plan
+        </Badge>
       )}
-      {tier.highlight && !isCurrent && (
-        <Badge variant="secondary" className="absolute -top-3 left-1/2 -translate-x-1/2">Recommended</Badge>
+      {tier.popular && !isCurrent && (
+        <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
+          <Star className="w-3 h-3 mr-1" />
+          Most Popular
+        </Badge>
       )}
-      <CardTitle className="text-xl font-bold">{tier.name}</CardTitle>
-      <CardDescription>{tier.description}</CardDescription>
-      <div className="mt-4 text-3xl font-bold">
-        {tier.price}
-        {tier.frequency && <span className="text-base font-normal text-muted-foreground">{tier.frequency}</span>}
+      {tier.highlight && !isCurrent && !tier.popular && (
+        <Badge variant="secondary" className="absolute -top-3 left-1/2 -translate-x-1/2">
+          <Zap className="w-3 h-3 mr-1" />
+          Recommended
+        </Badge>
+      )}
+      
+      <CardTitle className="text-xl font-bold flex items-center gap-2">
+        {tier.name}
+        {tier.tierId === "PRO" && <Zap className="h-5 w-5 text-primary" />}
+      </CardTitle>
+      <CardDescription className="text-sm">{tier.description}</CardDescription>
+      
+      <div className="mt-6">
+        <div className="flex items-baseline gap-1">
+          <span className="text-3xl font-bold">{tier.price}</span>
+          {tier.frequency && (
+            <span className="text-base font-normal text-muted-foreground">{tier.frequency}</span>
+          )}
+        </div>
+        {tier.savings && (
+          <p className="text-sm text-green-600 font-medium mt-1">{tier.savings}</p>
+        )}
       </div>
     </CardHeader>
+    
     <CardContent className="flex-grow">
       <ul role="list" className="space-y-3 text-sm">
         {tier.features.map((feature: string) => (
-          <li key={feature} className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-green-500" />
-            <span className="text-muted-foreground">{feature}</span>
+          <li key={feature} className="flex items-start gap-3">
+            <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+            <span className="text-muted-foreground leading-relaxed">{feature}</span>
           </li>
         ))}
       </ul>
     </CardContent>
-    <CardFooter>
+    
+    <CardFooter className="pt-6">
       <Button
-        className="w-full"
+        className={cn(
+          "w-full h-11 font-medium",
+          tier.highlight && "bg-primary hover:bg-primary/90"
+        )}
         onClick={onSelect}
-        disabled={isCurrent || tier.tierId === "FREE" || tier.tierId === "ENTERPRISE"}
+        disabled={isCurrent}
         variant={tier.highlight ? "default" : "outline"}
+        size="lg"
       >
-        {isCurrent ? "Your Current Plan" : tier.buttonText}
+        {isCurrent ? (
+          <>
+            <Check className="w-4 h-4 mr-2" />
+            Current Plan
+          </>
+        ) : (
+          tier.buttonText
+        )}
       </Button>
+      
+      {tier.tierId !== "FREE" && tier.tierId !== "ENTERPRISE" && !isCurrent && (
+        <p className="text-xs text-muted-foreground text-center mt-2">
+          14-day free trial • Cancel anytime
+        </p>
+      )}
     </CardFooter>
   </Card>
 );

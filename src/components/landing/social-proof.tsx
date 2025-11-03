@@ -3,12 +3,12 @@ import { motion } from 'motion/react';
 import Image from 'next/image';
 
 const customers = [
-  { name: "Nepal Bank", logo: "/logo.svg" },
-  { name: "Himalayan Java", logo: "/logo.svg" },
-  { name: "Bhatbhateni", logo: "/logo.svg" },
-  { name: "CG Group", logo: "/logo.svg" },
-  { name: "Nabil Bank", logo: "/logo.svg" },
-  { name: "Daraz Nepal", logo: "/logo.svg" },
+  { name: "Nepal Bank", logo: "/images/logos/company-logo.svg" },
+  { name: "Himalayan Java", logo: "/images/logos/company-logo.svg" },
+  { name: "Bhatbhateni", logo: "/images/logos/company-logo.svg" },
+  { name: "CG Group", logo: "/images/logos/company-logo.svg" },
+  { name: "Nabil Bank", logo: "/images/logos/company-logo.svg" },
+  { name: "Daraz Nepal", logo: "/images/logos/company-logo.svg" },
 ];
 
 const metrics = [
@@ -45,10 +45,12 @@ export function SocialProof() {
               >
                 <Image
                   src={customer.logo}
-                  alt={customer.name}
-                  width={80}
-                  height={40}
+                  alt={`${customer.name} logo`}
+                  width={120}
+                  height={60}
+                  loading="lazy"
                   className="h-8 w-auto"
+                  sizes="120px"
                 />
               </motion.div>
             ))}

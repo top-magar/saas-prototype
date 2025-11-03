@@ -248,10 +248,12 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+  
   body {
     @apply bg-background text-foreground font-sans;
     letter-spacing: var(--tracking-normal);
   }
+  
   h1 {
     @apply text-3xl font-bold;
   }
@@ -270,12 +272,15 @@ body {
   h6 {
     @apply text-sm font-semibold;
   }
+  
   p {
     @apply text-base leading-relaxed;
   }
+  
   a {
     @apply text-primary hover:underline;
   }
+  
   ul {
     @apply list-disc pl-5;
   }
@@ -284,11 +289,38 @@ body {
   }
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
+@layer components {
+  /* Global component utilities */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium transition-colors;
   }
-  body {
-    @apply bg-background text-foreground;
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2 rounded-md font-medium transition-colors;
+  }
+  
+  .card-elevated {
+    @apply bg-card text-card-foreground rounded-lg border shadow-lg hover:shadow-xl transition-shadow;
+  }
+  
+  .container-responsive {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .section-padding {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+  
+  /* Custom utilities for design system */
+  .bg-muted-soft {
+    background-color: hsl(var(--muted) / 0.3);
+  }
+  
+  .border-muted-soft {
+    border-color: hsl(var(--border) / 0.5);
+  }
+  
+  .bg-card-soft {
+    background-color: hsl(var(--card) / 0.5);
   }
 }

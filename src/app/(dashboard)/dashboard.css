@@ -1,0 +1,68 @@
+
+@reference "../globals.css";
+
+/* Dashboard Custom Tailwind Utilities */
+@layer components {
+  /* Dashboard layout */
+  .dashboard-layout {
+    @apply min-h-screen;
+    background-color: hsl(var(--muted) / 0.3);
+  }
+  
+  .dashboard-sidebar {
+    @apply border-r;
+    background-color: hsl(var(--sidebar));
+    border-color: hsl(var(--sidebar-border));
+  }
+  
+  .dashboard-main {
+    @apply flex-1 p-6 flex flex-col gap-6;
+  }
+  
+  /* Dashboard components */
+  .dashboard-card {
+    @apply bg-card border border-border rounded-lg p-6 shadow-sm;
+  }
+  
+  .dashboard-metric {
+    @apply bg-card border border-border rounded-lg p-4 flex flex-col gap-2;
+  }
+  
+  .dashboard-metric-value {
+    @apply text-2xl font-bold text-foreground;
+  }
+  
+  .dashboard-metric-label {
+    @apply text-sm text-muted-foreground;
+  }
+  
+  /* Dashboard tables */
+  .dashboard-table {
+    @apply w-full bg-card rounded-lg overflow-hidden border border-border;
+    border-collapse: collapse;
+  }
+  
+  .dashboard-table th {
+    @apply px-4 py-3 text-left text-sm font-medium text-muted-foreground border-b border-border;
+    background-color: hsl(var(--muted) / 0.5);
+  }
+  
+  .dashboard-table td {
+    @apply px-4 py-3 text-sm;
+    border-bottom: 1px solid hsl(var(--border) / 0.5);
+  }
+  
+  /* Dashboard forms */
+  .dashboard-form {
+    @apply flex flex-col gap-4 bg-card p-6 rounded-lg border border-border;
+  }
+  
+  /* Dashboard buttons */
+  .dashboard-btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md text-sm font-medium transition-colors;
+  }
+  
+  .dashboard-btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2 rounded-md text-sm font-medium transition-colors;
+  }
+}

@@ -75,7 +75,7 @@ export function Footer() {
           >
             <Link href="/" className="flex items-center space-x-3 mb-6 group">
               <div className="relative">
-                <Image src="/logo.svg" alt="Pasaal.io Logo" width={40} height={40} className="group-hover:scale-110 transition-transform duration-300" />
+                <Image src="/images/logos/company-logo.svg" alt="Pasaal.io Logo" width={40} height={40} className="group-hover:scale-110 transition-transform duration-300" />
                 <div className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full animate-pulse" />
               </div>
               <span className={`font-bold text-2xl ${styles.gradientText}`}>

@@ -1,19 +1,16 @@
 import { currentUser } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { createTenantAndAssociateUser } from '@/lib/tenant';
+import { createErrorResponse, createSuccessResponse, validateRequest } from '@/lib/server-only-utils';
 
 export async function POST(req: NextRequest) {
   try {
     const user = await currentUser();
     if (!user?.id) {
-      return new NextResponse('Unauthorized', { status: 401 });
+      return createErrorResponse('Unauthorized', 401);
     }
 
-    const { name, subdomain, primaryColor } = await req.json();
-
-    if (!name || !subdomain) {
-      return new NextResponse('Name and subdomain are required', { status: 400 });
-    }
+    const { name, subdomain, primaryColor } = await validateRequest(req, ['name', 'subdomain']);
 
     const tenant = await createTenantAndAssociateUser({
       clerkUserId: user.id,
@@ -24,13 +21,13 @@ export async function POST(req: NextRequest) {
       primaryColor: primaryColor || '#3B82F6',
     });
 
-    return NextResponse.json(tenant);
+    return createSuccessResponse(tenant);
   } catch (error) {
     console.error('Error creating tenant:', error);
     type PrismaError = { code?: string };
     if (error instanceof Error && (error as PrismaError).code === 'P2002') {
-      return new NextResponse('This subdomain is already taken.', { status: 409 });
+      return createErrorResponse('This subdomain is already taken.', 409);
     }
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return createErrorResponse('Internal Server Error', 500);
   }
 }

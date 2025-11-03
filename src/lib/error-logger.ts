@@ -1,0 +1,72 @@
+import * as Sentry from '@sentry/nextjs'
+
+export class ErrorLogger {
+  static log(error: Error, context?: Record<string, any>) {
+    const errorData = {
+      message: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString(),
+      context,
+      url: typeof window !== 'undefined' ? window.location.href : undefined,
+    }
+    
+    // Log to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error logged:', errorData)
+    }
+    
+    // Send to Sentry in production
+    if (process.env.NODE_ENV === 'production') {
+      Sentry.withScope((scope) => {
+        if (context) {
+          Object.keys(context).forEach(key => {
+            scope.setContext(key, context[key])
+          })
+        }
+        scope.setLevel('error')
+        Sentry.captureException(error)
+      })
+    }
+  }
+  
+  static logServerError(error: Error, context?: Record<string, any>) {
+    const errorData = {
+      message: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString(),
+      context,
+      server: true,
+    }
+    
+    console.error('Server error logged:', errorData)
+    
+    // Send to Sentry
+    if (process.env.NODE_ENV === 'production') {
+      Sentry.withScope((scope) => {
+        scope.setTag('server', true)
+        if (context) {
+          Object.keys(context).forEach(key => {
+            scope.setContext(key, context[key])
+          })
+        }
+        scope.setLevel('error')
+        Sentry.captureException(error)
+      })
+    }
+  }
+  
+  static logUserFeedback(error: Error, feedback: string, userEmail?: string) {
+    if (process.env.NODE_ENV === 'production') {
+      const eventId = Sentry.captureException(error)
+      
+      Sentry.captureUserFeedback({
+        event_id: eventId,
+        name: userEmail || 'Anonymous',
+        email: userEmail || 'anonymous@example.com',
+        comments: feedback,
+      })
+    }
+    
+    console.log('User feedback:', { error: error.message, feedback, userEmail })
+  }
+}

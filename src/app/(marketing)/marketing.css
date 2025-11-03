@@ -1,0 +1,55 @@
+@reference "../globals.css";
+
+/* Marketing Custom Tailwind Utilities */
+@layer components {
+  /* Landing page hero styles */
+  .marketing-hero {
+    @apply min-h-screen;
+    background: linear-gradient(135deg, 
+      hsl(var(--background)) 0%, 
+      hsl(var(--muted) / 0.2) 50%, 
+      hsl(var(--background)) 100%);
+  }
+  
+  /* Marketing typography */
+  .marketing-heading {
+    @apply text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight;
+    background: linear-gradient(135deg, 
+      hsl(var(--foreground)) 0%, 
+      hsl(var(--primary)) 50%, 
+      hsl(var(--muted-foreground)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .marketing-subheading {
+    @apply text-xl md:text-2xl text-muted-foreground leading-relaxed;
+  }
+  
+  /* Marketing buttons */
+  .marketing-cta {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-4 rounded-lg font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1;
+  }
+  
+  /* Marketing sections */
+  .marketing-section {
+    @apply py-20 md:py-32;
+  }
+  
+  /* Marketing cards */
+  .marketing-card {
+    @apply backdrop-blur-sm border rounded-xl p-8 transition-all duration-300 hover:-translate-y-1;
+    background-color: hsl(var(--card) / 0.5);
+    border-color: hsl(var(--border) / 0.5);
+  }
+  
+  .marketing-card:hover {
+    background-color: hsl(var(--card) / 0.8);
+  }
+  
+  /* Marketing animations */
+  .marketing-fade-in {
+    @apply animate-in fade-in slide-in-from-bottom-4 duration-700;
+  }
+}

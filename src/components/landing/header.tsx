@@ -48,7 +48,7 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 z-50">
-            <Image src="/logo.svg" alt="Pasaal.io Logo" width={32} height={32} />
+            <Image src="/images/logos/company-logo.svg" alt="Pasaal.io Logo" width={32} height={32} priority />
             <div>
               <span className="font-bold text-xl">PASAAL.IO</span>
               <Badge variant="secondary" className="ml-2 text-xs">Nepal</Badge>
