@@ -47,13 +47,12 @@ export const CommandMenu = () => {
   return (
     <>
       <Button
-        variant="outline"
-        size="sm"
-        className="w-64 justify-start text-muted-foreground"
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8"
         onClick={() => setOpen(true)}
       >
-        <Search className="mr-2 h-4 w-4" />
-        <span>Search...</span>
+        <Search className="size-5" strokeWidth={1.5} />
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Type a command or search..." />

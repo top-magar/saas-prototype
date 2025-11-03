@@ -81,3 +81,61 @@ export async function safeApiCall<T>(
 
   return { error: 'Max retries exceeded', success: false };
 }
+
+// Image utilities (consolidated from image-utils.ts)
+export const generateBlurDataURL = (width: number = 8, height: number = 8): string => {
+  if (typeof document === 'undefined') return '';
+  
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  
+  if (ctx) {
+    ctx.fillStyle = '#f3f4f6';
+    ctx.fillRect(0, 0, width, height);
+  }
+  
+  return canvas.toDataURL();
+};
+
+export const getImageSizes = (breakpoints: Record<string, string>): string => {
+  return Object.entries(breakpoints)
+    .map(([breakpoint, size]) => `(max-width: ${breakpoint}) ${size}`)
+    .join(', ');
+};
+
+export const responsiveSizes = getImageSizes({
+  '768px': '100vw',
+  '1200px': '50vw',
+  '9999px': '33vw'
+});
+
+// Retry utilities (consolidated from retry-wrapper.ts and use-retry.ts)
+interface RetryOptions {
+  maxAttempts?: number;
+  delay?: number;
+  backoff?: boolean;
+}
+
+export async function withRetry<T>(
+  operation: () => Promise<T>,
+  options: RetryOptions = {}
+): Promise<T> {
+  const { maxAttempts = 3, delay = 1000, backoff = true } = options;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      if (attempt === maxAttempts) {
+        throw error;
+      }
+
+      const waitTime = backoff ? delay * Math.pow(2, attempt - 1) : delay;
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+  }
+
+  throw new Error('Retry operation failed');
+}

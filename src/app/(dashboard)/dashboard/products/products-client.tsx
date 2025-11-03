@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Search, Plus, MoreHorizontal, ArrowUp, ArrowDown } from "lucide-react";
-import { ServerActionDialog } from "./server-action-dialog";
 import { DeleteButton } from "./delete-button";
 import Link from "next/link";
 
@@ -55,14 +54,11 @@ export default function ProductsClient({ initialProducts, categories }: Products
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
-        <div className="flex gap-2">
-          <ServerActionDialog />
-          <Link href="/dashboard/products/create">
-            <Button variant="outline">
-              <Plus className="mr-2 h-4 w-4" /> Create (No JS)
-            </Button>
-          </Link>
-        </div>
+        <Link href="/dashboard/products/create">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" /> Add Product
+          </Button>
+        </Link>
       </div>
 
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">

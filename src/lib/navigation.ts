@@ -19,6 +19,7 @@ import {
   Layers,
   Clipboard,
   BookOpen,
+  Palette,
 } from 'lucide-react';
 
 import { navigationStrings } from "./i18n/en";
@@ -83,6 +84,11 @@ export const navigationConfig: NavSection[] = [
     title: navigationStrings.customers,
     icon: Users,
     href: '/dashboard/customers',
+  },
+  {
+    title: 'Store Builder',
+    icon: Palette,
+    href: '/dashboard/store-builder',
   },
   {
     title: navigationStrings.automation,

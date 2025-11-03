@@ -4,6 +4,7 @@ import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/u
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ErrorBoundary } from '@/components/error-boundary';
+import Link from "next/link";
 import ProductsClient from './products-client';
 import { getProductsForTenant, getCategoriesForTenant } from '@/lib/server-only-utils';
 
@@ -42,9 +43,11 @@ export default async function ProductsPage() {
                     You haven&apos;t added any products yet. Get started by adding your first one.
                   </EmptyDescription>
                 </EmptyHeader>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" /> Add Product
-                </Button>
+                <Link href="/dashboard/products/add">
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" /> Add Product
+                  </Button>
+                </Link>
               </Empty>
             </CardContent>
           </Card>

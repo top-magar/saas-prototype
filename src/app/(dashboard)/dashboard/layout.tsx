@@ -7,7 +7,7 @@ import { TenantProvider } from "@/components/_shared";
 import { useTenant } from "@/lib/tenant-context";
 import dynamic from 'next/dynamic';
 
-const AppSidebar = dynamic(() => import("../_components/sidebar").then(mod => mod.AppSidebar), { ssr: false });
+const AppSidebar = dynamic(() => import("../_components/sidebar/app-sidebar").then(mod => mod.AppSidebar), { ssr: false });
 const Header = dynamic(() => import('../_components/header').then(mod => mod.Header), { ssr: false });
 
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -34,20 +34,20 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <div className="flex flex-col h-screen">
+      <div className="relative flex h-screen w-full">
+        <AppSidebar />
+        <SidebarInset className="flex flex-col">
           <NavigationProgress />
           <Header />
           <main className="flex-1 overflow-auto">
             <ErrorBoundary>
-              <div className="container mx-auto py-8 px-4 md:px-6 lg:px-8">
+              <div className="h-full w-full max-w-full p-4 sm:p-6">
                 {children}
               </div>
             </ErrorBoundary>
           </main>
-        </div>
-      </SidebarInset>
+        </SidebarInset>
+      </div>
     </SidebarProvider>
   );
 }
