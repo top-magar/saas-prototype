@@ -3,7 +3,7 @@ import { useUser } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { StatCard } from './_components/stat-card';
 import { RecentOrders } from './_components/recent-orders';
-import { Download, ArrowUp, User, CreditCard, AlertTriangle, Package } from 'lucide-react';
+import { Download, Package } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -61,15 +61,17 @@ export interface DashboardData {
 }
 
 const salesByChannelData = [
-  { name: "Online", value: 60, fill: "var(--color-online)" },
-  { name: "Store", value: 30, fill: "var(--color-store)" },
-  { name: "Referral", value: 10, fill: "var(--color-referral)" },
+  { name: "Online", value: 68, fill: "var(--color-online)" },
+  { name: "Store", value: 22, fill: "var(--color-store)" },
+  { name: "Mobile App", value: 7, fill: "var(--color-mobile)" },
+  { name: "Referral", value: 3, fill: "var(--color-referral)" },
 ];
 
 const salesByChannelConfig = {
   online: { label: "Online", color: "hsl(var(--chart-1))" },
   store: { label: "Store", color: "hsl(var(--chart-2))" },
-  referral: { label: "Referral", color: "hsl(var(--chart-3))" },
+  mobile: { label: "Mobile App", color: "hsl(var(--chart-3))" },
+  referral: { label: "Referral", color: "hsl(var(--chart-4))" },
 } satisfies ChartConfig;
 
 export default function DashboardClientPage({ data }: { data: DashboardData | null }) {
@@ -165,74 +167,76 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
         </div>
       </div>
 
-      <motion.div
-        className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-      >
-        {data.stats && (
-          <>
-            <motion.div variants={itemVariants}>
-              <StatCard
-                title="Total Sales"
-                value={data.stats.totalSales.toLocaleString()}
-                icon={<ArrowUp className="h-5 w-5 text-muted-foreground" />}
-                change={20.1}
-                changeType={'increase'}
-              />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <StatCard
-                title="Total Revenue"
-                value={`NPR ${data.stats.totalRevenue.toLocaleString()}`}
-                icon={<CreditCard className="h-5 w-5 text-muted-foreground" />}
-                change={15.5}
-                changeType={'increase'}
-              />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <StatCard
-                title="Active Customers"
-                value={data.stats.activeCustomers.toLocaleString()}
-                icon={<User className="h-5 w-5 text-muted-foreground" />}
-                change={10.2}
-                changeType={'increase'}
-              />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <StatCard
-                title="Refund Requests"
-                value={data.stats.refundRequests.toLocaleString()}
-                icon={<AlertTriangle className="h-5 w-5 text-muted-foreground" />}
-                change={5.0}
-                changeType={'decrease'}
-              />
-            </motion.div>
-          </>
-        )}
-      </motion.div>
+      {data.stats && (
+        <motion.div
+          className="mx-auto grid grid-cols-1 gap-px rounded-xl bg-border sm:grid-cols-2 lg:grid-cols-4"
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.div variants={itemVariants}>
+            <StatCard
+              name="Total Sales"
+              value={data.stats.totalSales.toLocaleString()}
+              change="+24.8%"
+              changeType="positive"
+              index={0}
+              total={4}
+            />
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <StatCard
+              name="Total Revenue"
+              value={`NPR ${data.stats.totalRevenue.toLocaleString()}`}
+              change="+18.2%"
+              changeType="positive"
+              index={1}
+              total={4}
+            />
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <StatCard
+              name="Active Customers"
+              value={data.stats.activeCustomers.toLocaleString()}
+              change="+12.5%"
+              changeType="positive"
+              index={2}
+              total={4}
+            />
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <StatCard
+              name="Refund Requests"
+              value={data.stats.refundRequests.toLocaleString()}
+              change="-8.3%"
+              changeType="negative"
+              index={3}
+              total={4}
+            />
+          </motion.div>
+        </motion.div>
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3">
           <Card>
             <CardHeader>
               <CardTitle>Sales & Revenue Overview</CardTitle>
-              <CardDescription>Monthly performance of your business.</CardDescription>
+              <CardDescription>12-month performance trend showing consistent growth.</CardDescription>
             </CardHeader>
             <CardContent>
               <OverviewChart data={data.overview} />
             </CardContent>
           </Card>
         </div>
-        <div>
+        <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Sales by Channel</CardTitle>
-              <CardDescription>Distribution of sales across different channels.</CardDescription>
+              <CardTitle>Sales Channels</CardTitle>
+              <CardDescription>Revenue distribution</CardDescription>
             </CardHeader>
             <CardContent className="flex items-center justify-center">
-              <ChartContainer config={salesByChannelConfig} className="mx-auto aspect-square max-h-[250px]">
+              <ChartContainer config={salesByChannelConfig} className="mx-auto aspect-square max-h-[200px]">
                 <PieChart>
                   <ChartTooltip
                     cursor={false}
@@ -242,15 +246,38 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
                     data={salesByChannelData}
                     dataKey="value"
                     nameKey="name"
-                    innerRadius={60}
-                    strokeWidth={5}
+                    innerRadius={40}
+                    strokeWidth={3}
                   />
                   <ChartLegend
                     content={<ChartLegendContent nameKey="name" />}
-                    className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+                    className="-translate-y-2 flex-wrap gap-1 text-xs [&>*]:basis-1/2 [&>*]:justify-center"
                   />
                 </PieChart>
               </ChartContainer>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Stats</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Avg Order Value</span>
+                <span className="font-semibold">NPR 47,720</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Conversion Rate</span>
+                <span className="font-semibold text-green-600">3.2%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Customer Satisfaction</span>
+                <span className="font-semibold">4.8/5.0</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Return Rate</span>
+                <span className="font-semibold text-red-600">0.4%</span>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -263,23 +290,29 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
 
       <Card>
         <CardHeader>
-          <CardTitle>Top Products</CardTitle>
-          <CardDescription>Your best-selling items this month.</CardDescription>
+          <CardTitle>Top Performing Products</CardTitle>
+          <CardDescription>Best-selling items ranked by performance and revenue contribution.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-6">
-          {data.topProducts && data.topProducts.map(product => (
-            <div key={product.name} className="flex items-center gap-4">
-              <Package className="h-6 w-6 text-muted-foreground" />
-              <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium">{product.name}</p>
-                <Progress value={product.percent} />
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {data.topProducts && data.topProducts.map((product, index) => (
+              <div key={product.name} className="flex items-center gap-4 p-4 border rounded-lg">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-bold text-primary">#{index + 1}</span>
+                  </div>
+                </div>
+                <div className="flex-1 space-y-2">
+                  <p className="text-sm font-medium">{product.name}</p>
+                  <Progress value={product.percent} className="h-2" />
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">{product.percent}% performance</span>
+                    <span className="font-medium">NPR {product.earnings.toLocaleString()}</span>
+                  </div>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-bold">{product.percent}%</p>
-                <p className="text-xs text-muted-foreground">NPR {product.earnings.toLocaleString()}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </CardContent>
       </Card>
     </motion.div>

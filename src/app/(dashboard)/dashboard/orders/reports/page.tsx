@@ -1,222 +1,189 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
-} from "@/components/ui/chart";
-import { Bar, BarChart, Line, LineChart, Pie, PieChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts";
-import { Download } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Area, AreaChart, Pie, PieChart, CartesianGrid, XAxis, YAxis, Cell, ResponsiveContainer } from "recharts";
+import { Download, FileText, Calendar } from "lucide-react";
+import { toast } from "sonner";
 
-const salesByProductData = [
-  { product: "Laptop", sales: 50000 },
-  { product: "Mouse", sales: 15000 },
-  { product: "Keyboard", sales: 25000 },
-  { product: "Monitor", sales: 30000 },
+const orderStatusData = [
+  { name: "Completed", value: 1245, color: "hsl(var(--chart-1))" },
+  { name: "Processing", value: 234, color: "hsl(var(--chart-2))" },
+  { name: "Shipped", value: 156, color: "hsl(var(--chart-3))" },
+  { name: "Cancelled", value: 45, color: "hsl(var(--chart-4))" },
 ];
 
-const salesByProductConfig = {
-  sales: {
-    label: "Sales",
-    color: "hsl(var(--chart-1))",
-  },
-};
-
-const salesByRegionData = [
-  { region: "North", sales: 40000, orders: 200 },
-  { region: "South", sales: 30000, orders: 150 },
-  { region: "East", sales: 50000, orders: 250 },
-  { region: "West", sales: 20000, orders: 100 },
+const monthlyOrdersData = [
+  { month: "Jan", orders: 245 },
+  { month: "Feb", orders: 312 },
+  { month: "Mar", orders: 289 },
+  { month: "Apr", orders: 356 },
+  { month: "May", orders: 398 },
+  { month: "Jun", orders: 445 },
 ];
 
-const salesByRegionConfig = {
-  sales: {
-    label: "Sales",
-    color: "hsl(var(--chart-1))",
-  },
-  orders: {
-    label: "Orders",
-    color: "hsl(var(--chart-2))",
-  },
-};
-
-const orderStatusDistribution = [
-  { name: "Completed", value: 70, color: "hsl(var(--chart-1))" },
-  { name: "Pending", value: 20, color: "hsl(var(--chart-2))" },
-  { name: "Cancelled", value: 10, color: "hsl(var(--chart-3))" },
+const recentOrders = [
+  { id: "ORD2024001", customer: "Rajesh Sharma", date: "2024-01-15", amount: 285000, status: "Completed" },
+  { id: "ORD2024002", customer: "Priya Patel", date: "2024-01-15", amount: 165000, status: "Processing" },
+  { id: "ORD2024003", customer: "Amit Kumar", date: "2024-01-14", amount: 125000, status: "Shipped" },
+  { id: "ORD2024004", customer: "Sneha Thapa", date: "2024-01-14", amount: 195000, status: "Processing" },
+  { id: "ORD2024005", customer: "Bikash Rai", date: "2024-01-13", amount: 35000, status: "Completed" },
 ];
-
-const orderStatusConfig = {
-  completed: { label: "Completed", color: "hsl(var(--chart-1))" },
-  pending: { label: "Pending", color: "hsl(var(--chart-2))" },
-  cancelled: { label: "Cancelled", color: "hsl(var(--chart-3))" },
-};
 
 export default function OrderReportsPage() {
   const [timeRange, setTimeRange] = useState("30d");
 
+  const exportReport = (format: string) => {
+    toast.success(`Order report exported as ${format.toUpperCase()}`);
+  };
+
+  const getStatusBadge = (status: string) => {
+    const variants = {
+      Completed: "default" as const,
+      Processing: "secondary" as const,
+      Shipped: "outline" as const,
+      Cancelled: "destructive" as const,
+    };
+    return <Badge variant={variants[status as keyof typeof variants]}>{status}</Badge>;
+  };
+
   return (
-    <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+    <div className="flex flex-col gap-6 p-4 lg:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold md:text-2xl">Order Reports</h1>
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a time range" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7d">Last 7 days</SelectItem>
-            <SelectItem value="30d">Last 30 days</SelectItem>
-            <SelectItem value="90d">Last 90 days</SelectItem>
-            <SelectItem value="1y">Last year</SelectItem>
-          </SelectContent>
-        </Select>
+        <div>
+          <h1 className="text-2xl font-semibold">Order Reports</h1>
+          <p className="text-muted-foreground">Track and analyze order performance</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">Last 7 days</SelectItem>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+              <SelectItem value="90d">Last 90 days</SelectItem>
+              <SelectItem value="6m">Last 6 months</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" onClick={() => exportReport("pdf")}>
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+        </div>
       </div>
 
-      <Tabs defaultValue="sales-by-product" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="sales-by-product">Sales by Product</TabsTrigger>
-          <TabsTrigger value="sales-by-region">Sales by Region</TabsTrigger>
-          <TabsTrigger value="order-status">Order Status</TabsTrigger>
-        </TabsList>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Monthly Order Volume</CardTitle>
+            <CardDescription>Number of orders per month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={{ orders: { label: "Orders", color: "hsl(var(--chart-1))" } }} className="h-[250px]">
+              <AreaChart data={monthlyOrdersData}>
+                <defs>
+                  <linearGradient id="orderGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.2} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} />
+                <YAxis axisLine={false} tickLine={false} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Area dataKey="orders" stroke="hsl(var(--chart-1))" strokeWidth={3} fill="url(#orderGradient)" />
+              </AreaChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
 
-        <TabsContent value="sales-by-product" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sales Performance by Product</CardTitle>
-              <CardDescription>Total sales generated by each product.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={salesByProductConfig} className="h-[300px]">
-                <BarChart accessibilityLayer data={salesByProductData}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="product"
-                    tickLine={false}
-                    tickMargin={10}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(value) => `$${value / 1000}k`}
-                  />
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent />} 
-                  />
-                  <ChartLegend content={<ChartLegendContent />} />
-                  <Bar dataKey="sales" fill="var(--color-sales)" radius={4} />
-                </BarChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        <Card>
+          <CardHeader>
+            <CardTitle>Order Status Distribution</CardTitle>
+            <CardDescription>Current order status breakdown</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center">
+            <ChartContainer config={{}} className="h-[200px] w-full flex justify-center">
+              <PieChart>
+                <Pie 
+                  data={orderStatusData} 
+                  dataKey="value" 
+                  nameKey="name" 
+                  innerRadius={60} 
+                  outerRadius={90}
+                  paddingAngle={2}
+                  cornerRadius={8}
+                  cx="50%"
+                  cy="50%"
+                >
+                  {orderStatusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} stroke="white" strokeWidth={2} />
+                  ))}
+                </Pie>
+                <ChartTooltip content={<ChartTooltipContent />} />
+              </PieChart>
+            </ChartContainer>
+            <div className="mt-4 grid grid-cols-2 gap-2 text-sm w-full">
+              {orderStatusData.map((item) => (
+                <div key={item.name} className="flex justify-between">
+                  <span>{item.name}</span>
+                  <span className="font-medium">{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        <TabsContent value="sales-by-region" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sales Performance by Region</CardTitle>
-              <CardDescription>Sales and number of orders across different regions.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={salesByRegionConfig} className="h-[300px]">
-                <LineChart accessibilityLayer data={salesByRegionData}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="region"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                  />
-                  <YAxis yAxisId="left" stroke="var(--color-sales)" />
-                  <YAxis yAxisId="right" orientation="right" stroke="var(--color-orders)" />
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent />} 
-                  />
-                  <ChartLegend content={<ChartLegendContent />} />
-                  <Line
-                    yAxisId="left"
-                    dataKey="sales"
-                    type="monotone"
-                    stroke="var(--color-sales)"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                  <Line
-                    yAxisId="right"
-                    dataKey="orders"
-                    type="monotone"
-                    stroke="var(--color-orders)"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Orders</CardTitle>
+          <CardDescription>Latest order transactions</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order ID</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recentOrders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell className="font-medium">{order.id}</TableCell>
+                  <TableCell>{order.customer}</TableCell>
+                  <TableCell>{order.date}</TableCell>
+                  <TableCell>NPR {order.amount.toLocaleString()}</TableCell>
+                  <TableCell>{getStatusBadge(order.status)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="order-status" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Order Status Distribution</CardTitle>
-              <CardDescription>Breakdown of orders by their current status.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center">
-              <ChartContainer config={orderStatusConfig} className="h-[250px] w-full">
-                <PieChart>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent nameKey="name" />} 
-                  />
-                  <Pie
-                    data={orderStatusDistribution}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={60}
-                    outerRadius={100}
-                    strokeWidth={2}
-                    startAngle={90}
-                    endAngle={-270}
-                  >
-                    {orderStatusDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <ChartLegend
-                    content={<ChartLegendContent nameKey="name" />} 
-                    className="flex-wrap justify-center gap-2 pt-2"
-                  />
-                </PieChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      <div className="flex justify-end">
-        <Button variant="outline">
-          <Download className="mr-2 h-4 w-4" /> Export Report
+      <div className="grid gap-4 md:grid-cols-3">
+        <Button variant="outline" onClick={() => exportReport("csv")} className="flex items-center gap-2">
+          <FileText className="h-4 w-4" />
+          Export CSV
+        </Button>
+        <Button variant="outline" onClick={() => exportReport("excel")} className="flex items-center gap-2">
+          <FileText className="h-4 w-4" />
+          Export Excel
+        </Button>
+        <Button variant="outline" onClick={() => exportReport("pdf")} className="flex items-center gap-2">
+          <Calendar className="h-4 w-4" />
+          Generate Report
         </Button>
       </div>
     </div>

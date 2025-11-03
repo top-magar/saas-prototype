@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldLabel, FieldContent, FieldError } from "@/components/ui/field";
 import { Plus, Pencil, Trash } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -54,6 +55,7 @@ const categoryFormSchema = z.object({
 type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 
 export default function CategoriesPage() {
+  const router = useRouter();
   const { tenant } = useTenant();
   const { data: categories, isLoading, isError, mutate } = useApi(tenant ? `/products/categories?tenantId=${tenant.id}` : null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -106,9 +108,7 @@ export default function CategoriesPage() {
       <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
         <div className="flex items-center justify-between">
             <h1 className="text-xl font-semibold md:text-2xl">Product Categories</h1>
-            <Button onClick={() => setIsDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" /> Add Category
-            </Button>
+            
         </div>
         <Card>
           <CardContent className="flex items-center justify-center p-8">
@@ -119,22 +119,13 @@ export default function CategoriesPage() {
                   You haven&apos;t added any categories yet. Get started by adding your first one.
                 </EmptyDescription>
               </EmptyHeader>
-              <Button onClick={() => setIsDialogOpen(true)}>
+              <Button onClick={() => router.push('/dashboard/products/categories/add')}>
                 <Plus className="mr-2 h-4 w-4" /> Add Category
               </Button>
             </Empty>
           </CardContent>
         </Card>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <CategoryFormDialog
-            category={null}
-            onSaveSuccess={() => {
-                setIsDialogOpen(false);
-                mutate();
-            }}
-            onClose={() => setIsDialogOpen(false)}
-          />
-        </Dialog>
+
       </div>
     );
   }
@@ -144,11 +135,6 @@ export default function CategoriesPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">Product Categories</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => setEditingCategory(null)}>
-              <Plus className="mr-2 h-4 w-4" /> Add Category
-            </Button>
-          </DialogTrigger>
           <CategoryFormDialog
             category={editingCategory}
             onSaveSuccess={() => {

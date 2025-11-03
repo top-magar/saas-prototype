@@ -84,33 +84,6 @@ const dashboardRoutes: Route[] = [
     title: "Analytics",
     icon: <BarChart className="size-4" />,
     link: "/dashboard/analytics",
-    subs: [
-      {
-        title: "Overview",
-        link: "/dashboard/analytics",
-        icon: <BarChart className="size-4" />,
-      },
-      {
-        title: "Revenue",
-        link: "/dashboard/analytics/revenue",
-        icon: <ArrowUp className="size-4" />,
-      },
-      {
-        title: "Customer Insights",
-        link: "/dashboard/analytics/customers",
-        icon: <User className="size-4" />,
-      },
-      {
-        title: "Product Analytics",
-        link: "/dashboard/analytics/products",
-        icon: <Package2 className="size-4" />,
-      },
-      {
-        title: "Custom Reports",
-        link: "/dashboard/analytics/custom-reports",
-        icon: <Layers className="size-4" />,
-      },
-    ],
   },
   {
     id: "products",

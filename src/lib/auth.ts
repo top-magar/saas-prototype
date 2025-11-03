@@ -39,7 +39,7 @@ export async function authorize(tenantId: string, allowedRoles: UserRole[]) {
 
   console.log(`[AUTHORIZE] User ${dbUser.clerkUserId} (DB ID: ${dbUser.id}) found. Role: ${dbUser.role}. Allowed roles: ${allowedRoles.join(', ')}`);
 
-  if (!allowedRoles.includes(dbUser.role as UserRole)) {
+  if (!allowedRoles.includes(dbUser.role.toLowerCase() as UserRole)) {
     console.log(`[AUTHORIZE] Forbidden: User role "${dbUser.role}" is not one of the allowed roles.`);
     throw new Error(`Forbidden: User role "${dbUser.role}" is not one of the allowed roles.`);
   }

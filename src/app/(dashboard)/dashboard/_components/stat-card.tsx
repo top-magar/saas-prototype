@@ -1,32 +1,41 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { ArrowUp, ArrowDown } from 'lucide-react';
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface StatCardProps {
-  title: string;
+  name: string;
   value: string;
-  icon: React.ReactNode;
-  change: number;
-  changeType: 'increase' | 'decrease';
+  change: string;
+  changeType: "positive" | "negative";
+  index: number;
+  total: number;
 }
 
-export function StatCard({ title, value, icon, change, changeType }: StatCardProps) {
-  const isIncrease = changeType === 'increase';
+export function StatCard({ name, value, change, changeType, index, total }: StatCardProps) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        {icon}
-      </CardHeader>
-      <CardContent>
-        <div className="text-xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground flex items-center gap-1">
-          <span className={cn('flex items-center gap-1', isIncrease ? 'text-green-500' : 'text-red-500')}>
-            {isIncrease ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
-            {Math.abs(change)}%
-          </span>
-          vs Last Week
-        </p>
+    <Card
+      className={cn(
+        "rounded-none border-0 shadow-none py-0",
+        index === 0 && "rounded-l-xl",
+        index === total - 1 && "rounded-r-xl"
+      )}
+    >
+      <CardContent className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 p-4 sm:p-6">
+        <div className="text-sm font-medium text-muted-foreground">
+          {name}
+        </div>
+        <div
+          className={cn(
+            "text-xs font-medium",
+            changeType === "positive"
+              ? "text-green-800 dark:text-green-400"
+              : "text-red-800 dark:text-red-400"
+          )}
+        >
+          {change}
+        </div>
+        <div className="w-full flex-none text-3xl font-medium tracking-tight text-foreground">
+          {value}
+        </div>
       </CardContent>
     </Card>
   );

@@ -53,13 +53,7 @@ export const navigationConfig: NavSection[] = [
   {
     title: navigationStrings.analytics,
     icon: BarChart,
-    items: [
-      { name: navigationStrings.overview, href: '/dashboard/analytics', icon: BarChart },
-      { name: navigationStrings.revenue, href: '/dashboard/analytics/revenue', tiers: ['PRO', 'ENTERPRISE'], icon: ArrowUp },
-      { name: navigationStrings.customerInsights, href: '/dashboard/analytics/customers', tiers: ['PRO', 'ENTERPRISE'], icon: User },
-      { name: navigationStrings.productAnalytics, href: '/dashboard/analytics/products', tiers: ['PRO', 'ENTERPRISE'], icon: Package },
-      { name: navigationStrings.customReports, href: '/dashboard/analytics/custom-reports', tiers: ['PRO', 'ENTERPRISE'], icon: Layers },
-    ],
+    href: '/dashboard/analytics',
   },
   {
     title: navigationStrings.products,
