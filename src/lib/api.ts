@@ -13,11 +13,11 @@ export const deleteCategory = (tenantId: string, categoryId: string) => {
   return api.delete(`/products/categories?tenantId=${tenantId}&categoryId=${categoryId}`);
 };
 
-export const updateCategory = (tenantId: string, categoryId: string, data: any) => {
+export const updateCategory = (tenantId: string, categoryId: string, data: Record<string, unknown>) => {
   return api.patch(`/products/categories?tenantId=${tenantId}&categoryId=${categoryId}`, data);
 };
 
-export const createCategory = (tenantId: string, data: any) => {
+export const createCategory = (tenantId: string, data: Record<string, unknown>) => {
   return api.post(`/products/categories?tenantId=${tenantId}`, data);
 };
 
@@ -33,11 +33,11 @@ export const bulkDeleteProducts = (tenantId: string, productIds: string[]) => {
   return api.delete(`/products/bulk`, { data: { tenantId, productIds } });
 };
 
-export const createProduct = (tenantId: string, data: any) => {
+export const createProduct = (tenantId: string, data: Record<string, unknown>) => {
     return api.post(`/products?tenantId=${tenantId}`, data);
 };
 
-export const updateProduct = (tenantId: string, productId: string, data: any) => {
+export const updateProduct = (tenantId: string, productId: string, data: Record<string, unknown>) => {
     return api.put(`/products?tenantId=${tenantId}&productId=${productId}`, data);
 };
 

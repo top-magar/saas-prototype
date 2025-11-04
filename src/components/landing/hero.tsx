@@ -50,7 +50,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.8 }}
             className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-4xl mx-auto leading-relaxed"
           >
-            Pasaal.io automates your inventory, sales, and customer management so you can focus on growing your business in Nepal's competitive market
+            Pasaal.io automates your inventory, sales, and customer management so you can focus on growing your business in Nepal&apos;s competitive market
           </motion.p>
 
           {/* Social proof */}

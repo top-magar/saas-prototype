@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -56,6 +57,7 @@ const allTenants: Tenant[] = [
 const ITEMS_PER_PAGE = 5;
 
 export default function AllTenantsPage() {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
@@ -75,19 +77,14 @@ export default function AllTenantsPage() {
   const currentTenants = filteredTenants.slice(startIndex, endIndex);
 
   const handleViewDetails = (id: string) => {
-    try {
-      // Navigate to tenant details page
-      window.location.href = `/dashboard/admin/tenants/${id}`;
-    } catch (error) {
-      // Handle navigation error
-    }
+    router.push(`/dashboard/admin/tenants/${id}`);
   };
 
   const handleSuspendTenant = async (id: string) => {
     try {
       // API call to suspend tenant
       await fetch(`/api/tenants/${id}/suspend`, { method: 'POST' });
-    } catch (error) {
+    } catch {
       // Handle API error
     }
   };
@@ -96,7 +93,7 @@ export default function AllTenantsPage() {
     try {
       // API call to activate tenant
       await fetch(`/api/tenants/${id}/activate`, { method: 'POST' });
-    } catch (error) {
+    } catch {
       // Handle API error
     }
   };

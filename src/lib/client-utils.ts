@@ -32,7 +32,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     try {
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
+    } catch {
       return initialValue;
     }
   });
@@ -44,8 +44,8 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
       }
-    } catch (error) {
-      console.error('Error saving to localStorage:', error);
+    } catch (err) {
+      console.error('Error saving to localStorage:', err);
     }
   };
 
@@ -53,21 +53,21 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 }
 
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia(query).matches;
+  });
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
     const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
     
     const listener = () => setMatches(media.matches);
     media.addListener(listener);
     
     return () => media.removeListener(listener);
-  }, [matches, query]);
+  }, [query]);
 
   return matches;
 }

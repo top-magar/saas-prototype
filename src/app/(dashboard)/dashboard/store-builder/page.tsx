@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import api from '@/lib/api';
+import { useTenant } from '@/lib/tenant-context';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
@@ -29,27 +31,31 @@ import {
   Tablet,
   Trash2,
   Settings,
-  Palette,
   Copy,
-  Move,
-  Plus
+  Plus,
+  Store
 } from 'lucide-react';
 
 interface ComponentData {
   id: string;
   type: 'navigation' | 'hero' | 'products' | 'text' | 'image' | 'testimonials' | 'cta' | 'footer';
   title: string;
-  content: {
+  props: {
     text?: string;
     heading?: string;
     subheading?: string;
     buttonText?: string;
-    backgroundColor?: string;
-    textColor?: string;
-    alignment?: 'left' | 'center' | 'right';
     imageUrl?: string;
     links?: Array<{ text: string; url: string }>;
   };
+  styles: {
+    base: {
+      backgroundColor?: string;
+      color?: string;
+      textAlign?: 'left' | 'center' | 'right';
+    };
+  };
+  children: ComponentData[];
 }
 
 const COMPONENT_TYPES = [
@@ -62,6 +68,36 @@ const COMPONENT_TYPES = [
   { id: 'cta', type: 'cta', title: 'Call to Action', icon: ShoppingCart, category: 'Marketing' },
   { id: 'footer', type: 'footer', title: 'Footer', icon: Layout, category: 'Layout' },
 ] as const;
+
+// Sanitization functions moved outside component to prevent recreation
+const sanitizeText = (text: string) => {
+  if (!text) return '';
+  return text.replace(/[<>"'&]/g, (match) => {
+    const entities: Record<string, string> = {
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      '&': '&amp;'
+    };
+    return entities[match] || match;
+  });
+};
+
+const sanitizeStyle = (value: string) => {
+  if (!value) return '';
+  // Only allow valid CSS color values
+  const colorRegex = /^(#[0-9a-fA-F]{3,6}|rgb\(\d{1,3},\s*\d{1,3},\s*\d{1,3}\)|rgba\(\d{1,3},\s*\d{1,3},\s*\d{1,3},\s*[01]?\.?\d*\)|[a-zA-Z]+)$/;
+  return colorRegex.test(value.trim()) ? value.trim() : '';
+};
+
+const sanitizeUrl = (url: string) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
+    return url;
+  }
+  return '';
+};
 
 function DraggableComponent({ component, isSelected, onSelect, onDelete, onDuplicate }: { 
   component: ComponentData; 
@@ -85,28 +121,27 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const renderComponent = () => {
-    const { content } = component;
+  // Memoize the rendered component to prevent unnecessary re-renders
+  const renderComponent = useMemo(() => {
+    const { props, styles } = component;
+    const baseStyles = styles?.base || {};
     
     switch (component.type) {
       case 'navigation':
         return (
-          <div className="bg-white border-b shadow-sm p-4" style={{ backgroundColor: content.backgroundColor || '#ffffff' }}>
+          <div className="bg-white border-b shadow-sm p-4" style={{ backgroundColor: baseStyles.backgroundColor || '#ffffff' }}>
             <div className="flex items-center justify-between">
-              <div className="font-bold text-xl" style={{ color: content.textColor || '#000000' }}>
-                {content.heading || 'Store Logo'}
+              <div className="font-bold text-xl" style={{ color: sanitizeStyle(baseStyles.color || '') || '#000000' }}>
+                {sanitizeText(props?.heading || 'Store Logo')}
               </div>
               <nav className="hidden md:flex items-center space-x-6">
-                {(content.links || [{ text: 'Home', url: '#' }, { text: 'Products', url: '#' }, { text: 'About', url: '#' }]).map((link, i) => (
-                  <a key={i} href={link.url} className="hover:opacity-75" style={{ color: content.textColor || '#666666' }}>
-                    {link.text}
-                  </a>
+                {(props?.links || [{ text: 'Home', url: '#' }, { text: 'Products', url: '#' }]).map((link, i) => (
+                  <span key={i} className="hover:opacity-75 cursor-pointer" style={{ color: sanitizeStyle(baseStyles.color) || '#666666' }}>
+                    {sanitizeText(link.text)}
+                  </span>
                 ))}
               </nav>
-              <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="sm">Login</Button>
-                <Button size="sm">{content.buttonText || 'Sign Up'}</Button>
-              </div>
+              <Button size="sm">{sanitizeText(props?.buttonText || 'Sign Up')}</Button>
             </div>
           </div>
         );
@@ -116,15 +151,15 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
           <div 
             className="p-12 rounded-lg text-center"
             style={{ 
-              backgroundColor: content.backgroundColor || '#3b82f6',
-              color: content.textColor || '#ffffff',
-              textAlign: content.alignment || 'center'
+              backgroundColor: baseStyles.backgroundColor || '#3b82f6',
+              color: baseStyles.color || '#ffffff',
+              textAlign: baseStyles.textAlign || 'center'
             }}
           >
-            <h1 className="text-4xl font-bold mb-4">{content.heading || 'Welcome to Our Store'}</h1>
-            <p className="text-xl mb-8">{content.subheading || 'Discover amazing products at great prices'}</p>
+            <h1 className="text-4xl font-bold mb-4">{sanitizeText(props?.heading || 'Welcome to Our Store')}</h1>
+            <p className="text-xl mb-8">{sanitizeText(props?.subheading || 'Discover amazing products at great prices')}</p>
             <Button className="bg-white text-blue-600 hover:bg-gray-100">
-              {content.buttonText || 'Shop Now'}
+              {sanitizeText(props?.buttonText || 'Shop Now')}
             </Button>
           </div>
         );
@@ -134,15 +169,15 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
           <div 
             className="prose max-w-none p-6"
             style={{ 
-              backgroundColor: content.backgroundColor || 'transparent',
-              textAlign: content.alignment || 'left'
+              backgroundColor: baseStyles.backgroundColor || 'transparent',
+              textAlign: baseStyles.textAlign || 'left'
             }}
           >
-            <h2 className="text-2xl font-bold mb-4" style={{ color: content.textColor || '#000000' }}>
-              {content.heading || 'About Our Store'}
+            <h2 className="text-2xl font-bold mb-4" style={{ color: sanitizeStyle(baseStyles.color) || '#000000' }}>
+              {sanitizeText(props?.heading || 'About Our Store')}
             </h2>
-            <p style={{ color: content.textColor || '#666666' }}>
-              {content.text || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}
+            <p style={{ color: sanitizeStyle(baseStyles.color) || '#666666' }}>
+              {sanitizeText(props?.text || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.')}
             </p>
           </div>
         );
@@ -150,8 +185,8 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
       case 'image':
         return (
           <div className="p-4">
-            {content.imageUrl ? (
-              <img src={content.imageUrl} alt="Component image" className="w-full h-64 object-cover rounded-lg" />
+            {props?.imageUrl ? (
+              <img src={sanitizeUrl(props.imageUrl)} alt="" className="w-full h-64 object-cover rounded-lg" />
             ) : (
               <div className="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
                 <Image className="h-12 w-12 text-gray-400" />
@@ -162,9 +197,9 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
       
       case 'products':
         return (
-          <div className="p-6" style={{ backgroundColor: content.backgroundColor || 'transparent' }}>
-            <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: content.textColor || '#000000' }}>
-              {content.heading || 'Featured Products'}
+          <div className="p-6" style={{ backgroundColor: baseStyles.backgroundColor || 'transparent' }}>
+            <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: sanitizeStyle(baseStyles.color) || '#000000' }}>
+              {sanitizeText(props?.heading || 'Featured Products')}
             </h2>
             <div className="grid grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
@@ -180,9 +215,9 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
       
       case 'testimonials':
         return (
-          <div className="p-6" style={{ backgroundColor: content.backgroundColor || '#f9fafb' }}>
-            <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: content.textColor || '#000000' }}>
-              {content.heading || 'What Our Customers Say'}
+          <div className="p-6" style={{ backgroundColor: baseStyles.backgroundColor || '#f9fafb' }}>
+            <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: sanitizeStyle(baseStyles.color) || '#000000' }}>
+              {sanitizeText(props?.heading || 'What Our Customers Say')}
             </h2>
             <div className="bg-white p-6 rounded-lg shadow-sm">
               <div className="flex items-center mb-4">
@@ -190,7 +225,7 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
                   <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
                 ))}
               </div>
-              <p className="italic mb-4">"{content.text || 'Amazing products and great service!'}"</p>
+              <p className="italic mb-4">&quot;{sanitizeText(props?.text || 'Amazing products and great service!')}&quot;</p>
               <p className="font-semibold">- Happy Customer</p>
             </div>
           </div>
@@ -201,51 +236,30 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
           <div 
             className="p-12 rounded-lg text-center"
             style={{ 
-              backgroundColor: content.backgroundColor || '#10b981',
-              color: content.textColor || '#ffffff'
+              backgroundColor: baseStyles.backgroundColor || '#10b981',
+              color: baseStyles.color || '#ffffff'
             }}
           >
-            <h2 className="text-3xl font-bold mb-4">{content.heading || 'Ready to Get Started?'}</h2>
-            <p className="text-lg mb-6">{content.subheading || 'Join thousands of satisfied customers'}</p>
+            <h2 className="text-3xl font-bold mb-4">{sanitizeText(props?.heading || 'Ready to Get Started?')}</h2>
+            <p className="text-lg mb-6">{sanitizeText(props?.subheading || 'Join thousands of satisfied customers')}</p>
             <Button className="bg-white text-green-600 hover:bg-gray-100">
-              {content.buttonText || 'Get Started Today'}
+              {sanitizeText(props?.buttonText || 'Get Started Today')}
             </Button>
           </div>
         );
       
       case 'footer':
         return (
-          <div className="bg-gray-900 text-white p-8" style={{ backgroundColor: content.backgroundColor || '#111827' }}>
+          <div className="bg-gray-900 text-white p-8" style={{ backgroundColor: baseStyles.backgroundColor || '#111827' }}>
             <div className="grid grid-cols-4 gap-8">
               <div>
-                <h3 className="font-bold text-lg mb-4">{content.heading || 'Company'}</h3>
+                <h3 className="font-bold text-lg mb-4">{sanitizeText(props?.heading || 'Company')}</h3>
                 <div className="space-y-2">
-                  {(content.links || [{ text: 'About', url: '#' }, { text: 'Contact', url: '#' }]).slice(0, 3).map((link, i) => (
-                    <a key={i} href={link.url} className="block hover:opacity-75" style={{ color: content.textColor || '#d1d5db' }}>
-                      {link.text}
-                    </a>
+                  {(props?.links || [{ text: 'About', url: '#' }, { text: 'Contact', url: '#' }]).slice(0, 3).map((link, i) => (
+                    <span key={i} className="block hover:opacity-75 cursor-pointer" style={{ color: sanitizeStyle(baseStyles.color) || '#d1d5db' }}>
+                      {sanitizeText(link.text)}
+                    </span>
                   ))}
-                </div>
-              </div>
-              <div>
-                <h3 className="font-bold text-lg mb-4">Products</h3>
-                <div className="space-y-2">
-                  <a href="#" className="block hover:opacity-75" style={{ color: content.textColor || '#d1d5db' }}>All Products</a>
-                  <a href="#" className="block hover:opacity-75" style={{ color: content.textColor || '#d1d5db' }}>Categories</a>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-bold text-lg mb-4">Support</h3>
-                <div className="space-y-2">
-                  <a href="#" className="block hover:opacity-75" style={{ color: content.textColor || '#d1d5db' }}>Help Center</a>
-                  <a href="#" className="block hover:opacity-75" style={{ color: content.textColor || '#d1d5db' }}>Contact Us</a>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-bold text-lg mb-4">Legal</h3>
-                <div className="space-y-2">
-                  <a href="#" className="block hover:opacity-75" style={{ color: content.textColor || '#d1d5db' }}>Privacy</a>
-                  <a href="#" className="block hover:opacity-75" style={{ color: content.textColor || '#d1d5db' }}>Terms</a>
                 </div>
               </div>
             </div>
@@ -255,7 +269,7 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
       default:
         return <div className="p-4 border rounded">Component Preview</div>;
     }
-  };
+  }, [component]); // Only re-render when component data changes
 
   return (
     <div
@@ -265,7 +279,6 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
       onClick={() => onSelect(component.id)}
       {...attributes}
     >
-      {/* Component Controls */}
       <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
         <div className="flex items-center gap-1 bg-white shadow-lg rounded-md p-1">
           <Button
@@ -294,7 +307,7 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
       </div>
 
       <div className="border-2 border-transparent hover:border-blue-200 transition-colors">
-        {renderComponent()}
+        {renderComponent}
       </div>
     </div>
   );
@@ -343,7 +356,7 @@ function ComponentLibrary({ onAddComponent }: { onAddComponent: (type: Component
 
 function PropertyPanel({ selectedComponent, onUpdateComponent }: { 
   selectedComponent: ComponentData | null;
-  onUpdateComponent: (id: string, updates: Partial<ComponentData['content']>) => void;
+  onUpdateComponent: (id: string, updates: Partial<ComponentData>) => void;
 }) {
   if (!selectedComponent) {
     return (
@@ -363,7 +376,7 @@ function PropertyPanel({ selectedComponent, onUpdateComponent }: {
     );
   }
 
-  const { content } = selectedComponent;
+  const { props, styles } = selectedComponent;
 
   return (
     <Card className="h-full">
@@ -377,8 +390,8 @@ function PropertyPanel({ selectedComponent, onUpdateComponent }: {
         <div className="space-y-2">
           <Label>Heading</Label>
           <Input
-            value={content.heading || ''}
-            onChange={(e) => onUpdateComponent(selectedComponent.id, { heading: e.target.value })}
+            value={props?.heading || ''}
+            onChange={(e) => onUpdateComponent(selectedComponent.id, { props: { ...props, heading: e.target.value } })}
             placeholder="Enter heading"
           />
         </div>
@@ -387,10 +400,9 @@ function PropertyPanel({ selectedComponent, onUpdateComponent }: {
           <div className="space-y-2">
             <Label>Text</Label>
             <Textarea
-              value={content.text || content.subheading || ''}
+              value={props?.text || props?.subheading || ''}
               onChange={(e) => onUpdateComponent(selectedComponent.id, { 
-                text: e.target.value,
-                subheading: e.target.value 
+                props: { ...props, text: e.target.value, subheading: e.target.value }
               })}
               placeholder="Enter text content"
               rows={3}
@@ -402,8 +414,8 @@ function PropertyPanel({ selectedComponent, onUpdateComponent }: {
           <div className="space-y-2">
             <Label>Button Text</Label>
             <Input
-              value={content.buttonText || ''}
-              onChange={(e) => onUpdateComponent(selectedComponent.id, { buttonText: e.target.value })}
+              value={props?.buttonText || ''}
+              onChange={(e) => onUpdateComponent(selectedComponent.id, { props: { ...props, buttonText: e.target.value } })}
               placeholder="Enter button text"
             />
           </div>
@@ -413,8 +425,10 @@ function PropertyPanel({ selectedComponent, onUpdateComponent }: {
           <Label>Background Color</Label>
           <Input
             type="color"
-            value={content.backgroundColor || '#ffffff'}
-            onChange={(e) => onUpdateComponent(selectedComponent.id, { backgroundColor: e.target.value })}
+            value={styles?.base?.backgroundColor || '#ffffff'}
+            onChange={(e) => onUpdateComponent(selectedComponent.id, { 
+              styles: { ...styles, base: { ...styles?.base, backgroundColor: e.target.value } }
+            })}
           />
         </div>
 
@@ -422,8 +436,10 @@ function PropertyPanel({ selectedComponent, onUpdateComponent }: {
           <Label>Text Color</Label>
           <Input
             type="color"
-            value={content.textColor || '#000000'}
-            onChange={(e) => onUpdateComponent(selectedComponent.id, { textColor: e.target.value })}
+            value={styles?.base?.color || '#000000'}
+            onChange={(e) => onUpdateComponent(selectedComponent.id, { 
+              styles: { ...styles, base: { ...styles?.base, color: e.target.value } }
+            })}
           />
         </div>
 
@@ -431,8 +447,10 @@ function PropertyPanel({ selectedComponent, onUpdateComponent }: {
           <div className="space-y-2">
             <Label>Alignment</Label>
             <Select
-              value={content.alignment || 'left'}
-              onValueChange={(value) => onUpdateComponent(selectedComponent.id, { alignment: value as 'left' | 'center' | 'right' })}
+              value={styles?.base?.textAlign || 'left'}
+              onValueChange={(value) => onUpdateComponent(selectedComponent.id, { 
+                styles: { ...styles, base: { ...styles?.base, textAlign: value as 'left' | 'center' | 'right' } }
+              })}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -450,8 +468,8 @@ function PropertyPanel({ selectedComponent, onUpdateComponent }: {
           <div className="space-y-2">
             <Label>Image URL</Label>
             <Input
-              value={content.imageUrl || ''}
-              onChange={(e) => onUpdateComponent(selectedComponent.id, { imageUrl: e.target.value })}
+              value={props?.imageUrl || ''}
+              onChange={(e) => onUpdateComponent(selectedComponent.id, { props: { ...props, imageUrl: e.target.value } })}
               placeholder="Enter image URL"
             />
           </div>
@@ -466,6 +484,12 @@ export default function StoreBuilderPage() {
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const [currentPage, setCurrentPage] = useState<{ id?: string; pageName?: string; pageSlug?: string } | null>(null);
+  const [stores, setStores] = useState<{ id: string; storeName: string; pages: unknown[] }[]>([]);
+  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { tenant } = useTenant();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -474,6 +498,88 @@ export default function StoreBuilderPage() {
       },
     })
   );
+
+  // Load stores and pages
+  useEffect(() => {
+    if (tenant?.id) {
+      loadStores();
+    }
+  }, [tenant?.id]);
+
+  const loadStores = async () => {
+    if (!tenant?.id) return;
+    
+    try {
+      const response = await api.get(`/api/stores?tenantId=${tenant.id}`);
+      setStores(response.data);
+      if (response.data.length > 0 && !selectedStoreId) {
+        setSelectedStoreId(response.data[0].id);
+      }
+    } catch (error) {
+      console.error('[LOAD_STORES_ERROR]', error);
+      
+      if (error instanceof Error) {
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          alert('Network error: Unable to load stores. Using demo mode.');
+        } else if (error.message.includes('unauthorized')) {
+          alert('Permission error: Unable to access stores. Using demo mode.');
+        }
+      }
+      
+      setStores([{
+        id: 'demo-store',
+        storeName: 'Demo Store',
+        pages: []
+      }]);
+      setSelectedStoreId('demo-store');
+    }
+  };
+
+  const savePage = async () => {
+    if (!selectedStoreId || !tenant?.id) {
+      console.log('Save skipped - demo mode or missing data');
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      const pageData = {
+        storeId: selectedStoreId,
+        pageName: currentPage?.pageName || 'New Page',
+        pageSlug: currentPage?.pageSlug || 'new-page',
+        layoutData: { components },
+        seoMetadata: {
+          title: 'Store Page',
+          description: 'Custom store page'
+        }
+      };
+
+      if (currentPage?.id) {
+        await api.put(`/api/pages?tenantId=${tenant.id}&pageId=${currentPage.id}`, pageData);
+      } else {
+        const response = await api.post(`/api/pages?tenantId=${tenant.id}`, pageData);
+        setCurrentPage(response.data);
+      }
+      console.log('Page saved successfully');
+    } catch (error) {
+      console.error('[SAVE_PAGE_ERROR]', error);
+      
+      // Show user-friendly error message
+      if (error instanceof Error) {
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          alert('Network error: Unable to save page. Please check your connection and try again.');
+        } else if (error.message.includes('unauthorized') || error.message.includes('403')) {
+          alert('Permission error: You do not have permission to save this page.');
+        } else {
+          alert('Save failed: Unable to save page. Please try again.');
+        }
+      } else {
+        alert('Save failed: An unexpected error occurred.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const selectedComponent = components.find(c => c.id === selectedComponentId) || null;
 
@@ -500,7 +606,9 @@ export default function StoreBuilderPage() {
       id: `${type}-${Date.now()}`,
       type,
       title: COMPONENT_TYPES.find(c => c.type === type)?.title || 'Component',
-      content: {},
+      props: {},
+      styles: { base: {} },
+      children: [],
     };
     setComponents(prev => [...prev, newComponent]);
     setSelectedComponentId(newComponent.id);
@@ -514,25 +622,35 @@ export default function StoreBuilderPage() {
   }, [selectedComponentId]);
 
   const duplicateComponent = useCallback((id: string) => {
-    const component = components.find(c => c.id === id);
-    if (component) {
-      const newComponent: ComponentData = {
-        ...component,
-        id: `${component.type}-${Date.now()}`,
-      };
-      setComponents(prev => {
-        const index = prev.findIndex(c => c.id === id);
-        return [...prev.slice(0, index + 1), newComponent, ...prev.slice(index + 1)];
-      });
+    try {
+      const component = components.find(c => c.id === id);
+      if (component) {
+        const newComponent: ComponentData = {
+          ...component,
+          id: `${component.type}-${Date.now()}`,
+        };
+        setComponents(prev => {
+          const index = prev.findIndex(c => c.id === id);
+          return [...prev.slice(0, index + 1), newComponent, ...prev.slice(index + 1)];
+        });
+      }
+    } catch (error) {
+      console.error('[COMPONENT_DUPLICATE_ERROR]', error);
+      alert('Failed to duplicate component. Please try again.');
     }
   }, [components]);
 
-  const updateComponent = useCallback((id: string, updates: Partial<ComponentData['content']>) => {
-    setComponents(prev => prev.map(c => 
-      c.id === id 
-        ? { ...c, content: { ...c.content, ...updates } }
-        : c
-    ));
+  const updateComponent = useCallback((id: string, updates: Partial<ComponentData>) => {
+    try {
+      setComponents(prev => prev.map(c => 
+        c.id === id 
+          ? { ...c, ...updates }
+          : c
+      ));
+    } catch (error) {
+      console.error('[COMPONENT_UPDATE_ERROR]', error);
+      alert('Failed to update component. Please try again.');
+    }
   }, []);
 
   const getPreviewWidth = () => {
@@ -547,11 +665,13 @@ export default function StoreBuilderPage() {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Store Builder</h1>
-          <p className="text-muted-foreground">Drag and drop to build your perfect store</p>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <Store className="h-8 w-8" />
+            Store Builder
+          </h1>
+          <p className="text-muted-foreground">Create beautiful stores with drag and drop</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -582,20 +702,18 @@ export default function StoreBuilderPage() {
             <Eye className="h-4 w-4 mr-2" />
             Preview
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={savePage} disabled={isLoading}>
             <Save className="h-4 w-4 mr-2" />
-            Save
+            {isLoading ? 'Saving...' : 'Save'}
           </Button>
         </div>
       </div>
 
       <div className="flex-1 grid grid-cols-12 gap-6">
-        {/* Component Library */}
         <div className="col-span-2">
           <ComponentLibrary onAddComponent={addComponent} />
         </div>
 
-        {/* Canvas */}
         <div className="col-span-7">
           <Card className="h-full">
             <CardHeader>
@@ -653,7 +771,6 @@ export default function StoreBuilderPage() {
           </Card>
         </div>
 
-        {/* Properties Panel */}
         <div className="col-span-3">
           <PropertyPanel
             selectedComponent={selectedComponent}

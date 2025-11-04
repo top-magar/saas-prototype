@@ -22,55 +22,20 @@ export default async function ProductsPage() {
   
   console.log('User:', user.id, 'TenantId:', tenantId); // Debug log
 
+  let products = null;
+  let categories = null;
+  let hasError = false;
+
   try {
-    const [products, categories] = await Promise.all([
+    [products, categories] = await Promise.all([
       getProductsForTenant(tenantId),
       getCategoriesForTenant(tenantId)
     ]);
+  } catch {
+    hasError = true;
+  }
 
-    if (!products || products.length === 0) {
-      return (
-        <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
-          </div>
-          <Card>
-            <CardContent className="flex items-center justify-center p-8">
-              <Empty>
-                <EmptyHeader>
-                  <EmptyTitle>No Products Found</EmptyTitle>
-                  <EmptyDescription>
-                    You haven&apos;t added any products yet. Get started by adding your first one.
-                  </EmptyDescription>
-                </EmptyHeader>
-                <Link href="/dashboard/products/add">
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" /> Add Product
-                  </Button>
-                </Link>
-              </Empty>
-            </CardContent>
-          </Card>
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Product Catalog</CardTitle>
-            <CardDescription>Manage all your products and their details.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ErrorBoundary>
-              <ProductsClient initialProducts={products} categories={categories} />
-            </ErrorBoundary>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  } catch (error) {
+  if (hasError) {
     return (
       <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
         <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
@@ -84,4 +49,47 @@ export default async function ProductsPage() {
       </div>
     );
   }
+
+  if (!products || products.length === 0) {
+    return (
+      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
+        </div>
+        <Card>
+          <CardContent className="flex items-center justify-center p-8">
+            <Empty>
+              <EmptyHeader>
+                <EmptyTitle>No Products Found</EmptyTitle>
+                <EmptyDescription>
+                  You haven&apos;t added any products yet. Get started by adding your first one.
+                </EmptyDescription>
+              </EmptyHeader>
+              <Link href="/dashboard/products/add">
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" /> Add Product
+                </Button>
+              </Link>
+            </Empty>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Product Catalog</CardTitle>
+          <CardDescription>Manage all your products and their details.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ErrorBoundary>
+            <ProductsClient initialProducts={products} categories={categories} />
+          </ErrorBoundary>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }

@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     question: 'Is Pasaal.io suitable for my business size?',
-    answer: 'Absolutely! Whether you\'re a solo entrepreneur or managing a growing team, our platform scales with your business. From startups to established enterprises, we have plans that fit every stage of growth.',
+    answer: 'Absolutely! Whether you&apos;re a solo entrepreneur or managing a growing team, our platform scales with your business. From startups to established enterprises, we have plans that fit every stage of growth.',
   },
   {
     question: 'Can I integrate with my existing tools and systems?',
@@ -64,7 +64,7 @@ export function FAQ() {
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Everything you need to know about Pasaal.io. Can't find what you're looking for? 
+            Everything you need to know about Pasaal.io. Can&apos;t find what you&apos;re looking for? 
             <span className="text-primary font-medium"> Contact our support team.</span>
           </p>
         </motion.div>

@@ -48,14 +48,17 @@ async function getDashboardData(): Promise<DashboardData | null> {
 }
 
 export default async function DashboardPage() {
+  let data = null;
+  
   try {
-    const [user, data] = await Promise.all([
+    const [, dashboardData] = await Promise.all([
       currentUser(),
       getDashboardData()
     ]);
-
-    return <DashboardClientPage data={data} />;
-  } catch (error) {
-    return <DashboardClientPage data={null} />;
+    data = dashboardData;
+  } catch {
+    // Error handled by returning null data
   }
+
+  return <DashboardClientPage data={data} />;
 }

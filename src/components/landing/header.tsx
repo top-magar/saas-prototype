@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Play, Shield, Users, LogIn, UserPlus } from 'lucide-react';
+import { Menu, Play, Users, LogIn, UserPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import styles from './header.module.css';
 
@@ -96,32 +96,14 @@ export function Header() {
                 {/* Mobile Navigation Links */}
                 <div className="flex flex-col space-y-4">
                   {navLinks.map((link) => (
-                    link.isPricing ? (
-                      <Dialog key={link.name}>
-                        <PricingDialog 
-                          trigger={
-                            <Button 
-                              variant="ghost" 
-                              className="justify-start text-base font-medium"
-                              onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                              <DollarSign className="h-5 w-5 mr-3" />
-                              {link.name}
-                            </Button>
-                          } 
-                          showPaymentMethods={false} 
-                        />
-                      </Dialog>
-                    ) : (
-                      <Link 
-                        key={link.name}
-                        href={link.href}
-                        className="text-base font-medium py-2 px-3 rounded-md hover:bg-muted transition-colors"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {link.name}
-                      </Link>
-                    )
+                    <Link 
+                      key={link.name}
+                      href={link.href}
+                      className="text-base font-medium py-2 px-3 rounded-md hover:bg-muted transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {link.name}
+                    </Link>
                   ))}
                 </div>
 

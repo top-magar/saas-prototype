@@ -3,7 +3,6 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarTrigger,
   useSidebar,
@@ -11,23 +10,13 @@ import {
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import {
-  Activity,
-  DollarSign,
   Home,
-  Infinity,
-  LinkIcon,
   Package2,
-  Percent,
-  PieChart,
   Settings,
   ShoppingBag,
-  Sparkles,
-  Store,
-  TrendingUp,
   Users,
   Palette,
   BarChart,
-  Briefcase,
   Workflow,
   Keyboard,
   Plus,
@@ -36,41 +25,16 @@ import {
   Upload,
   CreditCard,
   Check,
-  ArrowUp,
   User,
-  Layers,
   Clipboard,
   BookOpen,
 } from "lucide-react";
 import { Logo } from "./logo";
 import type { Route } from "./nav-main";
 import DashboardNavigation from "./nav-main";
-import { NotificationsPopover } from "./nav-notifications";
 
 
-const sampleNotifications = [
-  {
-    id: "1",
-    avatar: "/avatars/01.png",
-    fallback: "OM",
-    text: "New order received.",
-    time: "10m ago",
-  },
-  {
-    id: "2",
-    avatar: "/avatars/02.png",
-    fallback: "JL",
-    text: "Server upgrade completed.",
-    time: "1h ago",
-  },
-  {
-    id: "3",
-    avatar: "/avatars/03.png",
-    fallback: "HH",
-    text: "New user signed up.",
-    time: "2h ago",
-  },
-];
+
 
 const dashboardRoutes: Route[] = [
   {

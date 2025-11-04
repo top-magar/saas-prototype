@@ -5,11 +5,45 @@ import { Webhook } from "svix";
 import { prisma } from "@/lib/prisma";
 import { createTenantAndAssociateUser } from "@/lib/tenant";
 
-const webhookSecret: string = process.env.CLERK_WEBHOOK_SECRET || "";
+const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
+
+function validateWebhookSecret(): string | null {
+  if (!webhookSecret) {
+    console.error('[WEBHOOK_CONFIG_ERROR] CLERK_WEBHOOK_SECRET environment variable is not set');
+    return null;
+  }
+
+  if (webhookSecret.length < 32) {
+    console.error('[WEBHOOK_CONFIG_ERROR] CLERK_WEBHOOK_SECRET appears to be invalid (too short)');
+    return null;
+  }
+
+  return webhookSecret;
+}
 
 export async function POST(req: Request) {
-  const payload = await req.json();
-  const headersList = await headers();
+  const validSecret = validateWebhookSecret();
+  if (!validSecret) {
+    return new Response('Webhook configuration error', { status: 500 });
+  }
+
+  let payload: any;
+  
+  try {
+    payload = await req.json();
+  } catch (jsonError) {
+    console.error('[WEBHOOK_JSON_ERROR]', jsonError);
+    return new Response('Invalid JSON payload', { status: 400 });
+  }
+  
+  let headersList: any;
+  
+  try {
+    headersList = await headers();
+  } catch (headerError) {
+    console.error('Failed to read headers:', headerError);
+    return new Response('Failed to read request headers', { status: 400 });
+  }
 
   const svix_id = headersList.get("svix-id");
   const svix_timestamp = headersList.get("svix-timestamp");
@@ -21,7 +55,7 @@ export async function POST(req: Request) {
     });
   }
 
-  const svix = new Webhook(webhookSecret);
+  const svix = new Webhook(validSecret);
   let event: WebhookEvent;
 
   try {
@@ -31,9 +65,20 @@ export async function POST(req: Request) {
       "svix-signature": svix_signature,
     }) as WebhookEvent;
   } catch (err) {
-    console.error("Error verifying webhook:", err);
-    return new Response("Error occured", {
-      status: 400,
+    console.error("Error verifying webhook signature:", err);
+    
+    // Handle specific verification errors
+    if (err instanceof Error) {
+      if (err.message.includes('timestamp')) {
+        return new Response('Webhook timestamp invalid or expired', { status: 400 });
+      }
+      if (err.message.includes('signature')) {
+        return new Response('Webhook signature verification failed', { status: 401 });
+      }
+    }
+    
+    return new Response("Webhook verification failed", {
+      status: 401,
     });
   }
 
@@ -85,6 +130,17 @@ export async function POST(req: Request) {
 
     } catch (error) {
       console.error("Error in user.created webhook handler:", error);
+      
+      // Handle specific error types
+      if (error instanceof Error) {
+        if (error.message.includes('Unique constraint')) {
+          return new Response('User or tenant already exists', { status: 409 });
+        }
+        if (error.message.includes('Invalid subdomain')) {
+          return new Response('Invalid subdomain format', { status: 400 });
+        }
+      }
+      
       return new Response("Error processing user.created event", {
         status: 500,
       });
@@ -106,19 +162,24 @@ export async function POST(req: Request) {
       });
     }
 
-    await prisma.user.upsert({
-      where: { clerkUserId: id },
-      update: {
-        email: email,
-        name: `${first_name || ""} ${last_name || ""}`.trim(),
-      },
-      create: {
-        clerkUserId: id,
-        tenantId: null, // Tenant will be associated during creation
-        email: email,
-        name: `${first_name || ""} ${last_name || ""}`.trim(),
-      },
-    });
+    try {
+      await prisma.user.upsert({
+        where: { clerkUserId: id },
+        update: {
+          email: email,
+          name: `${first_name || ""} ${last_name || ""}`.trim(),
+        },
+        create: {
+          clerkUserId: id,
+          tenantId: null, // Tenant will be associated during creation
+          email: email,
+          name: `${first_name || ""} ${last_name || ""}`.trim(),
+        },
+      });
+    } catch (dbError) {
+      console.error('Database error in user.updated webhook:', dbError);
+      return new Response('Database update failed', { status: 500 });
+    }
   }
 
   return new Response("Received", { status: 200 });

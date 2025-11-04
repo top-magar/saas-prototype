@@ -16,11 +16,10 @@ export default function PaymentProcessingPage() {
   const router = useRouter();
   const [status, setStatus] = useState<PaymentStatus>('processing');
   const [countdown, setCountdown] = useState(5);
-
   const method = searchParams.get('method') || 'Card';
   const tier = searchParams.get('tier') || 'Pro';
   const amount = searchParams.get('amount') || '999';
-  const transactionId = searchParams.get('txn') || `TXN${Date.now()}`;
+  const transactionId = searchParams.get('txn') || 'TXN-LOADING';
 
   // Simulate payment processing
   useEffect(() => {

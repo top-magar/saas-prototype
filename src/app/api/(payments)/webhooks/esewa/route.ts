@@ -1,28 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+interface EsewaWebhookPayload {
+  tenantId: string;
+  tierId: 'FREE' | 'STARTER' | 'PRO' | 'ENTERPRISE';
+  transactionId?: string;
+  amount?: number;
+}
+
+function validateWebhookPayload(body: any): body is EsewaWebhookPayload {
+  return (
+    body &&
+    typeof body.tenantId === 'string' &&
+    body.tenantId.length > 0 &&
+    typeof body.tierId === 'string' &&
+    ['FREE', 'STARTER', 'PRO', 'ENTERPRISE'].includes(body.tierId)
+  );
+}
+
 export async function POST(req: NextRequest) {
+  let body: any;
+  
   try {
-    const body = await req.json();
-    console.log("eSewa Webhook received:", body);
+    // Parse JSON with error handling
+    body = await req.json();
+  } catch (jsonError) {
+    console.error('Invalid JSON in eSewa webhook');
+    return new NextResponse('Invalid JSON payload', { status: 400 });
+  }
 
-    // In a real scenario, you would verify the webhook signature/payload
-    // and then process the payment status.
+  try {
+    console.log('eSewa Webhook received');
 
-    // For mock purposes, let's assume a successful payment and update tenant tier
-    const { tenantId, tierId } = body; // Assuming these are sent in the webhook payload
+    // Validate payload structure
+    if (!validateWebhookPayload(body)) {
+      console.error('Invalid eSewa webhook payload structure');
+      return new NextResponse('Invalid payload structure', { status: 400 });
+    }
 
-    if (tenantId && tierId) {
+    const { tenantId, tierId } = body;
+
+    // Verify tenant exists before updating
+    const existingTenant = await prisma.tenant.findUnique({
+      where: { id: tenantId }
+    });
+
+    if (!existingTenant) {
+      console.error('Tenant not found for eSewa webhook');
+      return new NextResponse('Tenant not found', { status: 404 });
+    }
+
+    // Update tenant tier with error handling
+    try {
       await prisma.tenant.update({
         where: { id: tenantId },
         data: { tier: tierId },
       });
-      console.log(`Tenant ${tenantId} tier updated to ${tierId} via eSewa webhook.`);
+      console.log('Tenant tier updated via eSewa webhook');
+    } catch (dbError) {
+      console.error('Database update failed in eSewa webhook');
+      return new NextResponse('Database update failed', { status: 500 });
     }
 
-    return new NextResponse("OK", { status: 200 });
+    return new NextResponse('OK', { status: 200 });
   } catch (error) {
-    console.error("Error processing eSewa webhook:", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    console.error('Error processing eSewa webhook');
+    if (error instanceof Error) {
+      console.error('Error details:', error.message);
+    }
+    return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

@@ -41,6 +41,7 @@ model Tenant {
   workflows         Workflow[]
   auditLogs         AuditLog[]
   categories        Category[]
+  stores            Store[]
   
   @@index([subdomain])
   @@index([status])
@@ -400,4 +401,82 @@ model Category {
 
   @@index([tenantId])
   @@map("categories")
+}
+
+// ============== STORE BUILDER ==============
+model Store {
+  id              String    @id @default(uuid())
+  tenantId        String
+  tenant          Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  storeName       String
+  domain          String?   @unique
+  vanitySubdomain String?   @unique
+  brandingConfig  Json?     // logo, colors, fonts
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  pages           Page[]
+  
+  @@unique([tenantId, storeName])
+  @@index([tenantId])
+  @@map("stores")
+}
+
+model Page {
+  id              String    @id @default(uuid())
+  storeId         String
+  store           Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  
+  pageName        String
+  pageSlug        String
+  pageType        String    @default("custom") // home, product, collection, custom
+  layoutData      Json      // Serialized component tree
+  seoMetadata     Json?
+  publishStatus   String    @default("draft") // draft, published
+  publishedAt     DateTime?
+  
+  createdByUserId String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  versionNumber   Int       @default(1)
+  
+  // Relations
+  versions        PageVersion[]
+  
+  @@unique([storeId, pageSlug])
+  @@index([storeId])
+  @@index([publishStatus])
+  @@map("pages")
+}
+
+model PageVersion {
+  id              String    @id @default(uuid())
+  pageId          String
+  page            Page      @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  
+  versionNumber   Int
+  layoutData      Json
+  changeSummary   String?
+  createdByUserId String
+  createdAt       DateTime  @default(now())
+  
+  @@unique([pageId, versionNumber])
+  @@index([pageId])
+  @@map("page_versions")
+}
+
+model Template {
+  id              String    @id @default(uuid())
+  templateName    String
+  templateCategory String?  // ecommerce, service, digital
+  thumbnailUrl    String?
+  layoutData      Json      // Template component structure
+  industryTags    String[]  // Array of applicable industries
+  isPublic        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  
+  @@map("templates")
 }

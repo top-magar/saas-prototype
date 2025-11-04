@@ -12,7 +12,6 @@ export function NavigationProgress() {
 
   useEffect(() => {
     const handleStart = () => setIsNavigating(true);
-    const handleComplete = () => setIsNavigating(false);
 
     // Listen for navigation events
     window.addEventListener('beforeunload', handleStart);

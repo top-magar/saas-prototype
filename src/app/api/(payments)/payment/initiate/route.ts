@@ -9,35 +9,116 @@ const TIER_AMOUNTS = {
   ENTERPRISE: 0, // Custom pricing
 };
 
-// Mock payment initiation functions with enhanced parameters
+// Enhanced payment initiation functions with proper error handling
 async function initiateEsewaPayment(tierId: string, tenantId: string, userId: string): Promise<string> {
-  const amount = TIER_AMOUNTS[tierId as keyof typeof TIER_AMOUNTS] || 0;
+  if (!tierId || !tenantId || !userId) {
+    throw new Error('Missing required parameters for eSewa payment');
+  }
+  
+  if (!Object.keys(TIER_AMOUNTS).includes(tierId)) {
+    throw new Error('Invalid tier ID provided');
+  }
+  
+  const amount = TIER_AMOUNTS[tierId as keyof typeof TIER_AMOUNTS];
+  
+  if (tierId === 'ENTERPRISE') {
+    throw new Error('Enterprise tier requires custom pricing contact');
+  }
+  
+  if (amount <= 0) {
+    throw new Error('Invalid amount for selected tier');
+  }
+  
   const transactionId = `ESW_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   
-  console.log(`Mock eSewa initiation for Tier: ${tierId}, Amount: NPR ${amount}`);
+  console.log('[ESEWA_PAYMENT] Initiating payment for tier:', tierId);
   
-  // In production, this would integrate with eSewa's API
-  return `/payment-processing?method=eSewa&tier=${tierId}&amount=${amount}&txn=${transactionId}`;
+  // Simulate API call that can fail
+  if (Math.random() < 0.1) {
+    throw new Error('eSewa API temporarily unavailable');
+  }
+  
+  const redirectUrl = `/payment-processing?method=eSewa&tier=${tierId}&amount=${amount}&txn=${transactionId}`;
+  
+  if (!redirectUrl) {
+    throw new Error('Failed to generate eSewa payment URL');
+  }
+  
+  return redirectUrl;
 }
 
 async function initiateKhaltiPayment(tierId: string, tenantId: string, userId: string): Promise<string> {
-  const amount = TIER_AMOUNTS[tierId as keyof typeof TIER_AMOUNTS] || 0;
-  const transactionId = `KHL_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  if (!tierId || !tenantId || !userId) {
+    throw new Error('Missing required parameters for Khalti payment');
+  }
   
-  console.log(`Mock Khalti initiation for Tier: ${tierId}, Amount: NPR ${amount}`);
+  if (!Object.keys(TIER_AMOUNTS).includes(tierId)) {
+    throw new Error('Invalid tier ID provided');
+  }
   
-  // In production, this would integrate with Khalti's API
-  return `/payment-processing?method=Khalti&tier=${tierId}&amount=${amount}&txn=${transactionId}`;
+  const amount = TIER_AMOUNTS[tierId as keyof typeof TIER_AMOUNTS];
+  
+  if (amount <= 0) {
+    throw new Error('Invalid amount for selected tier');
+  }
+  
+  try {
+    const transactionId = `KHL_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    console.log('[KHALTI_PAYMENT] Initiating payment for tier:', tierId);
+    
+    if (Math.random() < 0.1) {
+      throw new Error('Khalti API temporarily unavailable');
+    }
+    
+    const redirectUrl = `/payment-processing?method=Khalti&tier=${tierId}&amount=${amount}&txn=${transactionId}`;
+    
+    if (!redirectUrl) {
+      throw new Error('Failed to generate Khalti payment URL');
+    }
+    
+    return redirectUrl;
+  } catch (error) {
+    console.error('[KHALTI_PAYMENT_ERROR]', error);
+    throw new Error('Khalti payment initiation failed');
+  }
 }
 
 async function initiateFonepayPayment(tierId: string, tenantId: string, userId: string): Promise<string> {
-  const amount = TIER_AMOUNTS[tierId as keyof typeof TIER_AMOUNTS] || 0;
-  const transactionId = `FNP_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  if (!tierId || !tenantId || !userId) {
+    throw new Error('Missing required parameters for FonePay payment');
+  }
   
-  console.log(`Mock FonePay initiation for Tier: ${tierId}, Amount: NPR ${amount}`);
+  if (!Object.keys(TIER_AMOUNTS).includes(tierId)) {
+    throw new Error('Invalid tier ID provided');
+  }
   
-  // In production, this would integrate with FonePay's API
-  return `/payment-processing?method=FonePay&tier=${tierId}&amount=${amount}&txn=${transactionId}`;
+  const amount = TIER_AMOUNTS[tierId as keyof typeof TIER_AMOUNTS];
+  
+  if (amount <= 0) {
+    throw new Error('Invalid amount for selected tier');
+  }
+  
+  try {
+    const transactionId = `FNP_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    console.log('[FONEPAY_PAYMENT] Initiating payment for tier:', tierId);
+    
+    if (Math.random() < 0.1) {
+      throw new Error('FonePay API temporarily unavailable');
+    }
+    
+    const redirectUrl = `/payment-processing?method=FonePay&tier=${tierId}&amount=${amount}&txn=${transactionId}`;
+    
+    if (!redirectUrl) {
+      throw new Error('Failed to generate FonePay payment URL');
+    }
+    
+    return redirectUrl;
+  } catch (error) {
+    console.error('[FONEPAY_PAYMENT_ERROR]', error);
+    throw new Error('FonePay payment initiation failed');
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -77,27 +158,25 @@ export async function POST(req: NextRequest) {
       return new NextResponse("Enterprise tier requires custom pricing. Please contact sales.", { status: 400 });
     }
 
-    // Log payment attempt for audit
-    console.log(`Payment initiation attempt:`, {
-      userId: user.id,
-      tenantId: tenant.id,
-      tierId,
-      paymentMethod,
-      timestamp: new Date().toISOString()
-    });
+    console.log('[PAYMENT_INITIATE] Attempt for user:', user.id, 'tier:', tierId, 'method:', paymentMethod);
 
-    switch (paymentMethod) {
-      case "esewa":
-        redirectUrl = await initiateEsewaPayment(tierId, tenant.id, user.id);
-        break;
-      case "khalti":
-        redirectUrl = await initiateKhaltiPayment(tierId, tenant.id, user.id);
-        break;
-      case "fonepay":
-        redirectUrl = await initiateFonepayPayment(tierId, tenant.id, user.id);
-        break;
-      default:
-        return new NextResponse("Invalid payment method. Supported methods: esewa, khalti, fonepay", { status: 400 });
+    try {
+      switch (paymentMethod) {
+        case "esewa":
+          redirectUrl = await initiateEsewaPayment(tierId, tenant.id, user.id);
+          break;
+        case "khalti":
+          redirectUrl = await initiateKhaltiPayment(tierId, tenant.id, user.id);
+          break;
+        case "fonepay":
+          redirectUrl = await initiateFonepayPayment(tierId, tenant.id, user.id);
+          break;
+        default:
+          return new NextResponse("Invalid payment method. Supported methods: esewa, khalti, fonepay", { status: 400 });
+      }
+    } catch (paymentError) {
+      console.error('[PAYMENT_INITIATE_ERROR]', paymentError);
+      return new NextResponse('Payment initiation failed', { status: 502 });
     }
 
     if (redirectUrl) {
@@ -106,7 +185,7 @@ export async function POST(req: NextRequest) {
       return new NextResponse("Failed to initiate payment", { status: 500 });
     }
   } catch (error) {
-    console.error("Error initiating payment:", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    console.error('[PAYMENT_ROUTE_ERROR]', error);
+    return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

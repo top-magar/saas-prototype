@@ -10,12 +10,20 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const { authorize } = await import('@/lib/auth');
+    await authorize(tenantId, ['admin', 'manager', 'user']);
+    
     const orders = await prisma.order.findMany({
       where: { tenantId },
+      take: 100, // Limit results for performance
+      orderBy: { createdAt: 'desc' }
     });
     return NextResponse.json(orders);
   } catch (error) {
-    console.error('Error fetching orders:', error);
+    console.error('[ORDERS_GET]', error);
+    if (error instanceof Error && error.message.includes('Unauthorized')) {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

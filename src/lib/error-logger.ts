@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 
 export class ErrorLogger {
-  static log(error: Error, context?: Record<string, any>) {
+  static log(error: Error, context?: Record<string, unknown>) {
     const errorData = {
       message: error.message,
       stack: error.stack,
@@ -29,7 +29,7 @@ export class ErrorLogger {
     }
   }
   
-  static logServerError(error: Error, context?: Record<string, any>) {
+  static logServerError(error: Error, context?: Record<string, unknown>) {
     const errorData = {
       message: error.message,
       stack: error.stack,

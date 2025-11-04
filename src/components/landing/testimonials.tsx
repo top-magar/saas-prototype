@@ -92,7 +92,7 @@ export function Testimonials() {
 
               {/* Content */}
               <blockquote className="text-foreground mb-6 leading-relaxed">
-                "{testimonial.content}"
+                &quot;{testimonial.content}&quot;
               </blockquote>
 
               {/* Results highlight */}

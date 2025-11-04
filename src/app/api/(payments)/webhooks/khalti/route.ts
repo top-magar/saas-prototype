@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log("Khalti Webhook received:", body);
+    console.log("Khalti Webhook received");
 
     // In a real scenario, you would verify the webhook signature/payload
     // and then process the payment status.
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
         where: { id: tenantId },
         data: { tier: tierId },
       });
-      console.log(`Tenant ${tenantId} tier updated to ${tierId} via Khalti webhook.`);
+      console.log('Tenant tier updated via Khalti webhook');
     }
 
     return new NextResponse("OK", { status: 200 });

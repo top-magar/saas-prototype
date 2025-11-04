@@ -18,10 +18,13 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
                    (user.privateMetadata?.tenantId as string) || 
                    user.id;
 
+  let analyticsData;
+  let hasError = false;
+
   try {
     const analytics = await calculateAnalytics(tenantId, timeRange);
     
-    const analyticsData = {
+    analyticsData = {
       overview: [
         { month: "Jan", totalSales: 45000, newCustomers: 240, orders: 180, avgOrderValue: 250 },
         { month: "Feb", totalSales: 52000, newCustomers: 320, orders: 208, avgOrderValue: 250 },
@@ -148,16 +151,11 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
         customerSatisfaction: 4.7
       }
     };
+  } catch {
+    hasError = true;
+  }
 
-    return (
-      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-        <AnalyticsClient 
-          data={analyticsData} 
-          timeRange={timeRange}
-        />
-      </div>
-    );
-  } catch (error) {
+  if (hasError) {
     return (
       <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
         <h1 className="text-xl font-semibold md:text-2xl">Analytics Overview</h1>
@@ -167,4 +165,13 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
       </div>
     );
   }
+
+  return (
+    <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+      <AnalyticsClient 
+        data={analyticsData} 
+        timeRange={timeRange}
+      />
+    </div>
+  );
 }
