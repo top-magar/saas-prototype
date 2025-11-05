@@ -100,7 +100,7 @@ export default function CategoriesPage() {
   }
   
   if (isError) {
-      toast.error("Failed to load categories.");
+    toast.error("Failed to load categories.");
   }
 
   if (!categories || categories.length === 0) {
@@ -138,8 +138,8 @@ export default function CategoriesPage() {
           <CategoryFormDialog
             category={editingCategory}
             onSaveSuccess={() => {
-                setIsDialogOpen(false);
-                mutate();
+              setIsDialogOpen(false);
+              mutate();
             }}
             onClose={() => setIsDialogOpen(false)}
           />

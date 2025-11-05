@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,74 +28,101 @@ const importHistory: ImportHistory[] = [
 ];
 
 export default function ImportExportPage() {
-  const [importFile, setImportFile] = useState<File | null>(null);
-  const [exportFormat, setExportFormat] = useState("csv");
-  const [exportScope, setExportScope] = useState("all");
-  const [importProgress, setImportProgress] = useState(0);
-  const [exportProgress, setExportProgress] = useState(0);
-  const [dragActive, setDragActive] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null    
+  );
+  const [exportFormat, setExportFormat] = useState("csv"    
+  );
+  const [exportScope, setExportScope] = useState("all"    
+  );
+  const [importProgress, setImportProgress] = useState(0    
+  );
+  const [exportProgress, setExportProgress] = useState(0    
+  );
+  const [dragActive, setDragActive] = useState(false    
+  );
 
   const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(    
+  );
+    e.stopPropagation(    
+  );
     if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
+      setDragActive(true    
+  );
     } else if (e.type === "dragleave") {
-      setDragActive(false);
+      setDragActive(false    
+  );
     }
   };
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
+    e.preventDefault(    
+  );
+    e.stopPropagation(    
+  );
+    setDragActive(false    
+  );
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setImportFile(e.dataTransfer.files[0]);
+      setImportFile(e.dataTransfer.files[0]    
+  );
     }
   };
 
   const handleImportFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setImportFile(event.target.files[0]);
+      setImportFile(event.target.files[0]    
+  );
     }
   };
 
   const handleImport = () => {
     if (!importFile) {
-      toast.error("Please select a file to import");
+      toast.error("Please select a file to import"    
+  );
       return;
     }
 
-    setImportProgress(0);
+    setImportProgress(0    
+  );
     const interval = setInterval(() => {
       setImportProgress((prev) => {
         if (prev >= 100) {
-          clearInterval(interval);
-          toast.success("Import completed successfully!");
+          clearInterval(interval    
+  );
+          toast.success("Import completed successfully!"    
+  );
           return 100;
         }
         return prev + 10;
-      });
-    }, 200);
+      }    
+  );
+    }, 200    
+  );
   };
 
   const handleExport = () => {
-    setExportProgress(0);
+    setExportProgress(0    
+  );
     const interval = setInterval(() => {
       setExportProgress((prev) => {
         if (prev >= 100) {
-          clearInterval(interval);
-          toast.success("Export ready for download!");
+          clearInterval(interval    
+  );
+          toast.success("Export ready for download!"    
+  );
           return 100;
         }
         return prev + 10;
-      });
-    }, 200);
+      }    
+  );
+    }, 200    
+  );
   };
 
   const downloadTemplate = (format: string) => {
-    toast.success(`${format.toUpperCase()} template downloaded`);
+    toast.success(`${format.toUpperCase()} template downloaded`    
+  );
   };
 
   const getStatusIcon = (status: string) => {
@@ -310,5 +336,6 @@ export default function ImportExportPage() {
         </CardContent>
       </Card>
     </div>
+      
   );
 }

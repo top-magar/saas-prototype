@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Card,
@@ -30,12 +29,15 @@ const allWorkflows: Workflow[] = [
 ];
 
 export default function WorkflowsPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [workflows, setWorkflows] = useState<Workflow[]>(allWorkflows);
+  const [searchTerm, setSearchTerm] = useState(""    
+  );
+  const [workflows, setWorkflows] = useState<Workflow[]>(allWorkflows    
+  );
 
   const filteredWorkflows = workflows.filter((workflow) =>
     workflow.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     workflow.description.toLowerCase().includes(searchTerm.toLowerCase())
+      
   );
 
   const handleToggleStatus = (id: string) => {
@@ -45,7 +47,8 @@ export default function WorkflowsPage() {
           ? { ...workflow, status: workflow.status === "Active" ? "Inactive" : "Active" }
           : workflow
       )
-    );
+        
+  );
   };
 
   const handleEditWorkflow = (id: string) => {
@@ -67,6 +70,7 @@ export default function WorkflowsPage() {
   };
 
   return (
+    
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">Workflows (Powered by Blaze)</h1>
@@ -125,5 +129,6 @@ export default function WorkflowsPage() {
         <p className="text-center text-muted-foreground">No workflows found.</p>
       )}
     </div>
+      
   );
 }

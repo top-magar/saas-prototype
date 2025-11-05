@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -57,33 +56,43 @@ const allTenants: Tenant[] = [
 const ITEMS_PER_PAGE = 5;
 
 export default function AllTenantsPage() {
-  const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter(    
+  );
+  const [searchTerm, setSearchTerm] = useState(""    
+  );
+  const [filterStatus, setFilterStatus] = useState("All"    
+  );
+  const [currentPage, setCurrentPage] = useState(1    
+  );
 
   const filteredTenants = allTenants.filter((tenant) => {
     const matchesSearch =
       tenant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.id.toLowerCase().includes(searchTerm.toLowerCase());
+      tenant.id.toLowerCase().includes(searchTerm.toLowerCase()    
+  );
     const matchesStatus =
       filterStatus === "All" || tenant.status === filterStatus;
     return matchesSearch && matchesStatus;
-  });
+  }    
+  );
 
-  const totalPages = Math.ceil(filteredTenants.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredTenants.length / ITEMS_PER_PAGE    
+  );
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentTenants = filteredTenants.slice(startIndex, endIndex);
+  const currentTenants = filteredTenants.slice(startIndex, endIndex    
+  );
 
   const handleViewDetails = (id: string) => {
-    router.push(`/dashboard/admin/tenants/${id}`);
+    router.push(`/dashboard/admin/tenants/${id}`    
+  );
   };
 
   const handleSuspendTenant = async (id: string) => {
     try {
       // API call to suspend tenant
-      await fetch(`/api/tenants/${id}/suspend`, { method: 'POST' });
+      await fetch(`/api/tenants/${id}/suspend`, { method: 'POST' }    
+  );
     } catch {
       // Handle API error
     }
@@ -92,13 +101,15 @@ export default function AllTenantsPage() {
   const handleActivateTenant = async (id: string) => {
     try {
       // API call to activate tenant
-      await fetch(`/api/tenants/${id}/activate`, { method: 'POST' });
+      await fetch(`/api/tenants/${id}/activate`, { method: 'POST' }    
+  );
     } catch {
       // Handle API error
     }
   };
 
   return (
+    
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <h1 className="text-xl font-semibold md:text-2xl">All Tenants</h1>
 
@@ -208,5 +219,6 @@ export default function AllTenantsPage() {
         </CardContent>
       </Card>
     </div>
+      
   );
 }

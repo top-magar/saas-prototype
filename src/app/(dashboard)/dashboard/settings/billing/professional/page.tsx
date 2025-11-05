@@ -1,5 +1,4 @@
 "use client";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,9 +33,11 @@ const plans = [
 ];
 
 function PlanSidebar({ currentPlan, onPlanChange }: { currentPlan: string, onPlanChange: (planId: string) => void }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false    
+  );
 
   return (
+    
     <>
       <Button variant="outline" onClick={() => setIsOpen(true)}>Change Plan</Button>
       
@@ -56,6 +57,7 @@ function PlanSidebar({ currentPlan, onPlanChange }: { currentPlan: string, onPla
                 {plans.map((plan) => {
                   const isCurrent = plan.tierId === currentPlan;
                   return (
+    
                     <div key={plan.tierId} className={cn(
                       "p-4 border rounded-lg",
                       isCurrent && "bg-blue-50 border-blue-200"
@@ -83,8 +85,10 @@ function PlanSidebar({ currentPlan, onPlanChange }: { currentPlan: string, onPla
                         <Button 
                           size="sm"
                           onClick={() => {
-                            onPlanChange(plan.tierId);
-                            setIsOpen(false);
+                            onPlanChange(plan.tierId    
+  );
+                            setIsOpen(false    
+  );
                           }}
                           disabled={isCurrent}
                           variant={isCurrent ? "secondary" : "default"}
@@ -101,7 +105,8 @@ function PlanSidebar({ currentPlan, onPlanChange }: { currentPlan: string, onPla
                         ))}
                       </ul>
                     </div>
-                  );
+                      
+  );
                 })}
               </div>
             </div>
@@ -109,6 +114,7 @@ function PlanSidebar({ currentPlan, onPlanChange }: { currentPlan: string, onPla
         </>
       )}
     </>
+      
   );
 }
 
@@ -126,17 +132,22 @@ const usageData = {
 };
 
 export default function ProfessionalBillingPage() {
-  const { tenant } = useTenant();
-  const router = useRouter();
+  const { tenant } = useTenant(    
+  );
+  const router = useRouter(    
+  );
   const currentPlan = tenant?.tier || "FREE";
-  const currentPlanData = plans.find(p => p.tierId === currentPlan);
+  const currentPlanData = plans.find(p => p.tierId === currentPlan    
+  );
 
   const handlePlanChange = (planId: string) => {
     if (planId === "ENTERPRISE") return;
-    router.push(`/payment-processing?plan=${planId}`);
+    router.push(`/payment-processing?plan=${planId}`    
+  );
   };
 
   return (
+    
     <div className="max-w-7xl mx-auto p-6 space-y-8">
       <div className="flex items-center justify-between">
         <div>
@@ -248,6 +259,7 @@ export default function ProfessionalBillingPage() {
             {plans.map((plan) => {
               const isCurrent = plan.tierId === currentPlan;
               return (
+    
                 <Card key={plan.tierId} className={cn(
                   "relative transition-all hover:shadow-lg",
                   isCurrent && "ring-2 ring-blue-500",
@@ -290,7 +302,8 @@ export default function ProfessionalBillingPage() {
                     </Button>
                   </CardContent>
                 </Card>
-              );
+                  
+  );
             })}
           </div>
         </TabsContent>
@@ -301,6 +314,7 @@ export default function ProfessionalBillingPage() {
               const icons = { products: TrendingUp, storage: HardDrive, users: Users, apiCalls: Zap };
               const Icon = icons[key as keyof typeof icons];
               return (
+    
                 <Card key={key}>
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2 text-base capitalize">
@@ -321,7 +335,8 @@ export default function ProfessionalBillingPage() {
                     </div>
                   </CardContent>
                 </Card>
-              );
+                  
+  );
             })}
           </div>
         </TabsContent>
@@ -378,5 +393,6 @@ export default function ProfessionalBillingPage() {
         </TabsContent>
       </Tabs>
     </div>
+      
   );
 }

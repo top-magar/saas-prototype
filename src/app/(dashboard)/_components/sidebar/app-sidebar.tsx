@@ -28,6 +28,8 @@ import {
   User,
   Clipboard,
   BookOpen,
+  UserX,
+  Percent,
 } from "lucide-react";
 import { Logo } from "./logo";
 import type { Route } from "./nav-main";
@@ -105,6 +107,18 @@ const dashboardRoutes: Route[] = [
     title: "Customers",
     icon: <Users className="size-4" />,
     link: "/dashboard/customers",
+  },
+  {
+    id: "leads",
+    title: "Leads",
+    icon: <UserX className="size-4" />,
+    link: "/dashboard/leads",
+  },
+  {
+    id: "coupons",
+    title: "Coupons",
+    icon: <Percent className="size-4" />,
+    link: "/dashboard/coupons",
   },
   {
     id: "store-builder",

@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,7 +37,8 @@ export default function WorkspaceSettingsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-4 lg:p-6">
+    
+      <div className="flex flex-col gap-6 p-4 lg:p-6">
       <div>
         <h1 className="text-2xl font-semibold">Workspace Settings</h1>
         <p className="text-muted-foreground">Manage your workspace configuration and preferences</p>
@@ -280,6 +280,7 @@ export default function WorkspaceSettingsPage() {
         <Button variant="outline">Cancel</Button>
         <Button onClick={handleSaveChanges}>Save Changes</Button>
       </div>
-    </div>
+      </div>
+    
   );
 }

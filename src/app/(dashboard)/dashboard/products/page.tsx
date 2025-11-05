@@ -37,59 +37,65 @@ export default async function ProductsPage() {
 
   if (hasError) {
     return (
-      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-        <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
-        <Card>
-          <CardContent className="flex items-center justify-center p-8">
-            <div className="text-center">
-              <p className="text-muted-foreground">Failed to load products</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      
+        <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
+          <Card>
+            <CardContent className="flex items-center justify-center p-8">
+              <div className="text-center">
+                <p className="text-muted-foreground">Failed to load products</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      
     );
   }
 
   if (!products || products.length === 0) {
     return (
-      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
+      
+        <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
+          </div>
+          <Card>
+            <CardContent className="flex items-center justify-center p-8">
+              <Empty>
+                <EmptyHeader>
+                  <EmptyTitle>No Products Found</EmptyTitle>
+                  <EmptyDescription>
+                    You haven&apos;t added any products yet. Get started by adding your first one.
+                  </EmptyDescription>
+                </EmptyHeader>
+                <Link href="/dashboard/products/add">
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" /> Add Product
+                  </Button>
+                </Link>
+              </Empty>
+            </CardContent>
+          </Card>
         </div>
-        <Card>
-          <CardContent className="flex items-center justify-center p-8">
-            <Empty>
-              <EmptyHeader>
-                <EmptyTitle>No Products Found</EmptyTitle>
-                <EmptyDescription>
-                  You haven&apos;t added any products yet. Get started by adding your first one.
-                </EmptyDescription>
-              </EmptyHeader>
-              <Link href="/dashboard/products/add">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" /> Add Product
-                </Button>
-              </Link>
-            </Empty>
-          </CardContent>
-        </Card>
-      </div>
+      
     );
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Product Catalog</CardTitle>
-          <CardDescription>Manage all your products and their details.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ErrorBoundary>
-            <ProductsClient initialProducts={products} categories={categories} />
-          </ErrorBoundary>
-        </CardContent>
-      </Card>
-    </div>
+    
+      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Product Catalog</CardTitle>
+            <CardDescription>Manage all your products and their details.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ErrorBoundary>
+              <ProductsClient initialProducts={products} categories={categories} />
+            </ErrorBoundary>
+          </CardContent>
+        </Card>
+      </div>
+    
   );
 }

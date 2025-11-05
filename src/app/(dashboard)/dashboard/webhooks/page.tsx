@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Card,
@@ -50,10 +49,14 @@ const initialWebhooks: Webhook[] = [
 ];
 
 export default function WebhooksPage() {
-  const [webhooks, setWebhooks] = useState<Webhook[]>(initialWebhooks);
-  const [newWebhookName, setNewWebhookName] = useState("");
-  const [newWebhookUrl, setNewWebhookUrl] = useState("");
-  const [newWebhookEvent, setNewWebhookEvent] = useState("");
+  const [webhooks, setWebhooks] = useState<Webhook[]>(initialWebhooks    
+  );
+  const [newWebhookName, setNewWebhookName] = useState(""    
+  );
+  const [newWebhookUrl, setNewWebhookUrl] = useState(""    
+  );
+  const [newWebhookEvent, setNewWebhookEvent] = useState(""    
+  );
 
   const handleAddWebhook = () => {
     if (newWebhookName && newWebhookUrl && newWebhookEvent) {
@@ -65,14 +68,20 @@ export default function WebhooksPage() {
         status: "Active",
         lastTriggered: "N/A",
       };
-      setWebhooks([...webhooks, newWebhook]);
-      setNewWebhookName("");
-      setNewWebhookUrl("");
-      setNewWebhookEvent("");
-      toast.success("Webhook added successfully.");
+      setWebhooks([...webhooks, newWebhook]    
+  );
+      setNewWebhookName(""    
+  );
+      setNewWebhookUrl(""    
+  );
+      setNewWebhookEvent(""    
+  );
+      toast.success("Webhook added successfully."    
+  );
       // In a real app, this would involve an API call to add the webhook
     } else {
-      toast.error("Please fill out all fields.");
+      toast.error("Please fill out all fields."    
+  );
     }
   };
 
@@ -83,17 +92,22 @@ export default function WebhooksPage() {
           ? { ...webhook, status: webhook.status === "Active" ? "Inactive" : "Active" }
           : webhook
       )
-    );
-    toast.success("Webhook status updated.");
+        
+  );
+    toast.success("Webhook status updated."    
+  );
   };
 
   const handleDeleteWebhook = (id: string) => {
-    setWebhooks(webhooks.filter((webhook) => webhook.id !== id));
-    toast.success("Webhook deleted successfully.");
+    setWebhooks(webhooks.filter((webhook) => webhook.id !== id)    
+  );
+    toast.success("Webhook deleted successfully."    
+  );
     // In a real app, this would involve an API call to delete the webhook
   };
 
   return (
+    
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">Webhooks</h1>
@@ -212,5 +226,6 @@ export default function WebhooksPage() {
         </CardContent>
       </Card>
     </div>
+      
   );
 }

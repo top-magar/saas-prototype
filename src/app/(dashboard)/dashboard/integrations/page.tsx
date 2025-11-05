@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Card,
@@ -61,34 +60,41 @@ const allIntegrations: Integration[] = [
 ];
 
 export default function IntegrationsPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [integrations, setIntegrations] = useState<Integration[]>(allIntegrations);
+  const [searchTerm, setSearchTerm] = useState(""    
+  );
+  const [integrations, setIntegrations] = useState<Integration[]>(allIntegrations    
+  );
 
   const filteredIntegrations = integrations.filter((integration) =>
     integration.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     integration.description.toLowerCase().includes(searchTerm.toLowerCase())
+      
   );
 
   const handleConnect = (id: string) => {
     setIntegrations(integrations.map(integration =>
       integration.id === id ? { ...integration, status: "Connected" } : integration
-    ));
+    )    
+  );
     // In a real app, this would involve an API call to connect the integration
   };
 
   const handleDisconnect = (id: string) => {
     setIntegrations(integrations.map(integration =>
       integration.id === id ? { ...integration, status: "Disconnected" } : integration
-    ));
+    )    
+  );
     // In a real app, this would involve an API call to disconnect the integration
   };
 
   const handleConfigure = (id: string) => {
     // In a real app, this would navigate to a configuration page or open a dialog
-    console.log(`Configure integration ${id}`);
+    console.log(`Configure integration ${id}`    
+  );
   };
 
   return (
+    
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <h1 className="text-xl font-semibold md:text-2xl">Integrations</h1>
       <div className="relative">
@@ -151,5 +157,6 @@ export default function IntegrationsPage() {
         <p className="text-center text-muted-foreground">No integrations found.</p>
       )}
     </div>
+      
   );
 }

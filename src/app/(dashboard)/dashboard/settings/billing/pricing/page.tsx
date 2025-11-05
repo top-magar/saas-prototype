@@ -1,5 +1,4 @@
 "use client";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -76,8 +75,10 @@ const pricingTiers = [
 ];
 
 export default function BillingPricingPage() {
-  const { tenant } = useTenant();
-  const router = useRouter();
+  const { tenant } = useTenant(    
+  );
+  const router = useRouter(    
+  );
   const currentTier = pricingTiers.find(p => p.tierId === tenant?.tier)?.tier ?? 0;
 
   const getButtonConfig = (tier: typeof pricingTiers[0]) => {
@@ -97,18 +98,22 @@ export default function BillingPricingPage() {
     if (tier.tierId === tenant?.tier) return;
     
     if (tier.tierId === "ENTERPRISE") {
-      toast.info("Please contact sales to learn more about our Enterprise plan.");
+      toast.info("Please contact sales to learn more about our Enterprise plan."    
+  );
       return;
     }
 
     if (tier.tier < currentTier) {
-      toast.warning(`Downgrading to ${tier.name} will reduce your features. Continue?`);
+      toast.warning(`Downgrading to ${tier.name} will reduce your features. Continue?`    
+  );
     }
 
-    router.push(`/payment-processing?plan=${tier.tierId}`);
+    router.push(`/payment-processing?plan=${tier.tierId}`    
+  );
   };
 
   return (
+    
     <div className="flex flex-col gap-6 p-6">
       <div>
         <h1 className="text-2xl font-bold">Pricing Plans</h1>
@@ -117,10 +122,12 @@ export default function BillingPricingPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         {pricingTiers.map((tier) => {
-          const buttonConfig = getButtonConfig(tier);
+          const buttonConfig = getButtonConfig(tier    
+  );
           const Icon = buttonConfig.icon;
           
           return (
+    
             <Card
               key={tier.name}
               className={cn(
@@ -184,9 +191,11 @@ export default function BillingPricingPage() {
                 </Button>
               </CardFooter>
             </Card>
-          );
+              
+  );
         })}
       </div>
     </div>
+      
   );
 }

@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,8 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Area, AreaChart, Pie, PieChart, CartesianGrid, XAxis, YAxis, Cell, ResponsiveContainer } from "recharts";
 import { Download, FileText, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Label } from "@/components/ui/label";
 
 const orderStatusData = [
   { name: "Completed", value: 1245, color: "hsl(var(--chart-1))" },
@@ -36,10 +37,16 @@ const recentOrders = [
 ];
 
 export default function OrderReportsPage() {
-  const [timeRange, setTimeRange] = useState("30d");
+  const [timeRange, setTimeRange] = useState("30d"    
+  );
+  const [startDate, setStartDate] = useState<Date>(    
+  );
+  const [endDate, setEndDate] = useState<Date>(    
+  );
 
   const exportReport = (format: string) => {
-    toast.success(`Order report exported as ${format.toUpperCase()}`);
+    toast.success(`Order report exported as ${format.toUpperCase()}`    
+  );
   };
 
   const getStatusBadge = (status: string) => {
@@ -53,6 +60,7 @@ export default function OrderReportsPage() {
   };
 
   return (
+    
     <div className="flex flex-col gap-6 p-4 lg:p-6">
       <div className="flex items-center justify-between">
         <div>
@@ -69,8 +77,23 @@ export default function OrderReportsPage() {
               <SelectItem value="30d">Last 30 days</SelectItem>
               <SelectItem value="90d">Last 90 days</SelectItem>
               <SelectItem value="6m">Last 6 months</SelectItem>
+              <SelectItem value="custom">Custom Range</SelectItem>
             </SelectContent>
           </Select>
+          {timeRange === "custom" && (
+            <div className="flex items-center gap-2">
+              <DatePicker
+                date={startDate}
+                onSelect={setStartDate}
+                placeholder="Start date"
+              />
+              <DatePicker
+                date={endDate}
+                onSelect={setEndDate}
+                placeholder="End date"
+              />
+            </div>
+          )}
           <Button variant="outline" onClick={() => exportReport("pdf")}>
             <Download className="mr-2 h-4 w-4" />
             Export
@@ -187,5 +210,6 @@ export default function OrderReportsPage() {
         </Button>
       </div>
     </div>
+      
   );
 }

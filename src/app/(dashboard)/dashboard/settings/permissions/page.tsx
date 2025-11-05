@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -67,7 +66,8 @@ export default function PermissionsPage() {
     admin: ["dashboard", "products", "orders", "customers", "analytics", "settings", "users", "billing"],
     manager: ["dashboard", "products", "orders", "customers", "analytics"],
     user: ["dashboard"],
-  });
+  }
+  );
 
   const getRoleBadge = (role: string) => {
     const variants = {
@@ -78,19 +78,23 @@ export default function PermissionsPage() {
     const config = variants[role as keyof typeof variants];
     const Icon = config.icon;
     return (
+    
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
         {role}
       </Badge>
-    );
+        
+  );
   };
 
   const getStatusBadge = (status: string) => {
     return (
+    
       <Badge variant={status === "active" ? "default" : "secondary"}>
         {status}
       </Badge>
-    );
+        
+  );
   };
 
   const handlePermissionChange = (roleId: string, permissionId: string, checked: boolean) => {
@@ -99,26 +103,32 @@ export default function PermissionsPage() {
       [roleId]: checked 
         ? [...(prev[roleId] || []), permissionId]
         : (prev[roleId] || []).filter(p => p !== permissionId)
-    }));
+    })    
+  );
   };
 
   const savePermissions = () => {
-    toast.success("Permissions updated successfully");
+    toast.success("Permissions updated successfully"    
+  );
   };
 
   const inviteUser = () => {
-    toast.success("Invitation sent successfully");
+    toast.success("Invitation sent successfully"    
+  );
   };
 
   const groupedPermissions = permissions.reduce((acc, permission) => {
     if (!acc[permission.category]) {
       acc[permission.category] = [];
     }
-    acc[permission.category].push(permission);
+    acc[permission.category].push(permission    
+  );
     return acc;
-  }, {} as Record<string, Permission[]>);
+  }, {} as Record<string, Permission[]>    
+  );
 
   return (
+    
     <div className="flex flex-col gap-6 p-4 lg:p-6">
       <div>
         <h1 className="text-2xl font-semibold">Permissions & Roles</h1>
@@ -308,5 +318,6 @@ export default function PermissionsPage() {
         </TabsContent>
       </Tabs>
     </div>
+      
   );
 }

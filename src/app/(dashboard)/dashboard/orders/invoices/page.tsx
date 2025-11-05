@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Card,
@@ -59,30 +58,39 @@ const allInvoices: Invoice[] = [
 const ITEMS_PER_PAGE = 5;
 
 export default function InvoicesPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(""    
+  );
+  const [filterStatus, setFilterStatus] = useState("All"    
+  );
+  const [currentPage, setCurrentPage] = useState(1    
+  );
 
   const filteredInvoices = allInvoices.filter((invoice) => {
     const matchesSearch =
       invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoice.customer.toLowerCase().includes(searchTerm.toLowerCase());
+      invoice.customer.toLowerCase().includes(searchTerm.toLowerCase()    
+  );
     const matchesStatus =
       filterStatus === "All" || invoice.status === filterStatus;
     return matchesSearch && matchesStatus;
-  });
+  }    
+  );
 
-  const totalPages = Math.ceil(filteredInvoices.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredInvoices.length / ITEMS_PER_PAGE    
+  );
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentInvoices = filteredInvoices.slice(startIndex, endIndex);
+  const currentInvoices = filteredInvoices.slice(startIndex, endIndex    
+  );
 
   const handleSendReminder = (invoiceId: string) => {
-    console.log(`Sending reminder for invoice ${invoiceId}`);
+    console.log(`Sending reminder for invoice ${invoiceId}`    
+  );
     // API call to send reminder
   };
 
   return (
+    
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <h1 className="text-xl font-semibold md:text-2xl">Invoices</h1>
 
@@ -192,5 +200,6 @@ export default function InvoicesPage() {
         </CardContent>
       </Card>
     </div>
+      
   );
 }

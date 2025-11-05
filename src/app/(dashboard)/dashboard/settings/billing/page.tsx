@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -64,24 +63,29 @@ const plans = [
 ];
 
 export default function BillingPage() {
-  const [currentPlan] = useState("PRO");
+  const [currentPlan] = useState("PRO"    
+  );
   const [usage] = useState({
     products: { used: 247, limit: 1000 },
     users: { used: 3, limit: 5 },
     storage: { used: 12.4, limit: 50 },
     apiCalls: { used: 8450, limit: 10000 },
-  });
+  }    
+  );
 
   const downloadInvoice = (invoiceId: string) => {
-    toast.success(`Invoice ${invoiceId} downloaded`);
+    toast.success(`Invoice ${invoiceId} downloaded`    
+  );
   };
 
   const changePlan = (planName: string) => {
-    toast.success(`Plan changed to ${planName}`);
+    toast.success(`Plan changed to ${planName}`    
+  );
   };
 
   const addPaymentMethod = () => {
-    toast.success("Payment method added successfully");
+    toast.success("Payment method added successfully"    
+  );
   };
 
   const getStatusBadge = (status: string) => {
@@ -93,11 +97,13 @@ export default function BillingPage() {
     const config = variants[status as keyof typeof variants];
     const Icon = config.icon;
     return (
+    
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
         {status}
       </Badge>
-    );
+        
+  );
   };
 
   const getPlanIcon = (planName: string) => {
@@ -110,6 +116,7 @@ export default function BillingPage() {
   };
 
   return (
+    
     <div className="flex flex-col gap-6 p-4 lg:p-6">
       <div>
         <h1 className="text-2xl font-semibold">Billing & Subscription</h1>
@@ -193,8 +200,10 @@ export default function BillingPage() {
         <TabsContent value="plans" className="mt-6">
           <div className="grid gap-6 md:grid-cols-3">
             {plans.map((plan) => {
-              const Icon = getPlanIcon(plan.name);
+              const Icon = getPlanIcon(plan.name    
+  );
               return (
+    
                 <Card key={plan.name} className={`relative ${plan.current ? 'ring-2 ring-primary' : ''}`}>
                   {plan.current && (
                     <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2">
@@ -233,7 +242,8 @@ export default function BillingPage() {
                     </div>
                   </CardContent>
                 </Card>
-              );
+                  
+  );
             })}
           </div>
         </TabsContent>
@@ -347,5 +357,6 @@ export default function BillingPage() {
         </TabsContent>
       </Tabs>
     </div>
+      
   );
 }

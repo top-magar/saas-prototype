@@ -18,14 +18,16 @@ export default async function UserProfilePage() {
   const dbUser = await prisma.user.findUnique({
     where: { clerkUserId: user.id },
     include: { tenant: true },
-  });
+  }    
+  );
 
   if (!dbUser) {
     return <p>User data not found.</p>;
   }
 
   const tenant = dbUser.tenant;
-  const joinedDate = new Date(user.createdAt).toLocaleDateString();
+  const joinedDate = new Date(user.createdAt).toLocaleDateString(    
+  );
   const lastLogin = dbUser.lastLoginAt ? new Date(dbUser.lastLoginAt).toLocaleDateString() : "Never";
 
   const getRoleBadge = (role: string) => {
@@ -47,6 +49,7 @@ export default async function UserProfilePage() {
   };
 
   return (
+    
     <div className="flex flex-col gap-6 p-4 lg:p-6">
       <div>
         <h1 className="text-2xl font-semibold">Profile Settings</h1>
@@ -205,5 +208,6 @@ export default async function UserProfilePage() {
         </div>
       </div>
     </div>
+      
   );
 }

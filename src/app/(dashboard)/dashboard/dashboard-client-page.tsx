@@ -95,7 +95,8 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
 
   if (!data) {
     return (
-      <div className="flex flex-col gap-6">
+      
+        <div className="flex flex-col gap-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <Skeleton className="h-8 w-48" />
@@ -121,17 +122,19 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
           </div>
         </div>
         <Skeleton className="h-96" />
-      </div>
+        </div>
+      
     );
   }
 
   return (
-    <motion.div
-      className="flex flex-col gap-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
+    
+      <motion.div
+        className="flex flex-col gap-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Welcome, {user?.firstName} 👋</h1>
@@ -315,6 +318,7 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+      </motion.div>
+    
   );
 }

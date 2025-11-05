@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Card,
@@ -60,25 +59,33 @@ const allOrders: Order[] = [
 const ITEMS_PER_PAGE = 5;
 
 export default function OrdersPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(""    
+  );
+  const [filterStatus, setFilterStatus] = useState("All"    
+  );
+  const [currentPage, setCurrentPage] = useState(1    
+  );
 
   const filteredOrders = allOrders.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.toLowerCase().includes(searchTerm.toLowerCase());
+      order.customer.toLowerCase().includes(searchTerm.toLowerCase()    
+  );
     const matchesStatus =
       filterStatus === "All" || order.status === filterStatus;
     return matchesSearch && matchesStatus;
-  });
+  }    
+  );
 
-  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE    
+  );
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentOrders = filteredOrders.slice(startIndex, endIndex);
+  const currentOrders = filteredOrders.slice(startIndex, endIndex    
+  );
 
   return (
+    
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <h1 className="text-xl font-semibold md:text-2xl">Orders & Sales</h1>
 
@@ -177,5 +184,6 @@ export default function OrdersPage() {
         </CardContent>
       </Card>
     </div>
+      
   );
 }

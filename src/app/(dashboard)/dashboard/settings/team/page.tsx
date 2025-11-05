@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Card,
@@ -54,9 +53,12 @@ const initialTeamMembers: TeamMember[] = [
 ];
 
 export default function TeamMembersPage() {
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
-  const [newMemberEmail, setNewMemberEmail] = useState("");
-  const [newMemberRole, setNewMemberRole] = useState<TeamMember["role"]>("Viewer");
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers    
+  );
+  const [newMemberEmail, setNewMemberEmail] = useState(""    
+  );
+  const [newMemberRole, setNewMemberRole] = useState<TeamMember["role"]>("Viewer"    
+  );
 
   const handleInviteMember = async () => {
     if (!newMemberEmail || !newMemberRole) return;
@@ -75,11 +77,15 @@ export default function TeamMembersPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: newMemberEmail, role: newMemberRole })
-      });
+      }    
+  );
       
-      setTeamMembers([...teamMembers, newMember]);
-      setNewMemberEmail("");
-      setNewMemberRole("Viewer");
+      setTeamMembers([...teamMembers, newMember]    
+  );
+      setNewMemberEmail(""    
+  );
+      setNewMemberRole("Viewer"    
+  );
     } catch (error) {
       // Handle invitation error
     }
@@ -90,20 +96,24 @@ export default function TeamMembersPage() {
       teamMembers.map((member) =>
         member.id === memberId ? { ...member, role: newRole } : member
       )
-    );
+        
+  );
   };
 
   const handleRemoveMember = async (memberId: string) => {
     try {
       // API call to remove member
-      await fetch(`/api/team/members/${memberId}`, { method: 'DELETE' });
-      setTeamMembers(teamMembers.filter((member) => member.id !== memberId));
+      await fetch(`/api/team/members/${memberId}`, { method: 'DELETE' }    
+  );
+      setTeamMembers(teamMembers.filter((member) => member.id !== memberId)    
+  );
     } catch (error) {
       // Handle removal error
     }
   };
 
   return (
+    
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <h1 className="text-xl font-semibold md:text-2xl">Team Members</h1>
 
@@ -218,5 +228,6 @@ export default function TeamMembersPage() {
         </CardContent>
       </Card>
     </div>
+      
   );
 }

@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Card,
@@ -57,24 +56,32 @@ const allProductsInventory: ProductInventory[] = [
 const ITEMS_PER_PAGE = 5;
 
 export default function InventoryPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [inventory, setInventory] = useState<ProductInventory[]>(allProductsInventory);
+  const [searchTerm, setSearchTerm] = useState(""    
+  );
+  const [filterStatus, setFilterStatus] = useState("All"    
+  );
+  const [currentPage, setCurrentPage] = useState(1    
+  );
+  const [inventory, setInventory] = useState<ProductInventory[]>(allProductsInventory    
+  );
 
   const filteredProducts = inventory.filter((product) => {
     const matchesSearch =
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase());
+      product.sku.toLowerCase().includes(searchTerm.toLowerCase()    
+  );
     const matchesStatus =
       filterStatus === "All" || product.status === filterStatus;
     return matchesSearch && matchesStatus;
-  });
+  }    
+  );
 
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE    
+  );
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+  const currentProducts = filteredProducts.slice(startIndex, endIndex    
+  );
 
   const handleStockChange = (id: string, newStock: number) => {
     setInventory(
@@ -92,12 +99,15 @@ export default function InventoryPage() {
             }
           : product
       )
-    );
-    console.log(`Updated stock for ${id} to ${newStock}`);
+        
+  );
+    console.log(`Updated stock for ${id} to ${newStock}`    
+  );
     // In a real app, this would involve an API call to update stock
   };
 
   return (
+    
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">Product Inventory</h1>
@@ -210,5 +220,6 @@ export default function InventoryPage() {
         </CardContent>
       </Card>
     </div>
+      
   );
 }

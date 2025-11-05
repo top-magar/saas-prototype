@@ -157,21 +157,25 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
 
   if (hasError) {
     return (
-      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-        <h1 className="text-xl font-semibold md:text-2xl">Analytics Overview</h1>
-        <div className="text-center py-8 text-muted-foreground">
-          Failed to load analytics data
+      
+        <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          <h1 className="text-xl font-semibold md:text-2xl">Analytics Overview</h1>
+          <div className="text-center py-8 text-muted-foreground">
+            Failed to load analytics data
+          </div>
         </div>
-      </div>
+      
     );
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <AnalyticsClient 
-        data={analyticsData} 
-        timeRange={timeRange}
-      />
-    </div>
+    
+      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <AnalyticsClient 
+          data={analyticsData} 
+          timeRange={timeRange}
+        />
+      </div>
+    
   );
 }

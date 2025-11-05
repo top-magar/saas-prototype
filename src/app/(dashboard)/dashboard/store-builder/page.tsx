@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import api from '@/lib/api';
 import { useTenant } from '@/lib/tenant-context';
@@ -81,7 +80,8 @@ const sanitizeText = (text: string) => {
       '&': '&amp;'
     };
     return entities[match] || match;
-  });
+  }    
+  );
 };
 
 const sanitizeStyle = (value: string) => {
@@ -113,7 +113,8 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: component.id });
+  } = useSortable({ id: component.id }    
+  );
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -129,6 +130,7 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
     switch (component.type) {
       case 'navigation':
         return (
+    
           <div className="bg-white border-b shadow-sm p-4" style={{ backgroundColor: baseStyles.backgroundColor || '#ffffff' }}>
             <div className="flex items-center justify-between">
               <div className="font-bold text-xl" style={{ color: sanitizeStyle(baseStyles.color || '') || '#000000' }}>
@@ -144,10 +146,12 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
               <Button size="sm">{sanitizeText(props?.buttonText || 'Sign Up')}</Button>
             </div>
           </div>
-        );
+            
+  );
       
       case 'hero':
         return (
+    
           <div 
             className="p-12 rounded-lg text-center"
             style={{ 
@@ -162,10 +166,12 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
               {sanitizeText(props?.buttonText || 'Shop Now')}
             </Button>
           </div>
-        );
+            
+  );
       
       case 'text':
         return (
+    
           <div 
             className="prose max-w-none p-6"
             style={{ 
@@ -180,10 +186,12 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
               {sanitizeText(props?.text || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.')}
             </p>
           </div>
-        );
+            
+  );
       
       case 'image':
         return (
+    
           <div className="p-4">
             {props?.imageUrl ? (
               <img src={sanitizeUrl(props.imageUrl)} alt="" className="w-full h-64 object-cover rounded-lg" />
@@ -193,10 +201,12 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
               </div>
             )}
           </div>
-        );
+            
+  );
       
       case 'products':
         return (
+    
           <div className="p-6" style={{ backgroundColor: baseStyles.backgroundColor || 'transparent' }}>
             <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: sanitizeStyle(baseStyles.color) || '#000000' }}>
               {sanitizeText(props?.heading || 'Featured Products')}
@@ -211,10 +221,12 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
               ))}
             </div>
           </div>
-        );
+            
+  );
       
       case 'testimonials':
         return (
+    
           <div className="p-6" style={{ backgroundColor: baseStyles.backgroundColor || '#f9fafb' }}>
             <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: sanitizeStyle(baseStyles.color) || '#000000' }}>
               {sanitizeText(props?.heading || 'What Our Customers Say')}
@@ -229,10 +241,12 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
               <p className="font-semibold">- Happy Customer</p>
             </div>
           </div>
-        );
+            
+  );
       
       case 'cta':
         return (
+    
           <div 
             className="p-12 rounded-lg text-center"
             style={{ 
@@ -246,10 +260,12 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
               {sanitizeText(props?.buttonText || 'Get Started Today')}
             </Button>
           </div>
-        );
+            
+  );
       
       case 'footer':
         return (
+    
           <div className="bg-gray-900 text-white p-8" style={{ backgroundColor: baseStyles.backgroundColor || '#111827' }}>
             <div className="grid grid-cols-4 gap-8">
               <div>
@@ -264,7 +280,8 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
               </div>
             </div>
           </div>
-        );
+            
+  );
       
       default:
         return <div className="p-4 border rounded">Component Preview</div>;
@@ -272,6 +289,7 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
   }, [component]); // Only re-render when component data changes
 
   return (
+    
     <div
       ref={setNodeRef}
       style={style}
@@ -310,13 +328,16 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
         {renderComponent}
       </div>
     </div>
+      
   );
 }
 
 function ComponentLibrary({ onAddComponent }: { onAddComponent: (type: ComponentData['type']) => void }) {
-  const categories = Array.from(new Set(COMPONENT_TYPES.map(c => c.category)));
+  const categories = Array.from(new Set(COMPONENT_TYPES.map(c => c.category))    
+  );
 
   return (
+    
     <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
@@ -335,6 +356,7 @@ function ComponentLibrary({ onAddComponent }: { onAddComponent: (type: Component
               {COMPONENT_TYPES.filter(c => c.category === category).map((componentType) => {
                 const Icon = componentType.icon;
                 return (
+    
                   <Button
                     key={componentType.id}
                     variant="outline"
@@ -344,13 +366,15 @@ function ComponentLibrary({ onAddComponent }: { onAddComponent: (type: Component
                     <Icon className="h-4 w-4 mr-2" />
                     {componentType.title}
                   </Button>
-                );
+                    
+  );
               })}
             </TabsContent>
           ))}
         </Tabs>
       </CardContent>
     </Card>
+      
   );
 }
 
@@ -360,6 +384,7 @@ function PropertyPanel({ selectedComponent, onUpdateComponent }: {
 }) {
   if (!selectedComponent) {
     return (
+    
       <Card className="h-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -373,12 +398,14 @@ function PropertyPanel({ selectedComponent, onUpdateComponent }: {
           </p>
         </CardContent>
       </Card>
-    );
+        
+  );
   }
 
   const { props, styles } = selectedComponent;
 
   return (
+    
     <Card className="h-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
@@ -476,20 +503,30 @@ function PropertyPanel({ selectedComponent, onUpdateComponent }: {
         )}
       </CardContent>
     </Card>
+      
   );
 }
 
 export default function StoreBuilderPage() {
-  const [components, setComponents] = useState<ComponentData[]>([]);
-  const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [previewMode, setPreviewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
-  const [currentPage, setCurrentPage] = useState<{ id?: string; pageName?: string; pageSlug?: string } | null>(null);
-  const [stores, setStores] = useState<{ id: string; storeName: string; pages: unknown[] }[]>([]);
-  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [components, setComponents] = useState<ComponentData[]>([]    
+  );
+  const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null    
+  );
+  const [activeId, setActiveId] = useState<string | null>(null    
+  );
+  const [previewMode, setPreviewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop'    
+  );
+  const [currentPage, setCurrentPage] = useState<{ id?: string; pageName?: string; pageSlug?: string } | null>(null    
+  );
+  const [stores, setStores] = useState<{ id: string; storeName: string; pages: unknown[] }[]>([]    
+  );
+  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null    
+  );
+  const [isLoading, setIsLoading] = useState(false    
+  );
   
-  const { tenant } = useTenant();
+  const { tenant } = useTenant(    
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -497,32 +534,41 @@ export default function StoreBuilderPage() {
         distance: 8,
       },
     })
+      
   );
 
   // Load stores and pages
   useEffect(() => {
     if (tenant?.id) {
-      loadStores();
+      loadStores(    
+  );
     }
-  }, [tenant?.id]);
+  }, [tenant?.id]    
+  );
 
   const loadStores = async () => {
     if (!tenant?.id) return;
     
     try {
-      const response = await api.get(`/api/stores?tenantId=${tenant.id}`);
-      setStores(response.data);
+      const response = await api.get(`/api/stores?tenantId=${tenant.id}`    
+  );
+      setStores(response.data    
+  );
       if (response.data.length > 0 && !selectedStoreId) {
-        setSelectedStoreId(response.data[0].id);
+        setSelectedStoreId(response.data[0].id    
+  );
       }
     } catch (error) {
-      console.error('[LOAD_STORES_ERROR]', error);
+      console.error('[LOAD_STORES_ERROR]', error    
+  );
       
       if (error instanceof Error) {
         if (error.message.includes('network') || error.message.includes('fetch')) {
-          alert('Network error: Unable to load stores. Using demo mode.');
+          alert('Network error: Unable to load stores. Using demo mode.'    
+  );
         } else if (error.message.includes('unauthorized')) {
-          alert('Permission error: Unable to access stores. Using demo mode.');
+          alert('Permission error: Unable to access stores. Using demo mode.'    
+  );
         }
       }
       
@@ -530,18 +576,22 @@ export default function StoreBuilderPage() {
         id: 'demo-store',
         storeName: 'Demo Store',
         pages: []
-      }]);
-      setSelectedStoreId('demo-store');
+      }]    
+  );
+      setSelectedStoreId('demo-store'    
+  );
     }
   };
 
   const savePage = async () => {
     if (!selectedStoreId || !tenant?.id) {
-      console.log('Save skipped - demo mode or missing data');
+      console.log('Save skipped - demo mode or missing data'    
+  );
       return;
     }
     
-    setIsLoading(true);
+    setIsLoading(true    
+  );
     try {
       const pageData = {
         storeId: selectedStoreId,
@@ -555,36 +605,47 @@ export default function StoreBuilderPage() {
       };
 
       if (currentPage?.id) {
-        await api.put(`/api/pages?tenantId=${tenant.id}&pageId=${currentPage.id}`, pageData);
+        await api.put(`/api/pages?tenantId=${tenant.id}&pageId=${currentPage.id}`, pageData    
+  );
       } else {
-        const response = await api.post(`/api/pages?tenantId=${tenant.id}`, pageData);
-        setCurrentPage(response.data);
+        const response = await api.post(`/api/pages?tenantId=${tenant.id}`, pageData    
+  );
+        setCurrentPage(response.data    
+  );
       }
-      console.log('Page saved successfully');
+      console.log('Page saved successfully'    
+  );
     } catch (error) {
-      console.error('[SAVE_PAGE_ERROR]', error);
+      console.error('[SAVE_PAGE_ERROR]', error    
+  );
       
       // Show user-friendly error message
       if (error instanceof Error) {
         if (error.message.includes('network') || error.message.includes('fetch')) {
-          alert('Network error: Unable to save page. Please check your connection and try again.');
+          alert('Network error: Unable to save page. Please check your connection and try again.'    
+  );
         } else if (error.message.includes('unauthorized') || error.message.includes('403')) {
-          alert('Permission error: You do not have permission to save this page.');
+          alert('Permission error: You do not have permission to save this page.'    
+  );
         } else {
-          alert('Save failed: Unable to save page. Please try again.');
+          alert('Save failed: Unable to save page. Please try again.'    
+  );
         }
       } else {
-        alert('Save failed: An unexpected error occurred.');
+        alert('Save failed: An unexpected error occurred.'    
+  );
       }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false    
+  );
     }
   };
 
   const selectedComponent = components.find(c => c.id === selectedComponentId) || null;
 
   const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
+    setActiveId(event.active.id as string    
+  );
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -592,13 +653,18 @@ export default function StoreBuilderPage() {
 
     if (active.id !== over?.id) {
       setComponents((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over?.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
+        const oldIndex = items.findIndex((item) => item.id === active.id    
+  );
+        const newIndex = items.findIndex((item) => item.id === over?.id    
+  );
+        return arrayMove(items, oldIndex, newIndex    
+  );
+      }    
+  );
     }
 
-    setActiveId(null);
+    setActiveId(null    
+  );
   };
 
   const addComponent = useCallback((type: ComponentData['type']) => {
@@ -610,35 +676,47 @@ export default function StoreBuilderPage() {
       styles: { base: {} },
       children: [],
     };
-    setComponents(prev => [...prev, newComponent]);
-    setSelectedComponentId(newComponent.id);
-  }, []);
+    setComponents(prev => [...prev, newComponent]    
+  );
+    setSelectedComponentId(newComponent.id    
+  );
+  }, []    
+  );
 
   const deleteComponent = useCallback((id: string) => {
-    setComponents(prev => prev.filter(c => c.id !== id));
+    setComponents(prev => prev.filter(c => c.id !== id)    
+  );
     if (selectedComponentId === id) {
-      setSelectedComponentId(null);
+      setSelectedComponentId(null    
+  );
     }
-  }, [selectedComponentId]);
+  }, [selectedComponentId]    
+  );
 
   const duplicateComponent = useCallback((id: string) => {
     try {
-      const component = components.find(c => c.id === id);
+      const component = components.find(c => c.id === id    
+  );
       if (component) {
         const newComponent: ComponentData = {
           ...component,
           id: `${component.type}-${Date.now()}`,
         };
         setComponents(prev => {
-          const index = prev.findIndex(c => c.id === id);
+          const index = prev.findIndex(c => c.id === id    
+  );
           return [...prev.slice(0, index + 1), newComponent, ...prev.slice(index + 1)];
-        });
+        }    
+  );
       }
     } catch (error) {
-      console.error('[COMPONENT_DUPLICATE_ERROR]', error);
-      alert('Failed to duplicate component. Please try again.');
+      console.error('[COMPONENT_DUPLICATE_ERROR]', error    
+  );
+      alert('Failed to duplicate component. Please try again.'    
+  );
     }
-  }, [components]);
+  }, [components]    
+  );
 
   const updateComponent = useCallback((id: string, updates: Partial<ComponentData>) => {
     try {
@@ -646,12 +724,16 @@ export default function StoreBuilderPage() {
         c.id === id 
           ? { ...c, ...updates }
           : c
-      ));
+      )    
+  );
     } catch (error) {
-      console.error('[COMPONENT_UPDATE_ERROR]', error);
-      alert('Failed to update component. Please try again.');
+      console.error('[COMPONENT_UPDATE_ERROR]', error    
+  );
+      alert('Failed to update component. Please try again.'    
+  );
     }
-  }, []);
+  }, []    
+  );
 
   const getPreviewWidth = () => {
     switch (previewMode) {
@@ -661,9 +743,11 @@ export default function StoreBuilderPage() {
     }
   };
 
-  const activeComponent = components.find(c => c.id === activeId);
+  const activeComponent = components.find(c => c.id === activeId    
+  );
 
   return (
+    
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -779,5 +863,6 @@ export default function StoreBuilderPage() {
         </div>
       </div>
     </div>
+      
   );
 }

@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { findOrCreateCustomer } from "@/lib/customer-utils";
 
 interface EsewaWebhookPayload {
   tenantId: string;
-  tierId: 'FREE' | 'STARTER' | 'PRO' | 'ENTERPRISE';
+  tierId?: 'FREE' | 'STARTER' | 'PRO' | 'ENTERPRISE';
   transactionId?: string;
   amount?: number;
+  customerEmail?: string;
+  customerName?: string;
+  customerPhone?: string;
+  orderId?: string;
 }
 
 function validateWebhookPayload(body: any): body is EsewaWebhookPayload {
@@ -13,8 +18,7 @@ function validateWebhookPayload(body: any): body is EsewaWebhookPayload {
     body &&
     typeof body.tenantId === 'string' &&
     body.tenantId.length > 0 &&
-    typeof body.tierId === 'string' &&
-    ['FREE', 'STARTER', 'PRO', 'ENTERPRISE'].includes(body.tierId)
+    (body.tierId === undefined || ['FREE', 'STARTER', 'PRO', 'ENTERPRISE'].includes(body.tierId))
   );
 }
 
@@ -50,16 +54,43 @@ export async function POST(req: NextRequest) {
       return new NextResponse('Tenant not found', { status: 404 });
     }
 
-    // Update tenant tier with error handling
-    try {
-      await prisma.tenant.update({
-        where: { id: tenantId },
-        data: { tier: tierId },
-      });
-      console.log('Tenant tier updated via eSewa webhook');
-    } catch (dbError) {
-      console.error('Database update failed in eSewa webhook');
-      return new NextResponse('Database update failed', { status: 500 });
+    // Handle subscription payment
+    if (tierId) {
+      try {
+        await prisma.tenant.update({
+          where: { id: tenantId },
+          data: { tier: tierId },
+        });
+        console.log('Tenant tier updated via eSewa webhook');
+      } catch (dbError) {
+        console.error('Database update failed in eSewa webhook');
+        return new NextResponse('Database update failed', { status: 500 });
+      }
+    }
+
+    // Handle order payment - auto-create customer
+    if (body.customerEmail && body.orderId) {
+      try {
+        const customer = await findOrCreateCustomer({
+          email: body.customerEmail,
+          name: body.customerName,
+          phone: body.customerPhone,
+          tenantId
+        });
+
+        // Update order with customer and payment status
+        await prisma.order.update({
+          where: { id: body.orderId },
+          data: {
+            userId: customer.id,
+            paymentStatus: 'completed',
+            status: 'confirmed'
+          }
+        });
+        console.log('Order updated and customer created via eSewa webhook');
+      } catch (error) {
+        console.error('Error processing order payment:', error);
+      }
     }
 
     return new NextResponse('OK', { status: 200 });

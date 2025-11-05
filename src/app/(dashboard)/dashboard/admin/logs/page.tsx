@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Card,
@@ -61,25 +60,33 @@ const allLogs: LogEntry[] = [
 const ITEMS_PER_PAGE = 5;
 
 export default function SystemLogsPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterLevel, setFilterLevel] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(""    
+  );
+  const [filterLevel, setFilterLevel] = useState("All"    
+  );
+  const [currentPage, setCurrentPage] = useState(1    
+  );
 
   const filteredLogs = allLogs.filter((log) => {
     const matchesSearch =
       log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.source.toLowerCase().includes(searchTerm.toLowerCase());
+      log.source.toLowerCase().includes(searchTerm.toLowerCase()    
+  );
     const matchesLevel =
       filterLevel === "All" || log.level === filterLevel;
     return matchesSearch && matchesLevel;
-  });
+  }    
+  );
 
-  const totalPages = Math.ceil(filteredLogs.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredLogs.length / ITEMS_PER_PAGE    
+  );
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentLogs = filteredLogs.slice(startIndex, endIndex);
+  const currentLogs = filteredLogs.slice(startIndex, endIndex    
+  );
 
   return (
+    
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <h1 className="text-xl font-semibold md:text-2xl">System Logs</h1>
 
@@ -174,5 +181,6 @@ export default function SystemLogsPage() {
         </CardContent>
       </Card>
     </div>
+      
   );
 }

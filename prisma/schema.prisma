@@ -42,6 +42,7 @@ model Tenant {
   auditLogs         AuditLog[]
   categories        Category[]
   stores            Store[]
+  coupons           Coupon[]
   
   @@index([subdomain])
   @@index([status])
@@ -479,4 +480,26 @@ model Template {
   createdAt       DateTime  @default(now())
   
   @@map("templates")
+}
+
+model Coupon {
+  id          String    @id @default(uuid())
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  code        String    @unique
+  type        String    // percentage, fixed, free_shipping
+  value       Decimal   @db.Decimal(10, 2)
+  minAmount   Decimal?  @db.Decimal(10, 2)
+  maxUses     Int?
+  usedCount   Int       @default(0)
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([tenantId])
+  @@index([code])
+  @@map("coupons")
 }

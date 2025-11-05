@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Card,
@@ -31,6 +30,8 @@ import {
 import { Copy, Plus, Trash, Pencil } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Field, FieldLabel, FieldContent } from "@/components/ui/field";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Label } from "@/components/ui/label";
 
 interface ApiKey {
   id: string;
@@ -69,9 +70,14 @@ const initialApiKeys: ApiKey[] = [
 ];
 
 export default function ApiKeysPage() {
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>(initialApiKeys);
-  const [newKeyName, setNewKeyName] = useState("");
-  const [generatedKey, setGeneratedKey] = useState("");
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>(initialApiKeys    
+  );
+  const [newKeyName, setNewKeyName] = useState(""    
+  );
+  const [generatedKey, setGeneratedKey] = useState(""    
+  );
+  const [expiryDate, setExpiryDate] = useState<Date>(    
+  );
 
   const generateNewKey = async () => {
     try {
@@ -82,9 +88,11 @@ export default function ApiKeysPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newKeyName || `API Key ${apiKeys.length + 1}` })
-      });
+      }    
+  );
       
-      setGeneratedKey(newKey);
+      setGeneratedKey(newKey    
+  );
       setApiKeys([
         ...apiKeys,
         {
@@ -93,10 +101,14 @@ export default function ApiKeysPage() {
           key: newKey,
           status: "Active",
           createdAt: new Date().toISOString().split("T")[0],
-          expiresAt: "Never",
+          expiresAt: expiryDate ? expiryDate.toISOString().split("T")[0] : "Never",
         },
-      ]);
-      setNewKeyName("");
+      ]    
+  );
+      setNewKeyName(""    
+  );
+      setExpiryDate(undefined    
+  );
     } catch (error) {
       // Handle key generation error
     }
@@ -105,12 +117,14 @@ export default function ApiKeysPage() {
   const revokeKey = async (id: string) => {
     try {
       // API call to revoke key
-      await fetch(`/api/keys/${id}/revoke`, { method: 'POST' });
+      await fetch(`/api/keys/${id}/revoke`, { method: 'POST' }    
+  );
       setApiKeys(
         apiKeys.map((key) =>
           key.id === id ? { ...key, status: "Revoked" } : key
         )
-      );
+          
+  );
     } catch (error) {
       // Handle revoke error
     }
@@ -118,7 +132,8 @@ export default function ApiKeysPage() {
 
   const copyToClipboard = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(text    
+  );
       // Show success notification
     } catch (error) {
       // Handle clipboard error
@@ -126,6 +141,7 @@ export default function ApiKeysPage() {
   };
 
   return (
+    
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">API Keys</h1>
@@ -176,6 +192,14 @@ export default function ApiKeysPage() {
                   </FieldContent>
                 </Field>
               )}
+              <div>
+                <Label>Expiry Date (Optional)</Label>
+                <DatePicker
+                  date={expiryDate}
+                  onSelect={setExpiryDate}
+                  placeholder="Never expires"
+                />
+              </div>
             </div>
             <DialogFooter>
               <Button onClick={generateNewKey}>Generate Key</Button>
@@ -246,5 +270,6 @@ export default function ApiKeysPage() {
         </CardContent>
       </Card>
     </div>
+      
   );
 }

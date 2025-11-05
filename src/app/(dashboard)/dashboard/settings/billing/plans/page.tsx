@@ -1,5 +1,4 @@
 "use client";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -48,8 +47,10 @@ const plans = [
 ];
 
 export function PlansDialog({ trigger }: { trigger: React.ReactNode }) {
-  const { tenant } = useTenant();
-  const router = useRouter();
+  const { tenant } = useTenant(    
+  );
+  const router = useRouter(    
+  );
   const currentPlan = tenant?.tier || "FREE";
   const currentTier = plans.find(p => p.tierId === currentPlan)?.tier ?? 0;
 
@@ -60,10 +61,12 @@ export function PlansDialog({ trigger }: { trigger: React.ReactNode }) {
       return;
     }
     
-    router.push(`/payment-processing?plan=${plan.tierId}`);
+    router.push(`/payment-processing?plan=${plan.tierId}`    
+  );
   };
 
   return (
+    
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-w-7xl w-[95vw] h-[85vh] p-8">
@@ -95,6 +98,7 @@ export function PlansDialog({ trigger }: { trigger: React.ReactNode }) {
                 const isDowngrade = plan.tier < currentTier;
 
                 return (
+    
                   <Card key={plan.tierId} className={cn(
                     "relative transition-all duration-200 flex flex-col h-full",
                     isCurrent && "ring-2 ring-blue-500",
@@ -166,20 +170,24 @@ export function PlansDialog({ trigger }: { trigger: React.ReactNode }) {
                       </Button>
                     </CardContent>
                   </Card>
-                );
+                    
+  );
               })}
             </div>
           </div>
         </div>
       </DialogContent>
     </Dialog>
+      
   );
 }
 
 export default function PlansPage() {
   return (
+    
     <div className="p-6">
       <PlansDialog trigger={<Button>Open Plans Dialog</Button>} />
     </div>
+      
   );
 }

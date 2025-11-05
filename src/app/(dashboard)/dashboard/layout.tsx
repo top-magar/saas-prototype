@@ -13,6 +13,7 @@ const Header = dynamic(() => import('../_components/header').then(mod => mod.Hea
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { NavigationProgress } from "@/components/_shared";
+import { SmoothScroll } from "@/components/ui/smooth-scroll";
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { tenant, isLoading } = useTenant();
@@ -39,13 +40,15 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         <SidebarInset className="flex flex-col">
           <NavigationProgress />
           <Header />
-          <main className="flex-1 overflow-auto">
-            <ErrorBoundary>
-              <div className="h-full w-full max-w-full p-4 sm:p-6">
-                {children}
-              </div>
-            </ErrorBoundary>
-          </main>
+          <SmoothScroll className="flex-1 overflow-auto">
+            <main>
+              <ErrorBoundary>
+                <div className="h-full w-full max-w-full p-4 sm:p-6">
+                  {children}
+                </div>
+              </ErrorBoundary>
+            </main>
+          </SmoothScroll>
         </SidebarInset>
       </div>
     </SidebarProvider>
