@@ -1,78 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { PageWrapper } from "@/components/ui/page-wrapper";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Field, FieldLabel, FieldContent, FieldError } from "@/components/ui/field";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Save } from "lucide-react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowLeft, X } from "lucide-react";
 import { toast } from "sonner";
+import { FileDropzone } from "@/components/ui/file-dropzone";
+import Image from "next/image";
 
-const categorySchema = z.object({
-  name: z.string().min(1, "Category name is required"),
-  description: z.string().optional(),
-  slug: z.string().min(1, "Slug is required"),
-  isActive: z.boolean().default(true),
-  parentCategory: z.string().optional(),
-  sortOrder: z.number().min(0).default(0),
-  metaTitle: z.string().optional(),
-  metaDescription: z.string().optional(),
-});
-
-type CategoryFormValues = z.infer<typeof categorySchema>;
-
-const existingCategories = [
-  { id: "1", name: "Electronics", slug: "electronics" },
-  { id: "2", name: "Clothing", slug: "clothing" },
-  { id: "3", name: "Home & Garden", slug: "home-garden" },
-  { id: "4", name: "Books", slug: "books" },
-];
+interface CategoryForm {
+  name: string;
+  image: File | null;
+  seoTitle: string;
+  seoDescription: string;
+  seoImage: File | null;
+  hideOnProductPages: boolean;
+}
 
 export default function AddCategoryPage() {
   const router = useRouter();
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const seoImageInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const form = useForm<CategoryFormValues>({
-    resolver: zodResolver(categorySchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      slug: "",
-      isActive: true,
-      parentCategory: "",
-      sortOrder: 0,
-      metaTitle: "",
-      metaDescription: "",
-    },
+  const [categoryImage, setCategoryImage] = useState<string>("");
+  const [seoImagePreview, setSeoImagePreview] = useState<string>("");
+  const [formData, setFormData] = useState<CategoryForm>({
+    name: "",
+    image: null,
+    seoTitle: "",
+    seoDescription: "",
+    seoImage: null,
+    hideOnProductPages: false
   });
 
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-  };
-
-  const handleNameChange = (name: string) => {
-    form.setValue("name", name);
-    if (!form.getValues("slug")) {
-      form.setValue("slug", generateSlug(name));
+  const handleSubmit = async () => {
+    if (!formData.name.trim()) {
+      toast.error("Category name is required");
+      return;
     }
-  };
 
-  const onSubmit = async (values: CategoryFormValues) => {
     setIsSubmitting(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log("Creating category:", values);
       toast.success("Category created successfully!");
       router.push("/dashboard/products/categories");
     } catch (error) {
@@ -82,241 +57,227 @@ export default function AddCategoryPage() {
     }
   };
 
+  const handleImageSelect = (files: FileList | null, type: 'category' | 'seo') => {
+    if (files && files[0]) {
+      const file = files[0];
+      if (file.size > 4 * 1024 * 1024) {
+        toast.error('File size must be less than 4MB');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        if (type === 'category') {
+          setCategoryImage(result);
+          setFormData(prev => ({ ...prev, image: file }));
+        } else {
+          setSeoImagePreview(result);
+          setFormData(prev => ({ ...prev, seoImage: file }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = (type: 'category' | 'seo') => {
+    if (type === 'category') {
+      setCategoryImage("");
+      setFormData(prev => ({ ...prev, image: null }));
+    } else {
+      setSeoImagePreview("");
+      setFormData(prev => ({ ...prev, seoImage: null }));
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="flex items-center gap-4">
-        <Button size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h1 className="text-xl font-semibold md:text-2xl">Add New Category</h1>
-          <p className="text-sm text-muted-foreground">Create a new product category</p>
-        </div>
-      </div>
-
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6 md:grid-cols-3">
-        <div className="md:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-              <CardDescription>Essential details for your category</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Field>
-                <FieldLabel>Category Name</FieldLabel>
-                <FieldContent>
-                  <Controller
-                    name="name"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        placeholder="e.g., Electronics, Clothing"
-                        onChange={(e) => handleNameChange(e.target.value)}
-                      />
-                    )}
-                  />
-                  <FieldError>{form.formState.errors.name?.message}</FieldError>
-                </FieldContent>
-              </Field>
-
-              <Field>
-                <FieldLabel>Description</FieldLabel>
-                <FieldContent>
-                  <Controller
-                    name="description"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Textarea
-                        {...field}
-                        placeholder="Brief description of this category"
-                        rows={3}
-                      />
-                    )}
-                  />
-                  <FieldError>{form.formState.errors.description?.message}</FieldError>
-                </FieldContent>
-              </Field>
-
-              <Field>
-                <FieldLabel>URL Slug</FieldLabel>
-                <FieldContent>
-                  <Controller
-                    name="slug"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        placeholder="category-url-slug"
-                      />
-                    )}
-                  />
-                  <FieldError>{form.formState.errors.slug?.message}</FieldError>
-                </FieldContent>
-              </Field>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>SEO Settings</CardTitle>
-              <CardDescription>Optimize for search engines</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Field>
-                <FieldLabel>Meta Title</FieldLabel>
-                <FieldContent>
-                  <Controller
-                    name="metaTitle"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        placeholder="SEO title for this category"
-                      />
-                    )}
-                  />
-                </FieldContent>
-              </Field>
-
-              <Field>
-                <FieldLabel>Meta Description</FieldLabel>
-                <FieldContent>
-                  <Controller
-                    name="metaDescription"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Textarea
-                        {...field}
-                        placeholder="SEO description for this category"
-                        rows={2}
-                      />
-                    )}
-                  />
-                </FieldContent>
-              </Field>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Category Settings</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Field>
-                <FieldLabel>Status</FieldLabel>
-                <FieldContent>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Active</span>
-                    <Controller
-                      name="isActive"
-                      control={form.control}
-                      render={({ field }) => (
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      )}
-                    />
-                  </div>
-                </FieldContent>
-              </Field>
-
-              <Field>
-                <FieldLabel>Parent Category</FieldLabel>
-                <FieldContent>
-                  <Controller
-                    name="parentCategory"
-                    control={form.control}
-                    render={({ field }) => (
-                      <select
-                        {...field}
-                        className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
-                      >
-                        <option value="">None (Top Level)</option>
-                        {existingCategories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  />
-                </FieldContent>
-              </Field>
-
-              <Field>
-                <FieldLabel>Sort Order</FieldLabel>
-                <FieldContent>
-                  <Controller
-                    name="sortOrder"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        type="number"
-                        min="0"
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                      />
-                    )}
-                  />
-                </FieldContent>
-              </Field>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Preview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Badge variant={form.watch("isActive") ? "default" : "secondary"}>
-                    {form.watch("isActive") ? "Active" : "Inactive"}
-                  </Badge>
-                  {form.watch("parentCategory") && (
-                    <Badge variant="outline">Sub-category</Badge>
-                  )}
-                </div>
-                <div className="text-sm font-medium">
-                  {form.watch("name") || "Category Name"}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  /{form.watch("slug") || "category-slug"}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.back()}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1"
-            >
-              {isSubmitting ? (
-                "Creating..."
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Create
-                </>
-              )}
-            </Button>
+    <PageWrapper className="min-h-screen from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <Button variant="ghost" onClick={() => router.back()} className="mb-4">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Categories
+          </Button>
+          <div className="text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Add Category
+            </h1>
+            <p className="text-lg text-muted-foreground mt-2">Create a new product category</p>
           </div>
         </div>
-      </form>
-    </div>
+
+        {/* Main Content */}
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 px-8 py-6 border-b">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">
+                    Category Information
+                  </h2>
+                  <p className="text-muted-foreground mt-1">
+                    Fill in the details for your new category
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Form Content */}
+            <div className="p-8">
+              <div className="max-w-2xl mx-auto space-y-6">
+                {/* Category Name */}
+                <div className="space-y-2">
+                  <Label htmlFor="name">Category Name *</Label>
+                  <Input
+                    id="name"
+                    placeholder="eg. Clothing"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+
+                {/* Category Image */}
+                <div className="space-y-2">
+                  <Label>Category Image *</Label>
+                  <p className="text-sm text-muted-foreground">Ratio depends on your store setting</p>
+                  <FileDropzone
+                    fileInputRef={imageInputRef}
+                    handleBoxClick={() => imageInputRef.current?.click()}
+                    handleDragOver={(e) => e.preventDefault()}
+                    handleDrop={(e) => {
+                      e.preventDefault();
+                      handleImageSelect(e.dataTransfer.files, 'category');
+                    }}
+                    handleFileSelect={(files) => handleImageSelect(files, 'category')}
+                  />
+                  {categoryImage && (
+                    <div className="relative inline-block mt-4">
+                      <Image
+                        src={categoryImage}
+                        alt="Category"
+                        width={200}
+                        height={200}
+                        className="w-48 h-32 object-cover rounded-lg border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage('category')}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* SEO Title */}
+                <div className="space-y-2">
+                  <Label htmlFor="seoTitle">SEO Title</Label>
+                  <p className="text-sm text-muted-foreground">Shown in search engine results (40-60 characters).</p>
+                  <Input
+                    id="seoTitle"
+                    placeholder="eg. Blanxer - Shop Clothing Online"
+                    value={formData.seoTitle}
+                    onChange={(e) => setFormData(prev => ({ ...prev, seoTitle: e.target.value }))}
+                  />
+                  <div className="text-xs text-muted-foreground">
+                    {formData.seoTitle.length}/60 characters
+                  </div>
+                </div>
+
+                {/* SEO Description */}
+                <div className="space-y-2">
+                  <Label htmlFor="seoDescription">SEO Description</Label>
+                  <p className="text-sm text-muted-foreground">Summarized details (140-160 characters).</p>
+                  <Textarea
+                    id="seoDescription"
+                    rows={3}
+                    placeholder="eg. Shop the latest clothing trends with secure delivery."
+                    value={formData.seoDescription}
+                    onChange={(e) => setFormData(prev => ({ ...prev, seoDescription: e.target.value }))}
+                  />
+                  <div className="text-xs text-muted-foreground">
+                    {formData.seoDescription.length}/160 characters
+                  </div>
+                </div>
+
+                {/* SEO Image */}
+                <div className="space-y-2">
+                  <Label>SEO Image</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Displayed when your page link is shared on social platforms. Recommended dimensions: 1200 x 630
+                  </p>
+                  <FileDropzone
+                    fileInputRef={seoImageInputRef}
+                    handleBoxClick={() => seoImageInputRef.current?.click()}
+                    handleDragOver={(e) => e.preventDefault()}
+                    handleDrop={(e) => {
+                      e.preventDefault();
+                      handleImageSelect(e.dataTransfer.files, 'seo');
+                    }}
+                    handleFileSelect={(files) => handleImageSelect(files, 'seo')}
+                  />
+                  {seoImagePreview && (
+                    <div className="relative inline-block mt-4">
+                      <Image
+                        src={seoImagePreview}
+                        alt="SEO"
+                        width={300}
+                        height={157}
+                        className="w-72 h-36 object-cover rounded-lg border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage('seo')}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Hide on Product Pages */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hideOnProductPages"
+                    checked={formData.hideOnProductPages}
+                    onCheckedChange={(checked) => 
+                      setFormData(prev => ({ ...prev, hideOnProductPages: checked as boolean }))
+                    }
+                  />
+                  <Label htmlFor="hideOnProductPages">Hide on product pages</Label>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-50 dark:bg-slate-700/50 px-8 py-6 border-t">
+              <div className="flex justify-between items-center max-w-2xl mx-auto">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.back()}
+                  className="px-6"
+                >
+                  Cancel
+                </Button>
+                
+                <Button 
+                  type="button" 
+                  onClick={handleSubmit} 
+                  disabled={isSubmitting || !formData.name.trim()}
+                  className="px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                >
+                  {isSubmitting ? 'Creating...' : 'Create Category'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </PageWrapper>
   );
 }

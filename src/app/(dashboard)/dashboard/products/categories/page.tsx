@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { PageWrapper } from "@/components/ui/page-wrapper";
 import {
   Card,
   CardContent,
@@ -80,7 +81,8 @@ export default function CategoriesPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+      <PageWrapper>
+        <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
         <h1 className="text-xl font-semibold md:text-2xl">Product Categories</h1>
         <Card>
           <CardHeader>
@@ -95,7 +97,8 @@ export default function CategoriesPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </PageWrapper>
     );
   }
   
@@ -105,7 +108,8 @@ export default function CategoriesPage() {
 
   if (!categories || categories.length === 0) {
     return (
-      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+      <PageWrapper>
+        <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
         <div className="flex items-center justify-between">
             <h1 className="text-xl font-semibold md:text-2xl">Product Categories</h1>
             
@@ -126,12 +130,14 @@ export default function CategoriesPage() {
           </CardContent>
         </Card>
 
-      </div>
+        </div>
+      </PageWrapper>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+    <PageWrapper>
+      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold md:text-2xl">Product Categories</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -187,7 +193,8 @@ export default function CategoriesPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </PageWrapper>
   );
 }
 

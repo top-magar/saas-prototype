@@ -33,7 +33,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Search } from "lucide-react";
+import { Search, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Order {
   id: string;
@@ -59,6 +60,7 @@ const allOrders: Order[] = [
 const ITEMS_PER_PAGE = 5;
 
 export default function OrdersPage() {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState(""    
   );
   const [filterStatus, setFilterStatus] = useState("All"    
@@ -87,7 +89,13 @@ export default function OrdersPage() {
   return (
     
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <h1 className="text-xl font-semibold md:text-2xl">Orders & Sales</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold md:text-2xl">Orders & Sales</h1>
+        <Button onClick={() => router.push('/dashboard/orders/add')}>
+          <Plus className="mr-2 h-4 w-4" />
+          Create Order
+        </Button>
+      </div>
 
       <Card>
         <CardHeader>

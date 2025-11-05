@@ -50,6 +50,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/providers/theme-provider"
+import { SmoothScrollProvider } from "@/components/ui/smooth-scroll-provider"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -61,7 +62,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             defaultTheme="system"
             enableSystem
           >
-            {children}
+            <SmoothScrollProvider>
+              {children}
+            </SmoothScrollProvider>
           </ThemeProvider>
         </body>
       </html>

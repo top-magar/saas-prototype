@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PageWrapper } from "@/components/ui/page-wrapper";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -454,7 +455,7 @@ export default function AddProductPage() {
   );
 
   return (
-    <div className="min-h-screen from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+    <PageWrapper className="min-h-screen from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -598,6 +599,6 @@ export default function AddProductPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }
