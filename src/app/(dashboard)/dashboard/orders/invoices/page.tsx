@@ -84,8 +84,7 @@ export default function InvoicesPage() {
   );
 
   const handleSendReminder = (invoiceId: string) => {
-    console.log(`Sending reminder for invoice ${invoiceId}`    
-  );
+    console.log('Sending reminder for invoice');
     // API call to send reminder
   };
 

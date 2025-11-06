@@ -78,19 +78,34 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
+  // Sanitize chart ID and config values
+  const sanitizedId = id.replace(/[^a-zA-Z0-9-_]/g, '')
+  
+  const sanitizeColor = (color: string): string => {
+    // Only allow valid CSS color formats
+    if (/^#[0-9A-Fa-f]{3,6}$/.test(color) || 
+        /^rgb\(\d+,\s*\d+,\s*\d+\)$/.test(color) ||
+        /^rgba\(\d+,\s*\d+,\s*\d+,\s*[0-9.]+\)$/.test(color) ||
+        /^hsl\(\d+,\s*\d+%,\s*\d+%\)$/.test(color)) {
+      return color
+    }
+    return '#000000' // fallback color
+  }
+
   return (
     <style
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
           .map(
             ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
+${prefix} [data-chart=${sanitizedId}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
     const color =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
       itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
+    const sanitizedKey = key.replace(/[^a-zA-Z0-9-_]/g, '')
+    return color ? `  --color-${sanitizedKey}: ${sanitizeColor(color)};` : null
   })
   .join("\n")}
 }

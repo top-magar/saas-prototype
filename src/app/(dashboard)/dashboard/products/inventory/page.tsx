@@ -101,8 +101,7 @@ export default function InventoryPage() {
       )
         
   );
-    console.log(`Updated stock for ${id} to ${newStock}`    
-  );
+    console.log('Stock updated successfully');
     // In a real app, this would involve an API call to update stock
   };
 

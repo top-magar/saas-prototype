@@ -12,7 +12,7 @@ export class ErrorLogger {
     
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.error('Error logged:', errorData)
+      console.error('Error logged:', JSON.stringify(errorData))
     }
     
     // Send to Sentry in production
@@ -38,7 +38,7 @@ export class ErrorLogger {
       server: true,
     }
     
-    console.error('Server error logged:', errorData)
+    console.error('Server error logged:', JSON.stringify(errorData))
     
     // Send to Sentry
     if (process.env.NODE_ENV === 'production') {
@@ -67,6 +67,6 @@ export class ErrorLogger {
       })
     }
     
-    console.log('User feedback:', { error: error.message, feedback, userEmail })
+    console.log('User feedback:', JSON.stringify({ error: error.message, feedback, userEmail }))
   }
 }

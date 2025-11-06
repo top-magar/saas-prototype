@@ -41,6 +41,20 @@ import { deleteCategory, updateCategory, createCategory } from "@/lib/api";
 import { useApi } from "@/hooks/use-api";
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
 
+// Sanitize user input to prevent XSS
+const sanitizeInput = (input: string): string => {
+  return input.replace(/[<>"'&]/g, (match) => {
+    const entities: { [key: string]: string } = {
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      '&': '&amp;'
+    };
+    return entities[match] || match;
+  });
+};
+
 interface Category {
   id: string;
   name: string;
@@ -170,8 +184,8 @@ export default function CategoriesPage() {
             <TableBody>
               {categories?.map((category: Category) => (
                 <TableRow key={category.id}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell>{category.description}</TableCell>
+                  <TableCell className="font-medium">{sanitizeInput(category.name)}</TableCell>
+                  <TableCell>{category.description ? sanitizeInput(category.description) : ''}</TableCell>
                   <TableCell>{category.productCount}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">

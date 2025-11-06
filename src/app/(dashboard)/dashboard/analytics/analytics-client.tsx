@@ -91,7 +91,7 @@ export default function AnalyticsClient({ data, timeRange }: AnalyticsClientProp
   
   const handleTimeRangeChange = (value: string) => {
     setSelectedTimeRange(value);
-    console.log('Time range changed to:', value);
+    console.log('Time range changed');
   };
 
   const activityIcons = {

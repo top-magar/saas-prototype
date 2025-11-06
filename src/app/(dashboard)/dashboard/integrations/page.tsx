@@ -89,8 +89,7 @@ export default function IntegrationsPage() {
 
   const handleConfigure = (id: string) => {
     // In a real app, this would navigate to a configuration page or open a dialog
-    console.log(`Configure integration ${id}`    
-  );
+    console.log('Configure integration requested');
   };
 
   return (

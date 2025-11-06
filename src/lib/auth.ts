@@ -20,7 +20,7 @@ export async function authorize(tenantId: string, allowedRoles: UserRole[]) {
     throw new Error('Unauthorized: No user logged in.');
   }
 
-  console.log(`[AUTHORIZE] Checking authorization for Clerk User ID: ${user.id}, Tenant ID: ${tenantId}`);
+  console.log('[AUTHORIZE] Checking authorization for user and tenant');
 
   const dbUser = await prisma.user.findFirst({
     where: {
@@ -33,17 +33,17 @@ export async function authorize(tenantId: string, allowedRoles: UserRole[]) {
   });
 
   if (!dbUser || !dbUser.tenant) {
-    console.log(`[AUTHORIZE] Forbidden: User ${user.id} does not belong to tenant ${tenantId} or tenant not found in DB.`);
+    console.log('[AUTHORIZE] Forbidden: User does not belong to tenant or tenant not found.');
     throw new Error('Forbidden: User does not belong to this tenant or tenant not found.');
   }
 
-  console.log(`[AUTHORIZE] User ${dbUser.clerkUserId} (DB ID: ${dbUser.id}) found. Role: ${dbUser.role}. Allowed roles: ${allowedRoles.join(', ')}`);
+  console.log('[AUTHORIZE] User found with role verification');
 
   if (!allowedRoles.includes(dbUser.role.toLowerCase() as UserRole)) {
-    console.log(`[AUTHORIZE] Forbidden: User role "${dbUser.role}" is not one of the allowed roles.`);
+    console.log('[AUTHORIZE] Forbidden: User role is not authorized.');
     throw new Error(`Forbidden: User role "${dbUser.role}" is not one of the allowed roles.`);
   }
 
-  console.log(`[AUTHORIZE] Authorization successful for user ${dbUser.clerkUserId} with role ${dbUser.role}.`);
+  console.log('[AUTHORIZE] Authorization successful.');
   return dbUser;
 }

@@ -31,7 +31,7 @@ async function initiateEsewaPayment(tierId: string, tenantId: string, userId: st
   
   const transactionId = `ESW_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   
-  console.log('[ESEWA_PAYMENT] Initiating payment for tier:', tierId);
+  console.log('[ESEWA_PAYMENT] Initiating payment for tier');
   
   // Simulate API call that can fail
   if (Math.random() < 0.1) {
@@ -65,7 +65,7 @@ async function initiateKhaltiPayment(tierId: string, tenantId: string, userId: s
   try {
     const transactionId = `KHL_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
-    console.log('[KHALTI_PAYMENT] Initiating payment for tier:', tierId);
+    console.log('[KHALTI_PAYMENT] Initiating payment for tier');
     
     if (Math.random() < 0.1) {
       throw new Error('Khalti API temporarily unavailable');
@@ -79,7 +79,7 @@ async function initiateKhaltiPayment(tierId: string, tenantId: string, userId: s
     
     return redirectUrl;
   } catch (error) {
-    console.error('[KHALTI_PAYMENT_ERROR]', error);
+    console.error('[KHALTI_PAYMENT_ERROR] Payment initiation failed');
     throw new Error('Khalti payment initiation failed');
   }
 }
@@ -102,7 +102,7 @@ async function initiateFonepayPayment(tierId: string, tenantId: string, userId: 
   try {
     const transactionId = `FNP_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
-    console.log('[FONEPAY_PAYMENT] Initiating payment for tier:', tierId);
+    console.log('[FONEPAY_PAYMENT] Initiating payment for tier');
     
     if (Math.random() < 0.1) {
       throw new Error('FonePay API temporarily unavailable');
@@ -116,7 +116,7 @@ async function initiateFonepayPayment(tierId: string, tenantId: string, userId: 
     
     return redirectUrl;
   } catch (error) {
-    console.error('[FONEPAY_PAYMENT_ERROR]', error);
+    console.error('[FONEPAY_PAYMENT_ERROR] Payment initiation failed');
     throw new Error('FonePay payment initiation failed');
   }
 }
@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
       return new NextResponse("Enterprise tier requires custom pricing. Please contact sales.", { status: 400 });
     }
 
-    console.log('[PAYMENT_INITIATE] Attempt for user:', user.id, 'tier:', tierId, 'method:', paymentMethod);
+    console.log('[PAYMENT_INITIATE] Payment attempt initiated');
 
     try {
       switch (paymentMethod) {
@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
           return new NextResponse("Invalid payment method. Supported methods: esewa, khalti, fonepay", { status: 400 });
       }
     } catch (paymentError) {
-      console.error('[PAYMENT_INITIATE_ERROR]', paymentError);
+      console.error('[PAYMENT_INITIATE_ERROR] Payment initiation failed');
       return new NextResponse('Payment initiation failed', { status: 502 });
     }
 
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
       return new NextResponse("Failed to initiate payment", { status: 500 });
     }
   } catch (error) {
-    console.error('[PAYMENT_ROUTE_ERROR]', error);
+    console.error('[PAYMENT_ROUTE_ERROR] Internal server error');
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
