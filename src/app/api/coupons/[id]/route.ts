@@ -4,9 +4,10 @@ import { getTenant } from '@/lib/tenant';
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const tenant = await getTenant();
     if (!tenant) {
       return new NextResponse('Tenant not found', { status: 404 });
@@ -17,7 +18,7 @@ export async function PUT(
 
     const coupon = await prisma.coupon.update({
       where: {
-        id: params.id,
+        id,
         tenantId: tenant.id
       },
       data: {
@@ -39,9 +40,10 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const tenant = await getTenant();
     if (!tenant) {
       return new NextResponse('Tenant not found', { status: 404 });
@@ -49,7 +51,7 @@ export async function DELETE(
 
     await prisma.coupon.delete({
       where: {
-        id: params.id,
+        id,
         tenantId: tenant.id
       }
     });

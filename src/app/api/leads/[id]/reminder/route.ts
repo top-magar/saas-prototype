@@ -4,15 +4,14 @@ import { getTenant } from '@/lib/tenant';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: orderId } = await params;
     const tenant = await getTenant();
     if (!tenant) {
       return new NextResponse('Tenant not found', { status: 404 });
     }
-
-    const orderId = params.id;
     
     // Get the abandoned order
     const order = await prisma.order.findFirst({
