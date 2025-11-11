@@ -1,3 +1,5 @@
+"use client";
+
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -14,8 +16,6 @@ export const metadata: Metadata = {
     description: 'Choose from Free, Starter (NPR 2,999), Pro (NPR 7,999), or Enterprise plans. 14-day free trial included.',
   },
 };
-
-"use client";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

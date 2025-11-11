@@ -59,11 +59,11 @@ export class ErrorLogger {
     if (process.env.NODE_ENV === 'production') {
       const eventId = Sentry.captureException(error)
       
-      Sentry.captureUserFeedback({
-        event_id: eventId,
+      Sentry.captureFeedback({
+        message: feedback,
         name: userEmail || 'Anonymous',
         email: userEmail || 'anonymous@example.com',
-        comments: feedback,
+        associatedEventId: eventId,
       })
     }
     

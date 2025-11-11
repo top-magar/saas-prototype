@@ -11,7 +11,7 @@
   
   /* Marketing typography */
   .marketing-heading {
-    @apply text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight;
+    @apply text-4xl font-bold tracking-tight;
     background: linear-gradient(135deg, 
       hsl(var(--foreground)) 0%, 
       hsl(var(--primary)) 50%, 
@@ -21,8 +21,26 @@
     -webkit-text-fill-color: transparent;
   }
   
+  @media (min-width: 768px) {
+    .marketing-heading {
+      @apply text-6xl;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .marketing-heading {
+      @apply text-7xl;
+    }
+  }
+  
   .marketing-subheading {
-    @apply text-xl md:text-2xl text-muted-foreground leading-relaxed;
+    @apply text-xl text-muted-foreground leading-relaxed;
+  }
+  
+  @media (min-width: 768px) {
+    .marketing-subheading {
+      @apply text-2xl;
+    }
   }
   
   /* Marketing buttons */
@@ -32,7 +50,13 @@
   
   /* Marketing sections */
   .marketing-section {
-    @apply py-20 md:py-32;
+    @apply py-20;
+  }
+  
+  @media (min-width: 768px) {
+    .marketing-section {
+      @apply py-32;
+    }
   }
   
   /* Marketing cards */
