@@ -1,22 +1,5 @@
 "use client";
 
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Pricing Plans - Choose the Perfect Plan for Your Business',
-  description: 'Start free and scale as you grow. All plans include a 14-day free trial with no credit card required. From NPR 0 to custom enterprise solutions.',
-  keywords: ['pricing', 'plans', 'Nepal', 'SaaS pricing', 'business plans', 'free trial'],
-  openGraph: {
-    title: 'PASAAL.IO Pricing - Start Free, Scale as You Grow',
-    description: 'Choose from Free, Starter (NPR 2,999), Pro (NPR 7,999), or Enterprise plans. 14-day free trial included.',
-    url: '/pricing',
-  },
-  twitter: {
-    title: 'PASAAL.IO Pricing - Start Free, Scale as You Grow',
-    description: 'Choose from Free, Starter (NPR 2,999), Pro (NPR 7,999), or Enterprise plans. 14-day free trial included.',
-  },
-};
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";

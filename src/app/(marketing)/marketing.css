@@ -21,26 +21,8 @@
     -webkit-text-fill-color: transparent;
   }
   
-  @media (min-width: 768px) {
-    .marketing-heading {
-      @apply text-6xl;
-    }
-  }
-  
-  @media (min-width: 1024px) {
-    .marketing-heading {
-      @apply text-7xl;
-    }
-  }
-  
   .marketing-subheading {
     @apply text-xl text-muted-foreground leading-relaxed;
-  }
-  
-  @media (min-width: 768px) {
-    .marketing-subheading {
-      @apply text-2xl;
-    }
   }
   
   /* Marketing buttons */
@@ -51,12 +33,6 @@
   /* Marketing sections */
   .marketing-section {
     @apply py-20;
-  }
-  
-  @media (min-width: 768px) {
-    .marketing-section {
-      @apply py-32;
-    }
   }
   
   /* Marketing cards */
@@ -73,5 +49,26 @@
   /* Marketing animations */
   .marketing-fade-in {
     @apply animate-in fade-in slide-in-from-bottom-4 duration-700;
+  }
+}
+
+/* Responsive utilities using media queries */
+@media (min-width: 768px) {
+  .marketing-heading {
+    @apply text-6xl;
+  }
+  
+  .marketing-subheading {
+    @apply text-2xl;
+  }
+  
+  .marketing-section {
+    @apply py-32;
+  }
+}
+
+@media (min-width: 1024px) {
+  .marketing-heading {
+    @apply text-7xl;
   }
 }
