@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    {
+      "source": "/((?!api|_next|_static|favicon.ico).*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "(?<subdomain>.*)\\.(?<domain>.*)"
+        }
+      ],
+      "destination": "/tenant/$subdomain$1"
+    }
+  ],
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  }
+}

@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     optimizeCss: true, // Enable CSS optimization in production
   },
 
+
   // Image Optimization (existing configuration)
   images: {
     formats: ['image/webp', 'image/avif'],

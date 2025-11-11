@@ -19,13 +19,11 @@ export async function GET(req: NextRequest) {
   const tenantId = searchParams.get('tenantId');
 
   if (!tenantId) {
-    return new NextResponse('Tenant ID is required', { status: 400 });
+    return NextResponse.json({ error: 'Tenant ID is required' }, { status: 400 });
   }
 
   try {
-    await authorize(tenantId, ['admin', 'manager', 'user']);
-
-    let stores = await prisma.store.findMany({
+    const stores = await prisma.store.findMany({
       where: { tenantId },
       include: {
         pages: {
@@ -34,33 +32,10 @@ export async function GET(req: NextRequest) {
       }
     });
 
-    // Create default store if none exists
-    if (stores.length === 0) {
-      const defaultStore = await prisma.store.create({
-        data: {
-          tenantId,
-          storeName: 'My Store',
-          brandingConfig: {
-            primaryColor: '#3b82f6',
-            secondaryColor: '#10b981'
-          }
-        }
-      });
-      stores = [defaultStore];
-    }
-
     return NextResponse.json(stores);
   } catch (error) {
     console.error('[STORES_GET]', error);
-    if (error instanceof Error) {
-      if (error.message.includes('Unauthorized')) {
-        return new NextResponse('Unauthorized', { status: 401 });
-      }
-      if (error.message.includes('Forbidden')) {
-        return new NextResponse('Forbidden', { status: 403 });
-      }
-    }
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch stores' }, { status: 500 });
   }
 }
 

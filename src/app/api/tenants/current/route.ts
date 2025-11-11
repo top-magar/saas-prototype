@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
       return new NextResponse('Tenant not found', { status: 404 });
     }
 
-    return NextResponse.json(dbUser.tenant);
+    return NextResponse.json({ tenant: dbUser.tenant });
   } catch (error) {
     console.error('Error fetching tenant:', error);
     return new NextResponse('Internal Server Error', { status: 500 });

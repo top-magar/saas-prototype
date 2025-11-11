@@ -3,18 +3,44 @@ import { prisma } from './prisma';
 
 export async function getTenant() {
   const headersList = await headers();
-  const host = headersList.get('host');
-  const subdomain = host?.split('.')[0];
-
-  if (!subdomain) {
+  const tenantSubdomain = headersList.get('x-tenant-subdomain');
+  
+  if (!tenantSubdomain) {
     return null;
   }
 
-  const tenant = await prisma.tenant.findUnique({
-    where: { subdomain },
+  return await prisma.tenant.findUnique({
+    where: { subdomain: tenantSubdomain },
   });
+}
 
-  return tenant;
+export async function getCurrentTenant() {
+  const headersList = await headers();
+  const tenantSubdomain = headersList.get('x-tenant-subdomain');
+  
+  if (!tenantSubdomain) {
+    return null;
+  }
+
+  return await prisma.tenant.findUnique({
+    where: { subdomain: tenantSubdomain },
+    include: {
+      users: true,
+    },
+  });
+}
+
+export function getTenantUrl(subdomain: string, path: string = '') {
+  const domain = process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000';
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const baseUrl = `${protocol}://${subdomain}.${domain}`;
+  
+  return `${baseUrl}${path}`;
+}
+
+export function isValidSubdomain(subdomain: string): boolean {
+  const reservedSubdomains = ['www', 'api', 'admin', 'app', 'mail', 'ftp'];
+  return !reservedSubdomains.includes(subdomain) && /^[a-z0-9-]+$/.test(subdomain);
 }
 
 interface CreateTenantAndAssociateUserParams {

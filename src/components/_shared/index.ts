@@ -1,4 +1,4 @@
 export { AppProviders } from './providers';
-export { TenantProvider } from './tenant-provider';
+export { TenantProvider } from '../providers/tenant-provider';
 export { OptimizedLink } from './optimized-link';
 export { NavigationProgress } from './navigation-progress';
