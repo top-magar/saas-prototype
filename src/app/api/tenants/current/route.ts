@@ -1,6 +1,6 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { supabaseAdmin } from "@/lib/supabase";
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,12 +16,11 @@ export async function GET(req: NextRequest) {
     }
 
     // Find user's tenant
-    const dbUser = await prisma.user.findFirst({
-      where: { clerkUserId },
-      include: {
-        tenant: true,
-      },
-    });
+    const { data: dbUser } = await supabaseAdmin
+      .from('users')
+      .select('*, tenant:tenants(*)')
+      .eq('clerkUserId', clerkUserId)
+      .single();
 
     if (!dbUser || !dbUser.tenant) {
       return new NextResponse('Tenant not found', { status: 404 });

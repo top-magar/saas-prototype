@@ -75,7 +75,9 @@ export default withSentryConfig(nextConfig, {
   reactComponentAnnotation: {
     enabled: true,
   },
-  hideSourceMaps: true,
+  sourcemaps: {
+    disable: true,
+  },
   disableLogger: true,
   automaticVercelMonitors: true,
 });

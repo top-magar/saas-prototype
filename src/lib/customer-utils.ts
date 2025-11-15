@@ -1,4 +1,4 @@
-import { prisma } from './prisma';
+import { supabase } from "./supabase";
 
 interface CustomerData {
   email: string;
@@ -12,25 +12,28 @@ export async function findOrCreateCustomer(data: CustomerData) {
 
   try {
     // First, try to find existing customer by email within the tenant
-    let customer = await prisma.user.findFirst({
-      where: {
-        email,
-        tenantId,
-        role: 'user' // Ensure we're looking for customers, not admin users
-      }
-    });
+    let { data: customer } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .eq('tenant_id', tenantId)
+      .eq('role', 'user')
+      .single();
 
     // If customer doesn't exist, create a new one
     if (!customer) {
-      customer = await prisma.user.create({
-        data: {
+      const { data: newCustomer } = await supabase
+        .from('users')
+        .insert({
           email,
-          name: name || email.split('@')[0], // Use email prefix as fallback name
-          tenantId,
+          name: name || email.split('@')[0],
+          tenant_id: tenantId,
           role: 'user',
           status: 'active'
-        }
-      });
+        })
+        .select()
+        .single();
+      customer = newCustomer;
     }
 
     return customer;

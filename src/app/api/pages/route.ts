@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { supabase } from "@/lib/supabase";
 import { NextRequest, NextResponse } from 'next/server';
 import { authorize } from '@/lib/auth';
 import { z } from 'zod';

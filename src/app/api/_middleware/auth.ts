@@ -29,12 +29,13 @@ export async function withRoleAuth(req: NextRequest, allowedRoles: UserRole[]): 
   }
   
   try {
-    const { prisma } = await import('@/lib/prisma');
+    const { supabase } = await import('@/lib/supabase');
     
-    const user = await prisma.user.findUnique({
-      where: { clerkUserId: authResult.userId },
-      select: { role: true }
-    });
+    const { data: user } = await supabase
+      .from('users')
+      .select('role')
+      .eq('clerk_user_id', authResult.userId)
+      .single();
     
     if (!user || !allowedRoles.includes(user.role as UserRole)) {
       return createErrorResponse('Forbidden: Insufficient permissions', 403);
@@ -66,12 +67,13 @@ export async function withAdminAuth(req: NextRequest): Promise<AuthResult> {
   
   try {
     // Import here to avoid circular dependencies
-    const { prisma } = await import('@/lib/prisma');
+    const { supabase } = await import('@/lib/supabase');
     
-    const user = await prisma.user.findUnique({
-      where: { clerkUserId: authResult.userId },
-      select: { role: true }
-    });
+    const { data: user } = await supabase
+      .from('users')
+      .select('role')
+      .eq('clerk_user_id', authResult.userId)
+      .single();
     
     if (!user || user.role !== 'admin') {
       return createErrorResponse('Forbidden: Admin access required', 403);

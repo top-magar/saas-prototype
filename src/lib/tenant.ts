@@ -1,5 +1,5 @@
 import { headers } from 'next/headers';
-import { prisma } from './prisma';
+import { supabase, supabaseAdmin } from './supabase';
 
 export async function getTenant() {
   const headersList = await headers();
@@ -9,9 +9,13 @@ export async function getTenant() {
     return null;
   }
 
-  return await prisma.tenant.findUnique({
-    where: { subdomain: tenantSubdomain },
-  });
+  const { data } = await supabase
+    .from('tenants')
+    .select('*')
+    .eq('subdomain', tenantSubdomain)
+    .single();
+  
+  return data;
 }
 
 export async function getCurrentTenant() {
@@ -22,12 +26,13 @@ export async function getCurrentTenant() {
     return null;
   }
 
-  return await prisma.tenant.findUnique({
-    where: { subdomain: tenantSubdomain },
-    include: {
-      users: true,
-    },
-  });
+  const { data } = await supabase
+    .from('tenants')
+    .select('*, users(*)')
+    .eq('subdomain', tenantSubdomain)
+    .single();
+  
+  return data;
 }
 
 export function getTenantUrl(subdomain: string, path: string = '') {
@@ -60,27 +65,39 @@ export async function createTenantAndAssociateUser({
   userName,
   primaryColor,
 }: CreateTenantAndAssociateUserParams) {
-  return await prisma.$transaction(async (tx) => {
-    const newTenant = await tx.tenant.create({
-      data: {
-        name,
-        subdomain,
-        primaryColor: primaryColor || '#3B82F6',
-        monthlyBudget: 0,
-      },
+  const now = new Date().toISOString();
+  const { data: newTenant, error: tenantError } = await supabaseAdmin
+    .from('tenants')
+    .insert({
+      id: crypto.randomUUID(),
+      name,
+      subdomain,
+      monthlyBudget: 0,
+      updatedAt: now,
+    })
+    .select()
+    .single();
+
+  if (tenantError || !newTenant) {
+    console.error('Tenant creation error:', tenantError);
+    throw new Error(`Failed to create tenant: ${tenantError?.message || 'Unknown error'}`);
+  }
+
+  const { error: userError } = await supabaseAdmin
+    .from('users')
+    .upsert({
+      id: crypto.randomUUID(),
+      clerkUserId: clerkUserId,
+      tenantId: newTenant.id,
+      email,
+      name: userName,
+      updatedAt: now,
     });
 
-    await tx.user.upsert({
-      where: { clerkUserId },
-      update: { tenantId: newTenant.id },
-      create: {
-        clerkUserId,
-        tenantId: newTenant.id,
-        email,
-        name: userName,
-      },
-    });
+  if (userError) {
+    console.error('User creation error:', userError);
+    throw new Error(`Failed to create user: ${userError.message}`);
+  }
 
-    return newTenant;
-  });
+  return newTenant;
 }

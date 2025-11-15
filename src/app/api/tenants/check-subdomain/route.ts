@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { supabaseAdmin } from '@/lib/supabase';
+import { isValidSubdomain } from '@/lib/tenant';
 
 export async function GET(req: NextRequest) {
   try {
@@ -7,17 +8,22 @@ export async function GET(req: NextRequest) {
     const subdomain = searchParams.get('subdomain');
 
     if (!subdomain) {
-      return new NextResponse('Subdomain is required', { status: 400 });
+      return NextResponse.json({ error: 'Subdomain is required' }, { status: 400 });
     }
 
-    const existingTenant = await prisma.tenant.findUnique({
-      where: { subdomain },
-      select: { id: true },
-    });
+    if (!isValidSubdomain(subdomain)) {
+      return NextResponse.json({ available: false, reason: 'Invalid subdomain format' });
+    }
 
-    return NextResponse.json({ available: !existingTenant });
+    const { data } = await supabaseAdmin
+      .from('tenants')
+      .select('id')
+      .eq('subdomain', subdomain)
+      .single();
+
+    return NextResponse.json({ available: !data });
   } catch (error) {
     console.error('Error checking subdomain:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 
 // Payment amounts mapping
 const TIER_AMOUNTS = {
@@ -136,10 +136,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Retrieve the tenant associated with the current user
-    const dbUser = await prisma.user.findUnique({
-      where: { clerkUserId: user.id },
-      include: { tenant: true },
-    });
+    const { data: dbUser } = await supabase
+      .from('users')
+      .select('*, tenant:tenants(*)')
+      .eq('clerk_user_id', user.id)
+      .single();
 
     if (!dbUser || !dbUser.tenant) {
       return new NextResponse("Tenant not found for the current user", { status: 404 });

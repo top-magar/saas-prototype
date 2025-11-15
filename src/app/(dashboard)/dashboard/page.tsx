@@ -28,7 +28,7 @@ async function getDashboardData(): Promise<DashboardData | null> {
       ],
       recentOrders: [
         { id: "ORD2024001", product: "MacBook Pro M3", customer: "Rajesh Sharma", date: "2024-01-15", amount: 285000.00, status: "Completed" },
-        { id: "ORD2024002", product: "iPhone 15 Pro", customer: "Priya Patel", date: "2024-01-15", amount: 165000.00, status: "Processing" },
+        { id: "ORD2024002", product: "iPhone 15 Pro", customer: "Priya Patel", date: "2024-01-15", amount: 165000.00, status: "Pending" },
         { id: "ORD2024003", product: "Samsung Galaxy S24", customer: "Amit Kumar", date: "2024-01-14", amount: 125000.00, status: "Completed" },
         { id: "ORD2024004", product: "Dell XPS 13", customer: "Sneha Thapa", date: "2024-01-14", amount: 195000.00, status: "Pending" },
         { id: "ORD2024005", product: "AirPods Pro", customer: "Bikash Rai", date: "2024-01-13", amount: 35000.00, status: "Completed" },

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { prisma } from '@/lib/prisma';
+import { supabase } from "@/lib/supabase";
 import { TenantProvider } from '@/components/providers/tenant-provider';
 
 interface TenantLayoutProps {
@@ -8,16 +8,11 @@ interface TenantLayoutProps {
 }
 
 async function getTenant(subdomain: string) {
-  const tenant = await prisma.tenant.findUnique({
-    where: { subdomain },
-    select: {
-      id: true,
-      name: true,
-      subdomain: true,
-      tier: true,
-      primaryColor: true,
-    },
-  });
+  const { data: tenant } = await supabase
+    .from('tenants')
+    .select('id, name, subdomain, tier, primaryColor')
+    .eq('subdomain', subdomain)
+    .single();
 
   return tenant;
 }

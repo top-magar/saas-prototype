@@ -48,11 +48,11 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 z-50">
-            <Image src="/images/logos/company-logo.svg" alt="Pasaal.io Logo" width={32} height={32} priority />
-            <div>
-              <span className="font-bold text-xl">PASAAL.IO</span>
-              <Badge variant="secondary" className="ml-2 text-xs">Nepal</Badge>
-            </div>
+            
+              <div>
+                <span className="font-bold text-2xl" style={{ fontFamily: 'Poppins, sans-serif' }}>Pasaal</span>
+              </div>
+              <Image src="/svg/logo.svg" alt="Pasaal Logo" width={32} height={32} priority />
           </Link>
 
           {/* Desktop Navigation */}
@@ -85,7 +85,7 @@ export function Header() {
           </div>
 
           {/* Mobile Menu */}
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen} suppressHydrationWarning>
             <SheetTrigger asChild className="md:hidden">
               <Button variant="ghost" size="sm">
                 <Menu className="h-5 w-5" />

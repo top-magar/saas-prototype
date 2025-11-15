@@ -16,7 +16,7 @@ A multi-tenant SaaS application built with Next.js, featuring user management, p
 ## Tech Stack
 
 - **Framework:** Next.js 16 (App Router)
-- **Database:** PostgreSQL with Prisma ORM
+- **Database:** Supabase (PostgreSQL with built-in APIs)
 - **Authentication:** Clerk
 - **UI:** Tailwind CSS + shadcn/ui
 - **Payments:** Multiple Nepalese payment gateways
@@ -39,9 +39,9 @@ A multi-tenant SaaS application built with Next.js, featuring user management, p
 
 3. **Database setup**
    ```bash
-   npx prisma generate
-   npx prisma db push
-   npx prisma db seed
+   # Run the schema.sql file in your Supabase dashboard
+   # Or use the Supabase CLI:
+   supabase db reset
    ```
 
 4. **Run development server**
@@ -66,7 +66,9 @@ src/
 ## Environment Variables
 
 ```env
-DATABASE_URL=postgresql://...
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
 CLERK_SECRET_KEY=sk_...
 ```

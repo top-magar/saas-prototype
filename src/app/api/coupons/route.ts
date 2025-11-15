@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { supabase } from "@/lib/supabase";
 import { NextRequest, NextResponse } from 'next/server';
 import { getTenant } from '@/lib/tenant';
 
@@ -9,10 +9,11 @@ export async function GET() {
       return new NextResponse('Tenant not found', { status: 404 });
     }
 
-    const coupons = await prisma.coupon.findMany({
-      where: { tenantId: tenant.id },
-      orderBy: { createdAt: 'desc' }
-    });
+    const { data: coupons } = await supabase
+      .from('coupons')
+      .select('*')
+      .eq('tenant_id', tenant.id)
+      .order('created_at', { ascending: false });
 
     return NextResponse.json(coupons);
   } catch (error) {
@@ -36,25 +37,29 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if coupon code already exists
-    const existingCoupon = await prisma.coupon.findFirst({
-      where: { code: code.toUpperCase() }
-    });
+    const { data: existingCoupon } = await supabase
+      .from('coupons')
+      .select('id')
+      .eq('code', code.toUpperCase())
+      .single();
 
     if (existingCoupon) {
       return new NextResponse('Coupon code already exists', { status: 409 });
     }
 
-    const coupon = await prisma.coupon.create({
-      data: {
-        tenantId: tenant.id,
+    const { data: coupon } = await supabase
+      .from('coupons')
+      .insert({
+        tenant_id: tenant.id,
         code: code.toUpperCase(),
         type,
         value,
-        minAmount,
-        maxUses,
-        expiresAt: expiresAt ? new Date(expiresAt) : null
-      }
-    });
+        minimum_amount: minAmount,
+        usage_limit: maxUses,
+        expires_at: expiresAt ? new Date(expiresAt).toISOString() : null
+      })
+      .select()
+      .single();
 
     return NextResponse.json(coupon);
   } catch (error) {

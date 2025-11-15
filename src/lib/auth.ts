@@ -1,6 +1,6 @@
 // src/lib/auth.ts
 import { currentUser } from '@clerk/nextjs/server';
-import { prisma } from './prisma';
+import { supabase } from './supabase';
 
 // Define user roles for better type safety
 type UserRole = 'admin' | 'manager' | 'user';
@@ -22,15 +22,12 @@ export async function authorize(tenantId: string, allowedRoles: UserRole[]) {
 
   console.log('[AUTHORIZE] Checking authorization for user and tenant');
 
-  const dbUser = await prisma.user.findFirst({
-    where: {
-      clerkUserId: user.id,
-      tenantId: tenantId,
-    },
-    include: {
-      tenant: true, // Include the tenant relation
-    },
-  });
+  const { data: dbUser } = await supabase
+    .from('users')
+    .select('*, tenant:tenants(*)')
+    .eq('clerk_user_id', user.id)
+    .eq('tenant_id', tenantId)
+    .single();
 
   if (!dbUser || !dbUser.tenant) {
     console.log('[AUTHORIZE] Forbidden: User does not belong to tenant or tenant not found.');

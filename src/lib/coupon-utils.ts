@@ -1,4 +1,4 @@
-import { prisma } from './prisma';
+import { supabase } from "./supabase";
 
 interface CouponValidation {
   isValid: boolean;
@@ -13,35 +13,35 @@ export async function validateCoupon(
   orderTotal: number
 ): Promise<CouponValidation> {
   try {
-    const coupon = await prisma.coupon.findFirst({
-      where: {
-        code: code.toUpperCase(),
-        tenantId,
-        isActive: true
-      }
-    });
+    const { data: coupon } = await supabase
+      .from('coupons')
+      .select('*')
+      .eq('code', code.toUpperCase())
+      .eq('tenant_id', tenantId)
+      .eq('is_active', true)
+      .single();
 
     if (!coupon) {
       return { isValid: false, discount: 0, freeShipping: false, message: 'Invalid coupon code' };
     }
 
     // Check expiry
-    if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) {
+    if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
       return { isValid: false, discount: 0, freeShipping: false, message: 'Coupon has expired' };
     }
 
     // Check usage limit
-    if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
+    if (coupon.usage_limit && coupon.used_count >= coupon.usage_limit) {
       return { isValid: false, discount: 0, freeShipping: false, message: 'Coupon usage limit reached' };
     }
 
     // Check minimum amount
-    if (coupon.minAmount && orderTotal < Number(coupon.minAmount)) {
+    if (coupon.minimum_amount && orderTotal < Number(coupon.minimum_amount)) {
       return { 
         isValid: false, 
         discount: 0, 
         freeShipping: false, 
-        message: `Minimum order amount is $${coupon.minAmount}` 
+        message: `Minimum order amount is $${coupon.minimum_amount}` 
       };
     }
 
@@ -70,10 +70,16 @@ export async function validateCoupon(
 
 export async function applyCoupon(couponId: string) {
   try {
-    await prisma.coupon.update({
-      where: { id: couponId },
-      data: { usedCount: { increment: 1 } }
-    });
+    const { data: currentCoupon } = await supabase
+      .from('coupons')
+      .select('used_count')
+      .eq('id', couponId)
+      .single();
+    
+    await supabase
+      .from('coupons')
+      .update({ used_count: (currentCoupon?.used_count || 0) + 1 })
+      .eq('id', couponId);
   } catch (error) {
     console.error('Error applying coupon:', error);
   }

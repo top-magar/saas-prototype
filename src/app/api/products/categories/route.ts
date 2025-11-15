@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { supabase } from "@/lib/supabase";
 import { NextRequest, NextResponse } from 'next/server';
 import { authorize } from '@/lib/auth';
 
@@ -17,17 +17,11 @@ export async function GET(req: NextRequest) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const categories = await prisma.category.findMany({
-      where: { tenantId },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        createdAt: true,
-        updatedAt: true
-      },
-      orderBy: { name: 'asc' }
-    });
+    const { data: categories } = await supabase
+      .from('categories')
+      .select('id, name, description, created_at, updated_at')
+      .eq('tenant_id', tenantId)
+      .order('name', { ascending: true });
 
     return NextResponse.json(categories);
   } catch (error) {
@@ -64,13 +58,15 @@ export async function POST(req: NextRequest) {
       return new NextResponse('Category name is required', { status: 400 });
     }
 
-    const category = await prisma.category.create({
-      data: {
-        tenantId,
+    const { data: category } = await supabase
+      .from('categories')
+      .insert({
+        tenant_id: tenantId,
         name: name.trim(),
         description: description?.trim() || null,
-      },
-    });
+      })
+      .select()
+      .single();
 
     return NextResponse.json(category, { status: 201 });
   } catch (error) {

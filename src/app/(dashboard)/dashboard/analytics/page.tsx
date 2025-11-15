@@ -18,7 +18,7 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
                    (user.privateMetadata?.tenantId as string) || 
                    user.id;
 
-  let analyticsData;
+  let analyticsData: any = null;
   let hasError = false;
 
   try {
@@ -172,7 +172,7 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
     
       <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
         <AnalyticsClient 
-          data={analyticsData} 
+          data={analyticsData!} 
           timeRange={timeRange}
         />
       </div>

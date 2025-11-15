@@ -29,25 +29,20 @@ export async function validateRequest(req: NextRequest, requiredFields: string[]
 // Server-only database operations with fallback
 export async function getProductsForTenant(tenantId: string) {
   try {
-    // Try to use Prisma if available
-    const { prisma } = await import('@/lib/prisma').catch(() => ({ prisma: null }));
+    // Try to use Supabase if available
+    const { supabase } = await import("@/lib/supabase").catch(() => ({ supabase: null }));
     
-    if (prisma) {
-      const products = await prisma.product.findMany({
-        where: { tenantId },
-        include: {
-          media: true,
-          categories: true,
-          variants: true,
-          options: {
-            include: {
-              values: true
-            }
-          }
-        },
-        orderBy: { createdAt: 'desc' }
-      });
-      return products;
+    if (supabase) {
+      const { data: products } = await supabase
+        .from('products')
+        .select(`
+          *,
+          media(*),
+          product_variants(*)
+        `)
+        .eq('tenantId', tenantId)
+        .order('createdAt', { ascending: false });
+      return products || [];
     }
     
     // Fallback: Return mock data for development
@@ -89,15 +84,16 @@ export async function getProductsForTenant(tenantId: string) {
 
 export async function getCategoriesForTenant(tenantId: string) {
   try {
-    // Try to use Prisma if available
-    const { prisma } = await import('@/lib/prisma').catch(() => ({ prisma: null }));
+    // Try to use Supabase if available
+    const { supabase } = await import("@/lib/supabase").catch(() => ({ supabase: null }));
     
-    if (prisma) {
-      const categories = await prisma.category.findMany({
-        where: { tenantId },
-        orderBy: { name: 'asc' }
-      });
-      return categories;
+    if (supabase) {
+      const { data: categories } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('tenantId', tenantId)
+        .order('name', { ascending: true });
+      return categories || [];
     }
     
     // Fallback: Return mock categories
@@ -119,29 +115,24 @@ export async function getCategoriesForTenant(tenantId: string) {
 // Server-only analytics calculations
 export async function calculateAnalytics(tenantId: string, timeRange: string) {
   try {
-    // Try to use Prisma if available
-    const { prisma } = await import('@/lib/prisma').catch(() => ({ prisma: null }));
+    // Try to use Supabase if available
+    const { supabase } = await import("@/lib/supabase").catch(() => ({ supabase: null }));
     
-    if (prisma) {
+    if (supabase) {
       const dateFilter = getDateFilter(timeRange);
       
-      const [totalSales, revenue, customers] = await Promise.all([
-        prisma.order.count({
-          where: { tenantId, createdAt: dateFilter }
-        }),
-        prisma.order.aggregate({
-          where: { tenantId, createdAt: dateFilter },
-          _sum: { total: true }
-        }),
-        prisma.user.count({
-          where: { tenantId, createdAt: dateFilter }
-        })
+      const [salesResult, revenueResult, customersResult] = await Promise.all([
+        supabase.from('orders').select('*', { count: 'exact', head: true }).eq('tenantId', tenantId).gte('createdAt', dateFilter.gte.toISOString()),
+        supabase.from('orders').select('total').eq('tenantId', tenantId).gte('createdAt', dateFilter.gte.toISOString()),
+        supabase.from('users').select('*', { count: 'exact', head: true }).eq('tenantId', tenantId).gte('createdAt', dateFilter.gte.toISOString())
       ]);
       
+      const revenue = revenueResult.data?.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
+      
       return {
-        totalSales,
-        revenue: revenue._sum.total || 0,
-        customers
+        totalSales: salesResult.count || 0,
+        revenue,
+        customers: customersResult.count || 0
       };
     }
     

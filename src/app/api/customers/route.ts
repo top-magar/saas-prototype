@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { supabase } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 import { getTenant } from '@/lib/tenant';
 
@@ -9,21 +9,15 @@ export async function GET() {
       return new NextResponse('Tenant not found', { status: 404 });
     }
 
-    const customers = await prisma.user.findMany({
-      where: {
-        tenantId: tenant.id,
-        role: 'user'
-      },
-      include: {
-        orders: {
-          select: {
-            total: true,
-            createdAt: true
-          }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+    const { data: customers } = await supabase
+      .from('users')
+      .select(`
+        *,
+        orders(total, created_at)
+      `)
+      .eq('tenant_id', tenant.id)
+      .eq('role', 'user')
+      .order('created_at', { ascending: false });
 
     const formattedCustomers = customers.map(customer => {
       const totalOrders = customer.orders.length;

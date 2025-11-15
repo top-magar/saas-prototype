@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { supabase } from "@/lib/supabase";
 import { NextRequest, NextResponse } from 'next/server';
 import { findOrCreateCustomer } from '@/lib/customer-utils';
 
@@ -14,11 +14,12 @@ export async function GET(req: NextRequest) {
     const { authorize } = await import('@/lib/auth');
     await authorize(tenantId, ['admin', 'manager', 'user']);
     
-    const orders = await prisma.order.findMany({
-      where: { tenantId },
-      take: 100, // Limit results for performance
-      orderBy: { createdAt: 'desc' }
-    });
+    const { data: orders } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('tenant_id', tenantId)
+      .order('created_at', { ascending: false })
+      .limit(100);
     return NextResponse.json(orders);
   } catch (error) {
     console.error('[ORDERS_GET]', error);
@@ -47,25 +48,30 @@ export async function POST(req: NextRequest) {
     });
 
     // Generate order number
-    const orderCount = await prisma.order.count({ where: { tenantId } });
-    const orderNumber = `ORD-${Date.now()}-${orderCount + 1}`;
+    const { count: orderCount } = await supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true })
+      .eq('tenant_id', tenantId);
+    const orderNumber = `ORD-${Date.now()}-${(orderCount || 0) + 1}`;
 
     // Create order with customer
-    const order = await prisma.order.create({
-      data: {
-        tenantId,
-        userId: customer.id,
-        orderNumber,
-        customerEmail,
-        customerName: customerName || customer.name,
-        customerPhone: customerPhone,
+    const { data: order } = await supabase
+      .from('orders')
+      .insert({
+        tenant_id: tenantId,
+        user_id: customer.id,
+        order_number: orderNumber,
+        customer_email: customerEmail,
+        customer_name: customerName || customer.name,
+        customer_phone: customerPhone,
         subtotal: total,
         total,
-        paymentMethod: paymentMethod || 'online',
+        payment_method: paymentMethod || 'online',
         status: 'pending',
-        paymentStatus: 'pending'
-      }
-    });
+        payment_status: 'pending'
+      })
+      .select()
+      .single();
 
     return NextResponse.json({ order, customer });
   } catch (error) {

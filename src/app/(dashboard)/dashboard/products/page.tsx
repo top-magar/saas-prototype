@@ -91,7 +91,7 @@ export default async function ProductsPage() {
           </CardHeader>
           <CardContent>
             <ErrorBoundary>
-              <ProductsClient initialProducts={products} categories={categories} />
+              <ProductsClient initialProducts={products} categories={categories || []} />
             </ErrorBoundary>
           </CardContent>
         </Card>

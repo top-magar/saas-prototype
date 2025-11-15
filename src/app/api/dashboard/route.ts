@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
-import { prisma}  from '@/lib/prisma';
+import { supabase } from "@/lib/supabase";
 import { getTenant } from '@/lib/tenant';
 
 async function getDashboardData() {
@@ -25,91 +25,89 @@ async function getDashboardData() {
     const now = new Date();
     const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    const totalSales = await prisma.order.count({
-      where: { tenantId: tenant.id },
-    });
+    const { count: totalSales } = await supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true })
+      .eq('tenant_id', tenant.id);
 
-    const totalRevenue = await prisma.order.aggregate({
-      where: { tenantId: tenant.id, status: 'completed' },
-      _sum: { total: true },
-    });
+    const { data: revenueData } = await supabase
+      .from('orders')
+      .select('total')
+      .eq('tenant_id', tenant.id)
+      .eq('status', 'completed');
+    const totalRevenue = revenueData?.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
 
-    const activeCustomers = await prisma.user.count({
-      where: { tenantId: tenant.id, lastLoginAt: { gte: lastWeek } },
-    });
+    const { count: activeCustomers } = await supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true })
+      .eq('tenant_id', tenant.id)
+      .gte('last_login_at', lastWeek.toISOString());
 
-    const refundRequests = await prisma.payment.count({
-      where: {
-        order: { tenantId: tenant.id },
-        status: 'refunded',
-      },
-    });
+    const { count: refundRequests } = await supabase
+      .from('payments')
+      .select('*, orders!inner(tenant_id)', { count: 'exact', head: true })
+      .eq('orders.tenant_id', tenant.id)
+      .eq('status', 'refunded');
 
-    const totalProfitData = await prisma.order.groupBy({
-      by: ['createdAt'],
-      where: {
-        tenantId: tenant.id,
-        status: 'completed',
-      },
-      _sum: {
-        total: true,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    });
+    const { data: profitData } = await supabase
+      .from('orders')
+      .select('created_at, total')
+      .eq('tenant_id', tenant.id)
+      .eq('status', 'completed')
+      .order('created_at', { ascending: true });
 
-    const recentOrders = await prisma.order.findMany({
-      where: { tenantId: tenant.id },
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-      include: { user: true },
-    });
+    const { data: recentOrders } = await supabase
+      .from('orders')
+      .select('*, users(name)')
+      .eq('tenant_id', tenant.id)
+      .order('created_at', { ascending: false })
+      .limit(5);
 
-    const topProducts = await prisma.orderItem.groupBy({
-      by: ['productId'],
-      where: { order: { tenantId: tenant.id } },
-      _sum: { subtotal: true },
-      orderBy: { _sum: { subtotal: 'desc' } },
-      take: 5,
-    });
+    const { data: orderItems } = await supabase
+      .from('order_items')
+      .select('product_id, subtotal, orders!inner(tenant_id)')
+      .eq('orders.tenant_id', tenant.id);
 
-    const productDetails = await prisma.product.findMany({
-      where: {
-        id: {
-          in: topProducts.map((p) => p.productId),
-        },
-      },
-    });
+    const productSales = orderItems?.reduce((acc, item) => {
+      acc[item.product_id] = (acc[item.product_id] || 0) + (item.subtotal || 0);
+      return acc;
+    }, {} as Record<string, number>) || {};
 
-    const totalProductRevenue = topProducts.reduce(
-      (sum, product) => sum + (product._sum.subtotal || 0), 
-      0
-    );
+    const topProductIds = Object.entries(productSales)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 5)
+      .map(([id]) => id);
+
+    const { data: productDetails } = await supabase
+      .from('products')
+      .select('id, name')
+      .in('id', topProductIds);
+
+    const totalProductRevenue = Object.values(productSales).reduce((sum, val) => sum + val, 0);
 
     return {
       stats: {
-        totalSales,
-        totalRevenue: totalRevenue._sum.total || 0,
-        activeCustomers,
-        refundRequests,
+        totalSales: totalSales || 0,
+        totalRevenue,
+        activeCustomers: activeCustomers || 0,
+        refundRequests: refundRequests || 0,
       },
-      overview: totalProfitData.map((d) => ({
-        month: d.createdAt.toLocaleString('default', { month: 'short' }),
-        totalSales: totalSales,
-        totalRevenue: d._sum.total,
-      })),
-      recentOrders: recentOrders.map((order) => ({
+      overview: profitData?.map((d) => ({
+        month: new Date(d.created_at).toLocaleString('default', { month: 'short' }),
+        totalSales: totalSales || 0,
+        totalRevenue: d.total,
+      })) || [],
+      recentOrders: recentOrders?.map((order) => ({
         id: order.id,
         product: 'Not available',
-        customer: order.customerName || order.user?.name || 'N/A',
-        date: order.createdAt.toLocaleDateString(),
+        customer: order.customer_name || order.users?.name || 'N/A',
+        date: new Date(order.created_at).toLocaleDateString(),
         amount: order.total,
         status: order.status,
-      })),
-      topProducts: topProducts.map((p, index) => {
-        const product = productDetails.find((pd) => pd.id === p.productId);
-        const earnings = p._sum.subtotal || 0;
+      })) || [],
+      topProducts: topProductIds.map((productId, index) => {
+        const product = productDetails?.find((pd) => pd.id === productId);
+        const earnings = productSales[productId] || 0;
         
         const revenuePercentage = totalProductRevenue > 0 
           ? Math.round((earnings / totalProductRevenue) * 100)

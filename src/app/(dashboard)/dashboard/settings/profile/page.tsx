@@ -1,5 +1,5 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { prisma } from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,11 +15,11 @@ export default async function UserProfilePage() {
     return <p>Not authenticated.</p>;
   }
 
-  const dbUser = await prisma.user.findUnique({
-    where: { clerkUserId: user.id },
-    include: { tenant: true },
-  }    
-  );
+  const { data: dbUser } = await supabase
+    .from('users')
+    .select('*, tenant:tenants(*)')
+    .eq('clerk_user_id', user.id)
+    .single();
 
   if (!dbUser) {
     return <p>User data not found.</p>;
