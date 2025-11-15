@@ -52,26 +52,36 @@ export async function getTenantAnalytics(tenantId: string, timeRange = '30d') {
   const dateFilter = getDateFilter(timeRange);
   
   // Parallel queries for better performance
-  const [ordersResult, revenueResult, customersResult] = await Promise.all([
-    supabase
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .eq('tenant_id', tenantId)
-      .gte('created_at', dateFilter.gte.toISOString()),
-    
-    supabase
-      .from('orders')
-      .select('total')
-      .eq('tenant_id', tenantId)
-      .eq('status', 'completed')
-      .gte('created_at', dateFilter.gte.toISOString()),
-    
-    supabase
-      .from('users')
-      .select('id', { count: 'exact', head: true })
-      .eq('tenant_id', tenantId)
-      .gte('created_at', dateFilter.gte.toISOString())
-  ]);
+  let ordersResult, revenueResult, customersResult;
+  try {
+    [ordersResult, revenueResult, customersResult] = await Promise.all([
+      supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId)
+        .gte('created_at', dateFilter.gte.toISOString()),
+      
+      supabase
+        .from('orders')
+        .select('total')
+        .eq('tenant_id', tenantId)
+        .eq('status', 'completed')
+        .gte('created_at', dateFilter.gte.toISOString()),
+      
+      supabase
+        .from('users')
+        .select('id', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId)
+        .gte('created_at', dateFilter.gte.toISOString())
+    ]);
+  } catch (error) {
+    throw new Error(`Failed to fetch analytics data: ${error}`);
+  }
+
+  // Check for errors in parallel queries
+  if (ordersResult.error) throw ordersResult.error;
+  if (revenueResult.error) throw revenueResult.error;
+  if (customersResult.error) throw customersResult.error;
 
   const analytics = {
     totalOrders: ordersResult.count || 0,

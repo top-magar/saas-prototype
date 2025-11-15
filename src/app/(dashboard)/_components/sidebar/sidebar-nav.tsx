@@ -29,7 +29,7 @@ export const SidebarNav = React.memo(() => {
   // Dummy function to check user roles and tenant tiers
   const userHasAccess = React.useCallback((itemOrSection: NavItem | NavSection) => {
     // Temporarily override currentTenantTier to ENTERPRISE for development purposes
-    const effectiveTenantTier = TenantTier.ENTERPRISE; 
+    const effectiveTenantTier: TenantTier = 'enterprise'; 
 
     // Check roles
     // if (itemOrSection.roles && itemOrSection.roles.length > 0) {

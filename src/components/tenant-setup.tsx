@@ -29,7 +29,9 @@ export function TenantSetup() {
 
       if (response.ok) {
         const { tenant } = await response.json();
-        window.location.href = `http://${tenant.subdomain}.localhost:3000`;
+        // Sanitize subdomain to prevent XSS
+        const sanitizedSubdomain = tenant.subdomain.replace(/[^a-z0-9-]/g, '');
+        window.location.href = `http://${sanitizedSubdomain}.localhost:3000`;
       } else {
         const { error } = await response.json();
         alert(error);

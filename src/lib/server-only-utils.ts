@@ -1,5 +1,11 @@
 import 'server-only';
 import { ErrorLogger } from './shared/error-logger';
+import { NextResponse } from 'next/server';
+
+// Error response helper
+export function createErrorResponse(message: string, status: number = 500) {
+  return NextResponse.json({ error: message }, { status });
+}
 
 // Server-only database operations with fallback
 export async function getProductsForTenant(tenantId: string) {

@@ -138,7 +138,7 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
               </div>
               <nav className="hidden md:flex items-center space-x-6">
                 {(props?.links || [{ text: 'Home', url: '#' }, { text: 'Products', url: '#' }]).map((link, i) => (
-                  <span key={i} className="hover:opacity-75 cursor-pointer" style={{ color: sanitizeStyle(baseStyles.color) || '#666666' }}>
+                  <span key={i} className="hover:opacity-75 cursor-pointer" style={{ color: sanitizeStyle(baseStyles.color || '#666666') }}>
                     {sanitizeText(link.text)}
                   </span>
                 ))}
@@ -179,10 +179,10 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
               textAlign: baseStyles.textAlign || 'left'
             }}
           >
-            <h2 className="text-2xl font-bold mb-4" style={{ color: sanitizeStyle(baseStyles.color) || '#000000' }}>
+            <h2 className="text-2xl font-bold mb-4" style={{ color: sanitizeStyle(baseStyles.color || '#000000') }}>
               {sanitizeText(props?.heading || 'About Our Store')}
             </h2>
-            <p style={{ color: sanitizeStyle(baseStyles.color) || '#666666' }}>
+            <p style={{ color: sanitizeStyle(baseStyles.color || '#666666') }}>
               {sanitizeText(props?.text || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.')}
             </p>
           </div>
@@ -208,7 +208,7 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
         return (
     
           <div className="p-6" style={{ backgroundColor: baseStyles.backgroundColor || 'transparent' }}>
-            <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: sanitizeStyle(baseStyles.color) || '#000000' }}>
+            <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: sanitizeStyle(baseStyles.color || '#000000') }}>
               {sanitizeText(props?.heading || 'Featured Products')}
             </h2>
             <div className="grid grid-cols-3 gap-4">
@@ -228,7 +228,7 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
         return (
     
           <div className="p-6" style={{ backgroundColor: baseStyles.backgroundColor || '#f9fafb' }}>
-            <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: sanitizeStyle(baseStyles.color) || '#000000' }}>
+            <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: sanitizeStyle(baseStyles.color || '#000000') }}>
               {sanitizeText(props?.heading || 'What Our Customers Say')}
             </h2>
             <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -272,7 +272,7 @@ function DraggableComponent({ component, isSelected, onSelect, onDelete, onDupli
                 <h3 className="font-bold text-lg mb-4">{sanitizeText(props?.heading || 'Company')}</h3>
                 <div className="space-y-2">
                   {(props?.links || [{ text: 'About', url: '#' }, { text: 'Contact', url: '#' }]).slice(0, 3).map((link, i) => (
-                    <span key={i} className="block hover:opacity-75 cursor-pointer" style={{ color: sanitizeStyle(baseStyles.color) || '#d1d5db' }}>
+                    <span key={i} className="block hover:opacity-75 cursor-pointer" style={{ color: sanitizeStyle(baseStyles.color || '#d1d5db') }}>
                       {sanitizeText(link.text)}
                     </span>
                   ))}
