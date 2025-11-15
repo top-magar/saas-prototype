@@ -1,5 +1,4 @@
 import { NextConfig } from 'next';
-import { withSentryConfig } from '@sentry/nextjs';
 
 const nextConfig: NextConfig = {
   // CSS Optimization
@@ -8,8 +7,7 @@ const nextConfig: NextConfig = {
     optimizeCss: true, // Enable CSS optimization in production
   },
 
-
-  // Image Optimization (existing configuration)
+  // Image Optimization
   images: {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -67,17 +65,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  silent: !process.env.CI,
-  widenClientFileUpload: true,
-  reactComponentAnnotation: {
-    enabled: true,
-  },
-  sourcemaps: {
-    disable: true,
-  },
-  disableLogger: true,
-  automaticVercelMonitors: true,
-});
+export default nextConfig;
