@@ -1,16 +1,16 @@
 "use client";
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Zap, Play } from 'lucide-react';
-import { OptimizedImage } from '@/components/optimized-image';
-import styles from './hero.module.css';
+// import { OptimizedImage } from '@/components/optimized-image';
+// Styles moved to organized CSS structure
 
 export function Hero() {
   return (
-    <section className={`${styles.hero} relative min-h-screen flex items-center justify-center overflow-hidden pt-20`}>
+    <section className="hero-bg relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       <div className="container mx-auto px-4 py-20">
         <div className="max-w-6xl mx-auto text-center">
           {/* Problem-focused headline */}
@@ -23,7 +23,7 @@ export function Hero() {
             <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700 px-4 py-2 mb-6">
               ⚠️ Business Problem Alert
             </Badge>
-            <h1 className={`${styles.title} text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight`}>
+            <h1 className="marketing-heading text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
               {"Stop Losing Money to Manual Business Management"
                 .split(" ")
                 .map((word, index) => (
@@ -81,7 +81,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 1.2 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
           >
-            <Button size="lg" asChild className={`${styles.ctaButton} h-14 px-8 text-lg group`}>
+            <Button size="lg" asChild className="marketing-cta h-14 px-8 text-lg group">
               <Link href="/sign-up" className="flex items-center space-x-2">
                 <Zap className="w-5 h-5" />
                 <span>Start 14-Day Free Trial</span>
@@ -93,7 +93,7 @@ export function Hero() {
             </div>
           </motion.div>
 
-          {/* Product preview with play button */}
+          {/* Product preview */}
           <motion.div
             initial={{ opacity: 0, y: 40, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -102,14 +102,14 @@ export function Hero() {
           >
             <div className="relative rounded-2xl border-2 border-border bg-card p-4 shadow-2xl hover:shadow-3xl transition-all duration-500">
               <div className="relative overflow-hidden rounded-xl">
-                <OptimizedImage
+                <Image
                   src="/images/dashboard/dashboard-preview.png"
-                  alt="Pasaal.io Dashboard - Real Business Management"
-                  width={1200}
+                  alt="Pasaal.io Dashboard Preview"
+                  width={1400}
                   height={800}
+                  quality={100}
                   priority
-                  className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                  className="w-full h-auto rounded-xl"
                 />
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <div className="bg-white/90 rounded-full p-4 transform scale-90 group-hover:scale-100 transition-transform">

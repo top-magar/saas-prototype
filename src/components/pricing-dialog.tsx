@@ -26,7 +26,7 @@ import { Banknote, Check, CreditCard, DollarSign, Star, Zap, Shield } from "luci
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
 import { toast } from "sonner";
-import { TenantTier } from "@/lib/types";
+import { TenantTier } from "@/lib/shared/types";
 
 const pricingTiers = [
   {

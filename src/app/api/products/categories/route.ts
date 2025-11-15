@@ -1,6 +1,6 @@
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/database/supabase";
 import { NextRequest, NextResponse } from 'next/server';
-import { authorize } from '@/lib/auth';
+import { authorize } from '@/lib/server/auth';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);

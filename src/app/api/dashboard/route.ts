@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
-import { supabase } from "@/lib/supabase";
-import { getTenant } from '@/lib/tenant';
+import { supabase } from "@/lib/database/supabase";
+import { getTenant } from '@/lib/database/tenant';
 
 async function getDashboardData() {
   try {

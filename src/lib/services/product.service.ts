@@ -1,13 +1,5 @@
-import { supabase } from '@/lib/supabase';
-
-const generateSlug = (text: string): string => {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9 -]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim();
-};
+import { supabase } from '../database/supabase';
+import { generateSlug } from '../shared/utils';
 
 interface CreateProductData {
   tenantId: string;

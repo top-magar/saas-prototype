@@ -1,6 +1,6 @@
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/database/supabase";
 import { NextRequest, NextResponse } from 'next/server';
-import { findOrCreateCustomer } from '@/lib/customer-utils';
+import { findOrCreateCustomer } from '@/lib/database/customers';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const { authorize } = await import('@/lib/auth');
+    const { authorize } = await import('@/lib/server/auth');
     await authorize(tenantId, ['admin', 'manager', 'user']);
     
     const { data: orders } = await supabase

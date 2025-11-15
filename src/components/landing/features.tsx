@@ -1,8 +1,7 @@
 "use client";
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { BentoGrid, BentoGridItem } from '@/components/ui/bento-grid';
 import { Package, ShoppingCart, Workflow, BarChart3, Users, Zap, TrendingUp, Shield } from 'lucide-react';
-import styles from './features.module.css';
 
 const features = [
   {
@@ -54,7 +53,7 @@ function FeatureHeader({ icon: Icon, color }: { icon: any; color: string }) {
 
 export function Features() {
   return (
-    <section className={`${styles.features} py-24 relative overflow-hidden`}>
+    <section className={`${features} py-24 relative overflow-hidden`}>
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -75,7 +74,7 @@ export function Features() {
           </motion.div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
             Everything You Need to{" "}
-            <span className={styles.gradientText}>
+            <span className="marketing-heading">
               Scale & Succeed
             </span>
           </h2>

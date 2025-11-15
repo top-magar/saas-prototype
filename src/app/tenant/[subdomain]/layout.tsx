@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/database/supabase";
 import { TenantProvider } from '@/components/providers/tenant-provider';
 
 interface TenantLayoutProps {

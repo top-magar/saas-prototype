@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/database/supabase";
 
 // Payment amounts mapping
 const TIER_AMOUNTS = {

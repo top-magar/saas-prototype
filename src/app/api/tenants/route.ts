@@ -1,7 +1,7 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { NextRequest } from 'next/server';
-import { createTenantAndAssociateUser } from '@/lib/tenant';
-import { createErrorResponse, createSuccessResponse, validateRequest } from '@/lib/server-only-utils';
+import { createTenantAndAssociateUser } from '@/lib/database/tenant';
+import { createErrorResponse, createSuccessResponse, validateRequest } from '@/lib/server/api-helpers';
 
 export async function POST(req: NextRequest) {
   try {

@@ -1,36 +1,11 @@
 import 'server-only';
-import { NextRequest, NextResponse } from 'next/server';
-import { ErrorLogger } from './error-logger';
-
-// Server-side API utilities
-export function createErrorResponse(message: string, status: number = 400) {
-  return NextResponse.json({ error: message }, { status });
-}
-
-export function createSuccessResponse(data: unknown, status: number = 200) {
-  return NextResponse.json(data, { status });
-}
-
-export async function validateRequest(req: NextRequest, requiredFields: string[]) {
-  try {
-    const body = await req.json();
-    const missing = requiredFields.filter(field => !body[field]);
-    
-    if (missing.length > 0) {
-      throw new Error(`Missing required fields: ${missing.join(', ')}`);
-    }
-    
-    return body;
-  } catch (error) {
-    throw new Error('Invalid request body');
-  }
-}
+import { ErrorLogger } from './shared/error-logger';
 
 // Server-only database operations with fallback
 export async function getProductsForTenant(tenantId: string) {
   try {
     // Try to use Supabase if available
-    const { supabase } = await import("@/lib/supabase").catch(() => ({ supabase: null }));
+    const { supabase } = await import("./database/supabase").catch(() => ({ supabase: null }));
     
     if (supabase) {
       const { data: products } = await supabase
@@ -85,7 +60,7 @@ export async function getProductsForTenant(tenantId: string) {
 export async function getCategoriesForTenant(tenantId: string) {
   try {
     // Try to use Supabase if available
-    const { supabase } = await import("@/lib/supabase").catch(() => ({ supabase: null }));
+    const { supabase } = await import("./database/supabase").catch(() => ({ supabase: null }));
     
     if (supabase) {
       const { data: categories } = await supabase
@@ -116,7 +91,7 @@ export async function getCategoriesForTenant(tenantId: string) {
 export async function calculateAnalytics(tenantId: string, timeRange: string) {
   try {
     // Try to use Supabase if available
-    const { supabase } = await import("@/lib/supabase").catch(() => ({ supabase: null }));
+    const { supabase } = await import("./database/supabase").catch(() => ({ supabase: null }));
     
     if (supabase) {
       const dateFilter = getDateFilter(timeRange);

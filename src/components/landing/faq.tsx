@@ -1,5 +1,5 @@
 "use client";
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import {
   Accordion,
   AccordionContent,
@@ -7,7 +7,6 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { HelpCircle, MessageCircle } from 'lucide-react';
-import styles from './faq.module.css';
 
 const faqs = [
   {
@@ -38,7 +37,7 @@ const faqs = [
 
 export function FAQ() {
   return (
-    <section className={`${styles.faq} py-24 relative`}>
+    <section className="py-24 relative bg-muted/10">
       <div className="container max-w-5xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -59,7 +58,7 @@ export function FAQ() {
           </motion.div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
             Frequently Asked{" "}
-            <span className={styles.gradientText}>
+            <span className="marketing-heading">
               Questions
             </span>
           </h2>

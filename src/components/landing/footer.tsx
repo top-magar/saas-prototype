@@ -3,8 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Twitter, Github, Linkedin, Mail, Heart, ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { motion } from 'motion/react';
-import styles from './footer.module.css';
+import { motion } from 'framer-motion';
 
 const footerLinks = {
   product: [
@@ -49,7 +48,7 @@ export function Footer() {
   };
 
   return (
-    <footer className={`${styles.footer} relative overflow-hidden`}>
+    <footer className="relative overflow-hidden border-t bg-muted/30">
       {/* Back to top button */}
       <motion.button
         onClick={scrollToTop}
@@ -78,11 +77,11 @@ export function Footer() {
                 <Image src="/images/logos/company-logo.svg" alt="Pasaal.io Logo" width={40} height={40} className="group-hover:scale-110 transition-transform duration-300" />
                 <div className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full animate-pulse" />
               </div>
-              <span className={`font-bold text-2xl ${styles.gradientText}`}>
+              <span className="font-bold text-2xl marketing-heading">
                 PASAAL.IO
               </span>
             </Link>
-            <p className={`${styles.textSecondary} mb-8 max-w-sm text-lg leading-relaxed`}>
+            <p className="text-muted-foreground mb-8 max-w-sm text-lg leading-relaxed">
               Empowering businesses across Nepal with intelligent automation and comprehensive management solutions.
             </p>
             
@@ -135,7 +134,7 @@ export function Footer() {
                   >
                     <Link 
                       href={link.href} 
-                      className={`${styles.textSecondary} hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block`}
+                      className="text-muted-foreground hover:text-primary transition-all duration-300 hover:translate-x-1 inline-block"
                     >
                       {link.name}
                     </Link>
@@ -154,10 +153,10 @@ export function Footer() {
           viewport={{ once: true }}
           className="pt-8 border-t-2 border-border/30 flex flex-col md:flex-row justify-between items-center gap-6"
         >
-          <p className={`text-base ${styles.textSecondary} flex items-center gap-2`}>
+          <p className="text-base text-muted-foreground flex items-center gap-2">
             © {new Date().getFullYear()} Pasaal.io. All rights reserved.
           </p>
-          <p className={`text-base ${styles.textSecondary} flex items-center gap-2`}>
+          <p className="text-base text-muted-foreground flex items-center gap-2">
             Made with <Heart className="w-4 h-4 text-red-500 animate-pulse" /> in Nepal 🇳🇵
           </p>
         </motion.div>

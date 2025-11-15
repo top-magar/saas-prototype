@@ -3,7 +3,7 @@
 import { Component, ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
-import { ErrorLogger } from '@/lib/error-logger'
+import { ErrorLogger } from '@/lib/shared/error-logger'
 import { ErrorFeedback } from './error-feedback'
 
 interface Props {

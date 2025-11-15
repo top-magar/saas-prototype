@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTenant } from '@/lib/tenant';
-import { validateCoupon } from '@/lib/coupon-utils';
+import { getTenant } from '@/lib/database/tenant';
+import { validateCoupon } from '@/lib/database/coupons';
 
 export async function POST(req: NextRequest) {
   try {

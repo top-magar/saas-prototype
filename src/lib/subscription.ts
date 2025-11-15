@@ -1,4 +1,4 @@
-import { TenantTier } from "@/lib/types";
+import { TenantTier } from "@/lib/utils";
 
 export interface SubscriptionLimits {
   products: number;

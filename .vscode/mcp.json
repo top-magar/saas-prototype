@@ -6,6 +6,10 @@
         "shadcn@latest",
         "mcp"
       ]
+    },
+    "Sentry": {
+      "url": "https://mcp.sentry.dev/mcp/top-magar/javascript-nextjs",
+      "type": "http"
     }
   }
 }

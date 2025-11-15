@@ -2,7 +2,7 @@
 
 import { useTenant } from "@/lib/tenant-context";
 import { checkLimit, SUBSCRIPTION_LIMITS } from "@/lib/subscription";
-import { TenantTier } from "@/lib/types";
+import { TenantTier } from "@/lib/shared/types";
 
 export function useSubscription() {
   const { tenant } = useTenant();

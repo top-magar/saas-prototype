@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle } from 'lucide-react'
-import { ErrorLogger } from '@/lib/error-logger'
+import { ErrorLogger } from '@/lib/shared/error-logger'
 
 export default function GlobalError({
   error,

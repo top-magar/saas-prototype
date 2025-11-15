@@ -1,5 +1,5 @@
 "use client";
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { AlertTriangle, ArrowRight, CheckCircle, TrendingUp } from 'lucide-react';
 
 const problemSolutions = [

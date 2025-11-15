@@ -1,6 +1,6 @@
 import { Header } from "@/components/landing/header";
 import { Footer } from "@/components/landing/footer";
-import "./marketing.css";
+// Marketing styles are now in the main CSS structure
 
 export default function MarketingLayout({
   children,

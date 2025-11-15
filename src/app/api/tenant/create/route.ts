@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { createTenantAndAssociateUser } from '@/lib/tenant';
-import { isValidSubdomain } from '@/lib/tenant';
+import { createTenantAndAssociateUser } from '@/lib/database/tenant';
+import { isValidSubdomain } from '@/lib/database/tenant';
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
-import { isValidSubdomain } from '@/lib/tenant';
+import { supabaseAdmin } from '@/lib/database/supabase';
+import { isValidSubdomain } from '@/lib/database/tenant';
 
 export async function GET(req: NextRequest) {
   try {

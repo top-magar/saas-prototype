@@ -5,8 +5,8 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { productService } from '@/lib/services/product.service'
-import { ErrorLogger } from '@/lib/error-logger'
-import { withRetry } from '@/lib/retry-wrapper'
+import { ErrorLogger } from '@/lib/shared/error-logger'
+import { withRetry } from '@/lib/utils'
 
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),

@@ -1,6 +1,6 @@
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/database/supabase";
 import { NextRequest, NextResponse } from 'next/server';
-import { authorize } from '@/lib/auth';
+import { authorize } from '@/lib/server/auth';
 import { z } from 'zod';
 
 const componentSchema: z.ZodType<any> = z.lazy(() => z.object({

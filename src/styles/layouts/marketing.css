@@ -1,0 +1,34 @@
+/* Marketing Layout Styles */
+@layer components {
+  .marketing-hero {
+    @apply min-h-screen bg-gradient-to-br from-background via-muted/20 to-background;
+  }
+  
+  .marketing-heading {
+    @apply text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight bg-gradient-to-br from-foreground via-primary to-muted-foreground bg-clip-text text-transparent;
+  }
+  
+  .marketing-subheading {
+    @apply text-xl md:text-2xl text-muted-foreground leading-relaxed;
+  }
+  
+  .marketing-cta {
+    @apply bg-primary text-primary-foreground px-8 py-4 rounded-lg font-semibold text-lg shadow-lg transition-all duration-300 hover:bg-primary/90 hover:shadow-xl hover:-translate-y-1;
+  }
+  
+  .marketing-section {
+    @apply py-20 md:py-32;
+  }
+  
+  .marketing-card {
+    @apply backdrop-blur-sm border border-border/50 rounded-xl p-8 transition-all duration-300 bg-card/50 hover:bg-card/80 hover:-translate-y-1;
+  }
+  
+  /* Hero Animation */
+  .hero-bg::after {
+    content: '';
+    @apply absolute -top-1/2 -left-1/2 w-[200%] h-[200%] pointer-events-none;
+    background: conic-gradient(from 0deg, transparent, hsl(var(--primary) / 0.02), transparent);
+    animation: rotate 30s linear infinite;
+  }
+}

@@ -1,6 +1,6 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/database/supabase';
 import { NextRequest, NextResponse } from 'next/server';
-import { getTenant } from '@/lib/tenant';
+import { getTenant } from '@/lib/database/tenant';
 
 export async function GET() {
   try {

@@ -1,0 +1,44 @@
+/* Utility Classes */
+@layer utilities {
+  /* Status Indicators */
+  .status-success { @apply text-success; }
+  .status-warning { @apply text-warning; }
+  .status-error { @apply text-destructive; }
+  .status-info { @apply text-info; }
+  
+  /* Loading States */
+  .loading { @apply animate-pulse; }
+  .skeleton { @apply bg-muted animate-pulse rounded; }
+  
+  /* Focus States - Use inline: focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 */
+  
+  /* Scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Code Blocks */
+  .code-block {
+    @apply bg-muted/50 border rounded-lg overflow-hidden;
+  }
+  
+  .code-block pre {
+    @apply text-sm p-4 overflow-x-auto;
+  }
+  
+  .code-block code {
+    @apply font-mono;
+  }
+  
+  /* Responsive Container */
+  @media (max-width: 640px) {
+    .container {
+      @apply px-4;
+    }
+  }
+}
