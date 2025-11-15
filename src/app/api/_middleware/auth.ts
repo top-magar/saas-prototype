@@ -29,7 +29,7 @@ export async function withRoleAuth(req: NextRequest, allowedRoles: UserRole[]): 
   }
   
   try {
-    const { supabase } = await import('@/lib/supabase');
+    const { supabase } = await import('@/lib/database/supabase');
     
     const { data: user } = await supabase
       .from('users')
@@ -67,7 +67,7 @@ export async function withAdminAuth(req: NextRequest): Promise<AuthResult> {
   
   try {
     // Import here to avoid circular dependencies
-    const { supabase } = await import('@/lib/supabase');
+    const { supabase } = await import('@/lib/database/supabase');
     
     const { data: user } = await supabase
       .from('users')
