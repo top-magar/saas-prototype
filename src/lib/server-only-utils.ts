@@ -2,9 +2,14 @@ import 'server-only';
 import { ErrorLogger } from './shared/error-logger';
 import { NextResponse } from 'next/server';
 
-// Error response helper
+// Error response helper for API routes
 export function createErrorResponse(message: string, status: number = 500) {
   return NextResponse.json({ error: message }, { status });
+}
+
+// Error object helper for auth middleware
+export function createAuthError(message: string, status: number = 500) {
+  return { error: message, status };
 }
 
 // Server-only database operations with fallback

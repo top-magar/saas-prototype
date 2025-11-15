@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest } from 'next/server';
-import { createErrorResponse } from '@/lib/server-only-utils';
+import { createAuthError } from '@/lib/server-only-utils';
 
 // Type definitions for better maintainability
 type AuthResult = { userId: string } | { error: string; status: number };
@@ -11,13 +11,13 @@ export async function withAuth(req: NextRequest): Promise<AuthResult> {
     const { userId } = await auth();
     
     if (!userId) {
-      return createErrorResponse('Unauthorized', 401);
+      return createAuthError('Unauthorized', 401);
     }
     
     return { userId };
   } catch (error) {
     console.error('[AUTH_ERROR]', error);
-    return createErrorResponse('Authentication failed', 401);
+    return createAuthError('Authentication failed', 401);
   }
 }
 
@@ -38,7 +38,7 @@ export async function withRoleAuth(req: NextRequest, allowedRoles: UserRole[]): 
       .single();
     
     if (!user || !allowedRoles.includes(user.role as UserRole)) {
-      return createErrorResponse('Forbidden: Insufficient permissions', 403);
+      return createAuthError('Forbidden: Insufficient permissions', 403);
     }
     
     return authResult;
@@ -47,14 +47,14 @@ export async function withRoleAuth(req: NextRequest, allowedRoles: UserRole[]): 
     
     if (error instanceof Error) {
       if (error.message.includes('connect') || error.message.includes('timeout')) {
-        return createErrorResponse('Database connection error', 503);
+        return createAuthError('Database connection error', 503);
       }
       if (error.message.includes('not found')) {
-        return createErrorResponse('User not found', 401);
+        return createAuthError('User not found', 401);
       }
     }
     
-    return createErrorResponse('Authorization check failed', 500);
+    return createAuthError('Authorization check failed', 500);
   }
 }
 
@@ -76,7 +76,7 @@ export async function withAdminAuth(req: NextRequest): Promise<AuthResult> {
       .single();
     
     if (!user || user.role !== 'admin') {
-      return createErrorResponse('Forbidden: Admin access required', 403);
+      return createAuthError('Forbidden: Admin access required', 403);
     }
     
     return authResult;
@@ -85,13 +85,13 @@ export async function withAdminAuth(req: NextRequest): Promise<AuthResult> {
     
     if (error instanceof Error) {
       if (error.message.includes('connect') || error.message.includes('timeout')) {
-        return createErrorResponse('Database connection error', 503);
+        return createAuthError('Database connection error', 503);
       }
       if (error.message.includes('not found')) {
-        return createErrorResponse('User not found', 401);
+        return createAuthError('User not found', 401);
       }
     }
     
-    return createErrorResponse('Authorization check failed', 500);
+    return createAuthError('Authorization check failed', 500);
   }
 }
