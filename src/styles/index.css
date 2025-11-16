@@ -38,6 +38,8 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+  --color-sidebar-header: var(--sidebar-header);
+  --color-sidebar-header-foreground: var(--sidebar-header-foreground);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -76,9 +78,7 @@
     @apply border-border;
   }
   
-  *:focus {
-    @apply outline-none ring-2 ring-ring ring-offset-2;
-  }
+  
   
   html {
     @apply scroll-smooth;

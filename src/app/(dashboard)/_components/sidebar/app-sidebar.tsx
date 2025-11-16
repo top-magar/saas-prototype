@@ -35,9 +35,6 @@ import { Logo } from "./logo";
 import type { Route } from "./nav-main";
 import DashboardNavigation from "./nav-main";
 
-
-
-
 const dashboardRoutes: Route[] = [
   {
     id: "home",
@@ -199,16 +196,16 @@ export function AppSidebar() {
     <Sidebar variant="floating" collapsible="icon">
       <SidebarHeader
         className={cn(
-          "flex md:pt-3.5",
+          "flex md:pt-3.5 bg-sidebar-header text-sidebar-header-foreground rounded-t-lg",
           isCollapsed
             ? "flex-row items-center justify-between gap-y-4 md:flex-col md:items-start md:justify-start"
             : "flex-row items-center justify-between"
         )}
       >
         <a href="/dashboard" className="flex items-center gap-2">
-          <Logo className="h-8 w-8" />
+          <Logo className="h-8 w-8 text-sidebar-header-foreground" />
           {!isCollapsed && (
-            <span className="font-semibold text-black dark:text-white">
+            <span className="font-semibold text-sidebar-header-foreground">
               Pasaal.Io
             </span>
           )}
@@ -227,7 +224,7 @@ export function AppSidebar() {
           <SidebarTrigger />
         </motion.div>
       </SidebarHeader>
-      <SidebarContent className="gap-4 px-2 py-4">
+      <SidebarContent className="gap-4 px-2 py-4 bg-sidebar text-sidebar-foreground rounded-b-lg">
         <DashboardNavigation routes={dashboardRoutes} />
       </SidebarContent>
 
