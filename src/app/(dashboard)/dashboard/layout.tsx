@@ -43,7 +43,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           <SmoothScroll className="flex-1 overflow-auto">
             <main>
               <ErrorBoundary>
-                <div className="h-full w-full max-w-full p-4 sm:p-6">
+                <div className="h-full w-full max-w-full p-4 sm:p-6  ">
                   {children}
                 </div>
               </ErrorBoundary>

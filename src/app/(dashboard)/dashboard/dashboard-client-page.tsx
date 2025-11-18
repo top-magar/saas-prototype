@@ -3,7 +3,7 @@ import { useUser } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { StatCard } from './_components/stat-card';
 import { RecentOrders } from './_components/recent-orders';
-import { Download, Package } from 'lucide-react';
+import { Download, Package, ExternalLink } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -19,6 +19,8 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLe
 import { Pie, PieChart, Cell } from 'recharts';
 import { ButtonGroup } from '@/components/ui/button-group';
 import dynamic from 'next/dynamic';
+import { Heading, Text, Metric } from '@/components/ui/design-system';
+import { LAYOUTS } from '@/lib/design-system';
 
 import { InteractiveBarChart } from './_components/interactive-bar-chart';
 
@@ -77,6 +79,21 @@ const salesByChannelConfig = {
 export default function DashboardClientPage({ data }: { data: DashboardData | null }) {
   const { user } = useUser();
   const [timeframe, setTimeframe] = useState("30d");
+  
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
+  
+  const getTodayDate = () => {
+    return new Date().toLocaleDateString('en-US', { 
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -130,194 +147,74 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
   return (
     
       <motion.div
-        className="flex flex-col gap-6"
+        className="flex flex-col gap-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Welcome, {user?.firstName} 👋</h1>
-          <p className="text-base text-muted-foreground">
-            An overview of customer insights, sales performance, and revenue analytics.
-          </p>
+        <div className="mb-6">
+          <div className="flex items-start justify-between mb-6">
+            <div className="space-y-1">
+              <h1 className="text-3xl font-bold tracking-tight">
+                {getTimeBasedGreeting()}, {user?.firstName || 'User'}!
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Here are your stats for today — {getTodayDate()}
+              </p>
+            </div>
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Visit Website
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <ButtonGroup>
-            <Button
-              variant={timeframe === "7d" ? "default" : "outline"}
-              onClick={() => setTimeframe("7d")}
-            >
-              7D
-            </Button>
-            <Button
-              variant={timeframe === "30d" ? "default" : "outline"}
-              onClick={() => setTimeframe("30d")}
-            >
-              30D
-            </Button>
-            <Button
-              variant={timeframe === "90d" ? "default" : "outline"}
-              onClick={() => setTimeframe("90d")}
-            >
-              90D
-            </Button>
-          </ButtonGroup>
-          <Button>
-            <Download className="mr-2 h-4 w-4" />
-            Export Report
-          </Button>
-        </div>
-      </div>
 
       {data.stats && (
-        <motion.div
-          className="mx-auto grid grid-cols-1 gap-px rounded-xl bg-border sm:grid-cols-2 lg:grid-cols-4"
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-        >
-          <motion.div variants={itemVariants}>
-            <StatCard
-              name="Total Sales"
-              value={data.stats.totalSales.toLocaleString()}
-              change="+24.8%"
-              changeType="positive"
-              index={0}
-              total={4}
-            />
-          </motion.div>
-          <motion.div variants={itemVariants}>
-            <StatCard
-              name="Total Revenue"
-              value={`NPR ${data.stats.totalRevenue.toLocaleString()}`}
-              change="+18.2%"
-              changeType="positive"
-              index={1}
-              total={4}
-            />
-          </motion.div>
-          <motion.div variants={itemVariants}>
-            <StatCard
-              name="Active Customers"
-              value={data.stats.activeCustomers.toLocaleString()}
-              change="+12.5%"
-              changeType="positive"
-              index={2}
-              total={4}
-            />
-          </motion.div>
-          <motion.div variants={itemVariants}>
-            <StatCard
-              name="Refund Requests"
-              value={data.stats.refundRequests.toLocaleString()}
-              change="-8.3%"
-              changeType="negative"
-              index={3}
-              total={4}
-            />
-          </motion.div>
-        </motion.div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-4">
+          <StatCard
+            name="Total Sales"
+            value={data.stats.totalSales.toLocaleString()}
+            change="+24.8%"
+            changeType="positive"
+            index={0}
+            total={4}
+          />
+          <StatCard
+            name="Total Revenue"
+            value={`NPR ${data.stats.totalRevenue.toLocaleString()}`}
+            change="+18.2%"
+            changeType="positive"
+            index={1}
+            total={4}
+          />
+          <StatCard
+            name="Active Customers"
+            value={data.stats.activeCustomers.toLocaleString()}
+            change="+12.5%"
+            changeType="positive"
+            index={2}
+            total={4}
+          />
+          <StatCard
+            name="Refund Requests"
+            value={data.stats.refundRequests.toLocaleString()}
+            change="-8.3%"
+            changeType="negative"
+            index={3}
+            total={4}
+          />
+        </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sales & Revenue Overview</CardTitle>
-              <CardDescription>12-month performance trend showing consistent growth.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <OverviewChart data={data.overview} />
-            </CardContent>
-          </Card>
-        </div>
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sales Channels</CardTitle>
-              <CardDescription>Revenue distribution</CardDescription>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center">
-              <ChartContainer config={salesByChannelConfig} className="mx-auto aspect-square max-h-[200px]">
-                <PieChart>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                  />
-                  <Pie
-                    data={salesByChannelData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={40}
-                    strokeWidth={3}
-                  />
-                  <ChartLegend
-                    content={<ChartLegendContent nameKey="name" />}
-                    className="-translate-y-2 flex-wrap gap-1 text-xs [&>*]:basis-1/2 [&>*]:justify-center"
-                  />
-                </PieChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Stats</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Avg Order Value</span>
-                <span className="font-semibold">NPR 47,720</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Conversion Rate</span>
-                <span className="font-semibold text-green-600">3.2%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Customer Satisfaction</span>
-                <span className="font-semibold">4.8/5.0</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Return Rate</span>
-                <span className="font-semibold text-red-600">0.4%</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="bg-background border border-border/50 p-8">
+        <div className="text-sm font-mono font-semibold uppercase tracking-wide mb-6">PERFORMANCE</div>
+        <OverviewChart data={data.overview} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <InteractiveBarChart />
+      <div className="bg-background border border-border/50 p-4">
+        <div className="text-sm font-mono font-semibold uppercase tracking-wide mb-4">RECENT ACTIVITY</div>
         {data.recentOrders && <RecentOrders data={data.recentOrders} />}
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Top Performing Products</CardTitle>
-          <CardDescription>Best-selling items ranked by performance and revenue contribution.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {data.topProducts && data.topProducts.map((product, index) => (
-              <div key={product.name} className="flex items-center gap-4 p-4 border rounded-lg">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-bold text-primary">#{index + 1}</span>
-                  </div>
-                </div>
-                <div className="flex-1 space-y-2">
-                  <p className="text-sm font-medium">{product.name}</p>
-                  <Progress value={product.percent} className="h-2" />
-                  <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">{product.percent}% performance</span>
-                    <span className="font-medium">NPR {product.earnings.toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
       </motion.div>
     
   );

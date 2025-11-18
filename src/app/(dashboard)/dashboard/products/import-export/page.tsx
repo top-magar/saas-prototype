@@ -145,10 +145,7 @@ export default function ImportExportPage() {
 
   return (
     <div className="flex flex-col gap-6 p-4 lg:p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Product Import/Export</h1>
-        <p className="text-muted-foreground">Manage your product data with bulk import and export operations</p>
-      </div>
+
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>

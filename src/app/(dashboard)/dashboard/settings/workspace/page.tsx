@@ -39,10 +39,7 @@ export default function WorkspaceSettingsPage() {
   return (
     
       <div className="flex flex-col gap-6 p-4 lg:p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Workspace Settings</h1>
-        <p className="text-muted-foreground">Manage your workspace configuration and preferences</p>
-      </div>
+
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">

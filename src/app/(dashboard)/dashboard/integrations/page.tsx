@@ -95,7 +95,6 @@ export default function IntegrationsPage() {
   return (
     
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <h1 className="text-xl font-semibold md:text-2xl">Integrations</h1>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input

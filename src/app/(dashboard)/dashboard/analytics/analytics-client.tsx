@@ -14,13 +14,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Item, ItemGroup, ItemContent, ItemTitle, ItemDescription, ItemMedia } from "@/components/ui/item";
 import { Line, LineChart, Bar, BarChart, Area, AreaChart, Pie, PieChart, Cell, CartesianGrid, XAxis, YAxis } from "recharts";
 import { User, ShoppingCart, RefreshCcw, Plus, Pencil, Trash } from "lucide-react";
+import { EnhancedRevenueTab } from "./enhanced-revenue-tab";
+import { EnhancedCustomersTab } from "./enhanced-customers-tab";
+import { EnhancedProductsTab } from "./enhanced-products-tab";
+import { EnhancedMarketingTab } from "./enhanced-marketing-tab";
+import { EnhancedReportsTab } from "./enhanced-reports-tab";
 
 interface AnalyticsData {
   overview: Array<{ month: string; totalSales: number; newCustomers: number; orders: number; avgOrderValue: number }>;
   revenue: {
-    chartData: Array<{ month: string; total: number; subscriptions: number; oneTime: number; refunds: number }>;
-    sources: Array<{ source: string; amount: string; percentage: string; growth: string }>;
-    metrics: { mrr: number; arr: number; churnRate: number; ltv: number; cac: number };
+    chartData: Array<{ month: string; total: number; subscriptions: number; oneTime: number; refunds: number; upgrades: number; addons: number }>;
+    sources: Array<{ source: string; amount: string; percentage: string; growth: string; trend?: number[] }>;
+    metrics: { mrr: number; arr: number; churnRate: number; ltv: number; cac: number; paybackPeriod: number; grossMargin: number; netRevenue: number; recurringRevenue: number };
+    cohorts: Array<{ month: string; customers: number; retention: number[] }>;
+    forecasting: {
+      nextMonth: { predicted: number; confidence: number; range: number[] };
+      nextQuarter: { predicted: number; confidence: number; range: number[] };
+      yearEnd: { predicted: number; confidence: number; range: number[] };
+    };
   };
   customers: {
     segmentation: Array<{ name: string; value: number; color: string; growth: string }>;
@@ -103,8 +114,7 @@ export default function AnalyticsClient({ data, timeRange }: AnalyticsClientProp
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold md:text-2xl">Analytics Dashboard</h1>
+      <div className="flex justify-end">
         <Select value={selectedTimeRange} onValueChange={handleTimeRangeChange}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select a time range" />
@@ -244,418 +254,23 @@ export default function AnalyticsClient({ data, timeRange }: AnalyticsClientProp
         </TabsContent>
         
         <TabsContent value="revenue" className="mt-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle>Monthly Revenue Trend</CardTitle>
-                <CardDescription>Total revenue and its breakdown over time.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer config={revenueChartConfig} className="h-[300px]">
-                  <AreaChart data={data.revenue.chartData} margin={{ left: 12, right: 12 }}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, 3)} />
-                    <YAxis tickLine={false} axisLine={false} tickFormatter={(value) => `$${value / 1000}k`} />
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    <Area dataKey="subscriptions" type="monotone" fill="var(--color-subscriptions)" stroke="var(--color-subscriptions)" stackId="a" />
-                    <Area dataKey="oneTime" type="monotone" fill="var(--color-oneTime)" stroke="var(--color-oneTime)" stackId="a" />
-                  </AreaChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Revenue Sources</CardTitle>
-                <CardDescription>Breakdown of revenue by source with growth metrics.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Source</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Share</TableHead>
-                      <TableHead>Growth</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.revenue.sources.map((item) => (
-                      <TableRow key={item.source}>
-                        <TableCell className="font-medium">{item.source}</TableCell>
-                        <TableCell>{item.amount}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{item.percentage}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={item.growth.startsWith('+') ? 'default' : 'destructive'}>
-                            {item.growth}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </div>
+          <EnhancedRevenueTab data={data.revenue} />
         </TabsContent>
 
         <TabsContent value="customers" className="mt-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Customer Segmentation</CardTitle>
-                <CardDescription>Breakdown of customer types with growth.</CardDescription>
-              </CardHeader>
-              <CardContent className="flex items-center justify-center">
-                <ChartContainer config={customerSegmentationConfig} className="h-[200px] w-full">
-                  <PieChart>
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent nameKey="name" />} />
-                    <Pie data={data.customers.segmentation} dataKey="value" nameKey="name" innerRadius={40} outerRadius={80} strokeWidth={2}>
-                      {data.customers.segmentation.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Demographics</CardTitle>
-                <CardDescription>Customer age distribution.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {data.customers.demographics.ageGroups.map((group) => (
-                    <div key={group.range} className="flex items-center justify-between">
-                      <span className="text-sm font-medium">{group.range}</span>
-                      <div className="flex items-center gap-2">
-                        <Progress value={group.percentage} className="w-16" />
-                        <span className="text-sm text-muted-foreground">{group.percentage}%</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Latest customer actions.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ItemGroup>
-                  {data.customers.activities.slice(0, 4).map((activity) => {
-                    const IconComponent = activityIcons[activity.activity as keyof typeof activityIcons] || User;
-                    return (
-                      <Item key={activity.id} className="flex items-center gap-3">
-                        <ItemMedia variant="icon">
-                          <IconComponent className="size-4" />
-                        </ItemMedia>
-                        <ItemContent>
-                          <ItemTitle className="text-sm">{activity.customer}</ItemTitle>
-                          <ItemDescription className="text-xs">{activity.activity}</ItemDescription>
-                        </ItemContent>
-                        <div className="text-right">
-                          <div className="text-xs font-medium">{activity.value}</div>
-                          <div className="text-xs text-muted-foreground">{activity.time}</div>
-                        </div>
-                      </Item>
-                    );
-                  })}
-                </ItemGroup>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card className="mt-4">
-            <CardHeader>
-              <CardTitle>Geographic Distribution</CardTitle>
-              <CardDescription>Customer locations and market penetration.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-5">
-                {data.customers.demographics.locations.map((location) => (
-                  <div key={location.country} className="text-center">
-                    <div className="text-2xl font-bold">{location.count}</div>
-                    <div className="text-sm font-medium">{location.country}</div>
-                    <div className="text-xs text-muted-foreground">{location.percentage}%</div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <EnhancedCustomersTab data={data.customers} />
         </TabsContent>
 
         <TabsContent value="products" className="mt-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Performance Over Time</CardTitle>
-                <CardDescription>Sales and units sold monthly.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer config={productPerformanceConfig} className="h-[250px]">
-                  <LineChart data={data.products.performance} margin={{ left: 12, right: 12 }}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, 3)} />
-                    <YAxis />
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    <Line dataKey="sales" type="monotone" stroke="var(--color-sales)" strokeWidth={2} dot={false} />
-                    <Line dataKey="units" type="monotone" stroke="var(--color-units)" strokeWidth={2} dot={false} />
-                  </LineChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Top Selling Products</CardTitle>
-                <CardDescription>Products with the highest sales.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ItemGroup>
-                  {data.products.topProducts.map((product) => (
-                    <Item key={product.id} className="flex items-center gap-4">
-                      <ItemContent>
-                        <ItemTitle>{product.name}</ItemTitle>
-                        <ItemDescription>Sales: ${product.sales}</ItemDescription>
-                        <Progress value={product.progress} className="mt-2" />
-                      </ItemContent>
-                    </Item>
-                  ))}
-                </ItemGroup>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Categories</CardTitle>
-                <CardDescription>Performance by category with margins.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {data.products.categories.map((category) => (
-                    <div key={category.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <div className="font-medium">{category.name}</div>
-                        <div className="text-sm text-muted-foreground">{category.count} products</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold">${category.sales.toLocaleString()}</div>
-                        <div className="flex gap-2">
-                          <Badge variant="secondary">{category.margin}% margin</Badge>
-                          <Badge variant={category.growth.startsWith('+') ? 'default' : 'destructive'}>
-                            {category.growth}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Inventory Status</CardTitle>
-                <CardDescription>Stock levels and alerts.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 grid-cols-2">
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-orange-600">{data.products.inventory.lowStock}</div>
-                    <div className="text-sm font-medium">Low Stock</div>
-                  </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-red-600">{data.products.inventory.outOfStock}</div>
-                    <div className="text-sm font-medium">Out of Stock</div>
-                  </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold">{data.products.inventory.totalProducts}</div>
-                    <div className="text-sm font-medium">Total Products</div>
-                  </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold">{data.products.inventory.avgStockLevel}%</div>
-                    <div className="text-sm font-medium">Avg Stock Level</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <EnhancedProductsTab data={data.products} />
         </TabsContent>
 
         <TabsContent value="marketing" className="mt-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Marketing Channels</CardTitle>
-                <CardDescription>Performance by acquisition channel.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {data.marketing.channels.map((channel) => (
-                    <div key={channel.channel} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <div className="font-medium">{channel.channel}</div>
-                        <div className="text-sm text-muted-foreground">{channel.visitors.toLocaleString()} visitors</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold">{channel.conversions} conversions</div>
-                        <div className="flex gap-2">
-                          <Badge variant="secondary">ROAS: {channel.roas}</Badge>
-                          {channel.cost > 0 && (
-                            <Badge variant="outline">${channel.cost}</Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Active Campaigns</CardTitle>
-                <CardDescription>Current marketing campaign performance.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {data.marketing.campaigns.map((campaign) => (
-                    <div key={campaign.name} className="p-3 border rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="font-medium">{campaign.name}</div>
-                        <Badge variant={campaign.status === 'Active' ? 'default' : campaign.status === 'Completed' ? 'secondary' : 'outline'}>
-                          {campaign.status}
-                        </Badge>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <div className="text-muted-foreground">Budget</div>
-                          <div className="font-medium">${campaign.budget.toLocaleString()}</div>
-                        </div>
-                        <div>
-                          <div className="text-muted-foreground">Spent</div>
-                          <div className="font-medium">${campaign.spent.toLocaleString()}</div>
-                        </div>
-                        <div>
-                          <div className="text-muted-foreground">Conversions</div>
-                          <div className="font-medium">{campaign.conversions}</div>
-                        </div>
-                        <div>
-                          <div className="text-muted-foreground">ROAS</div>
-                          <div className="font-medium">{campaign.roas}</div>
-                        </div>
-                      </div>
-                      {campaign.status === 'Active' && (
-                        <Progress value={(campaign.spent / campaign.budget) * 100} className="mt-2" />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <EnhancedMarketingTab data={data.marketing} />
         </TabsContent>
 
         <TabsContent value="reports" className="mt-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Report Builder</CardTitle>
-                <CardDescription>Define parameters for your custom report.</CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4">
-                <Field>
-                  <FieldLabel>Report Name</FieldLabel>
-                  <FieldContent>
-                    <Input placeholder="e.g., Q4 Marketing Performance" value={reportName} onChange={(e) => setReportName(e.target.value)} />
-                  </FieldContent>
-                </Field>
-
-                <Field>
-                  <FieldLabel>Report Type</FieldLabel>
-                  <FieldContent>
-                    <Select value={reportType} onValueChange={setReportType}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select report type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sales">Sales</SelectItem>
-                        <SelectItem value="customers">Customers</SelectItem>
-                        <SelectItem value="products">Products</SelectItem>
-                        <SelectItem value="marketing">Marketing</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FieldContent>
-                </Field>
-
-                <Field>
-                  <FieldLabel>Include Charts</FieldLabel>
-                  <FieldContent>
-                    <Switch checked={includeCharts} onCheckedChange={setIncludeCharts} />
-                    <FieldDescription>Toggle to include visual charts in your report.</FieldDescription>
-                  </FieldContent>
-                </Field>
-
-                <Button className="mt-4">Generate Report Preview</Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Saved Reports</CardTitle>
-                <CardDescription>Manage your previously created reports.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.reports.saved.map((report) => (
-                      <TableRow key={report.id}>
-                        <TableCell>
-                          <div className="font-medium">{report.name}</div>
-                          <div className="text-sm text-muted-foreground">Last run: {report.lastRun}</div>
-                        </TableCell>
-                        <TableCell>{report.type}</TableCell>
-                        <TableCell>
-                          <Badge variant={report.status === "Active" ? "default" : report.status === "Scheduled" ? "secondary" : "outline"}>
-                            {report.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button variant="destructive" size="sm">
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </div>
+          <EnhancedReportsTab data={data.reports} />
         </TabsContent>
       </Tabs>
     </div>

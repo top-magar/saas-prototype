@@ -52,8 +52,7 @@ export default function ProductsClient({ initialProducts, categories }: Products
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold md:text-2xl">Products</h1>
+      <div className="flex justify-end">
         <Link href="/dashboard/products/create">
           <Button>
             <Plus className="mr-2 h-4 w-4" /> Add Product

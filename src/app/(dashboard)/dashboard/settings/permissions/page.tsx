@@ -130,10 +130,7 @@ export default function PermissionsPage() {
   return (
     
     <div className="flex flex-col gap-6 p-4 lg:p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Permissions & Roles</h1>
-        <p className="text-muted-foreground">Manage user access and permissions across your workspace</p>
-      </div>
+
 
       <Tabs defaultValue="users" className="w-full">
         <TabsList className="grid w-full grid-cols-3">

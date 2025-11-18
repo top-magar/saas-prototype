@@ -12,31 +12,37 @@ interface StatCardProps {
 
 export function StatCard({ name, value, change, changeType, index, total }: StatCardProps) {
   return (
-    <Card
+    <div
       className={cn(
-        "rounded-none border-0 shadow-none py-0",
-        index === 0 && "rounded-l-xl",
-        index === total - 1 && "rounded-r-xl"
+        "bg-background border border-border/50 cursor-pointer transition-all hover:border-border hover:bg-muted/30",
+        "relative overflow-hidden group"
       )}
     >
-      <CardContent className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 p-4 sm:p-6">
-        <div className="text-sm font-medium text-muted-foreground">
-          {name}
+      <div className="p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+            {name}
+          </div>
+          <div
+            className={cn(
+              "text-xs font-mono px-2 py-1 border",
+              changeType === "positive"
+                ? "text-green-600 border-green-200 bg-green-50 dark:text-green-400 dark:border-green-800 dark:bg-green-950/20"
+                : "text-red-600 border-red-200 bg-red-50 dark:text-red-400 dark:border-red-800 dark:bg-red-950/20"
+            )}
+          >
+            {change}
+          </div>
         </div>
-        <div
-          className={cn(
-            "text-xs font-medium",
-            changeType === "positive"
-              ? "text-green-800 dark:text-green-400"
-              : "text-red-800 dark:text-red-400"
-          )}
-        >
-          {change}
-        </div>
-        <div className="w-full flex-none text-3xl font-medium tracking-tight text-foreground">
+        <div className="text-2xl font-mono font-bold tracking-tight text-foreground">
           {value}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div className={cn(
+        "absolute bottom-0 left-0 h-0.5 w-full transition-all duration-300",
+        changeType === "positive" ? "bg-green-500" : "bg-red-500",
+        "group-hover:h-1"
+      )} />
+    </div>
   );
 }

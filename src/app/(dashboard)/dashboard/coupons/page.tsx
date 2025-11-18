@@ -140,11 +140,7 @@ export default function CouponsPage() {
   return (
     <PageTransition>
       <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Discount Coupons</h1>
-          <p className="text-muted-foreground mt-1">Create and manage discount codes</p>
-        </div>
+      <div className="flex justify-end">
         <Button onClick={() => setShowCreateDialog(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Create Coupon

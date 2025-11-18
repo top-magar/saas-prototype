@@ -1,0 +1,196 @@
+/* Geometric Design System - Zero Curve Guidelines */
+
+:root {
+  /* Design System Variables */
+  --ds-spacing-xs: 0.25rem;
+  --ds-spacing-sm: 0.5rem;
+  --ds-spacing-md: 1rem;
+  --ds-spacing-lg: 1.5rem;
+  --ds-spacing-xl: 2rem;
+  --ds-spacing-2xl: 3rem;
+  
+  --ds-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  --ds-font-sans: ui-sans-serif, system-ui, sans-serif;
+  
+  --ds-header-height: 3.5rem;
+  --ds-sidebar-width: 16rem;
+  --ds-container-padding: 1.5rem;
+  --ds-card-padding: 1.5rem;
+  
+  --ds-border-width: 1px;
+  --ds-border-radius: 0;
+}
+
+/* Remove all border radius globally */
+* {
+  border-radius: 0 !important;
+}
+
+/* Override component library rounded classes */
+.rounded,
+.rounded-sm,
+.rounded-md,
+.rounded-lg,
+.rounded-xl,
+.rounded-2xl,
+.rounded-3xl,
+.rounded-full {
+  border-radius: 0 !important;
+}
+
+/* Design System Base Classes */
+.ds-container {
+  width: 100%;
+  max-width: 100%;
+  padding-left: var(--ds-container-padding);
+  padding-right: var(--ds-container-padding);
+}
+
+.ds-section {
+  padding-top: var(--ds-spacing-xl);
+  padding-bottom: var(--ds-spacing-xl);
+}
+
+.ds-grid {
+  display: grid;
+  gap: var(--ds-spacing-lg);
+}
+
+.ds-heading {
+  font-family: var(--ds-font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ds-body {
+  font-family: var(--ds-font-mono);
+  font-size: 0.875rem;
+}
+
+.ds-caption {
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Geometric button styles */
+.btn-geometric {
+  border-radius: 0;
+  border: 1px solid hsl(var(--border));
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+}
+
+.btn-geometric:hover {
+  border-color: hsl(var(--foreground));
+  background-color: hsl(var(--muted) / 0.5);
+}
+
+/* Geometric card styles */
+.card-geometric {
+  border-radius: 0;
+  border: 1px solid hsl(var(--border) / 0.5);
+  background: hsl(var(--background));
+  position: relative;
+  overflow: hidden;
+}
+
+.card-geometric::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, hsl(var(--primary)), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-geometric:hover::before {
+  opacity: 1;
+}
+
+/* Geometric input styles */
+.input-geometric {
+  border-radius: 0;
+  border: 1px solid hsl(var(--border));
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  background: hsl(var(--background));
+  transition: border-color 0.2s ease;
+}
+
+.input-geometric:focus {
+  border-color: hsl(var(--primary));
+  box-shadow: none;
+  outline: none;
+}
+
+/* Geometric typography */
+.text-geometric {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  letter-spacing: 0.025em;
+}
+
+.heading-geometric {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Geometric layout */
+.layout-geometric {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* Geometric borders */
+.border-geometric {
+  border: 1px solid hsl(var(--border) / 0.3);
+}
+
+.border-geometric-accent {
+  border-left: 3px solid hsl(var(--primary));
+}
+
+/* Geometric shadows - minimal */
+.shadow-geometric {
+  box-shadow: 0 1px 3px 0 hsl(var(--foreground) / 0.1);
+}
+
+/* Geometric animations */
+.animate-geometric-slide {
+  animation: geometric-slide 0.3s ease-out;
+}
+
+@keyframes geometric-slide {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-geometric-fade {
+  animation: geometric-fade 0.2s ease-out;
+}
+
+@keyframes geometric-fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

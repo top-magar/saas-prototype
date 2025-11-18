@@ -2,6 +2,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { fontClasses } from "@/lib/fonts";
 import { Metadata } from 'next';
 import "../styles/index.css";
+import "../styles/geometric.css";
 import { QueryProvider } from '@/lib/providers/query-provider';
 import { ThemeProvider } from "@/components/providers/theme-provider";
 

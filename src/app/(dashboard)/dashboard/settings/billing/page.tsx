@@ -118,10 +118,7 @@ export default function BillingPage() {
   return (
     
     <div className="flex flex-col gap-6 p-4 lg:p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Billing & Subscription</h1>
-        <p className="text-muted-foreground">Manage your subscription, billing, and payment methods</p>
-      </div>
+
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-4">

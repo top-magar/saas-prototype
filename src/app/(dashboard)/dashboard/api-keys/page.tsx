@@ -143,8 +143,7 @@ export default function ApiKeysPage() {
   return (
     
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold md:text-2xl">API Keys</h1>
+      <div className="flex justify-end">
         <Dialog>
           <DialogTrigger asChild>
             <Button>

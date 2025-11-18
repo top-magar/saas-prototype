@@ -18,7 +18,6 @@ import {
   Palette,
   BarChart,
   Workflow,
-  Keyboard,
   Plus,
   Archive,
   List,
@@ -30,6 +29,7 @@ import {
   BookOpen,
   UserX,
   Percent,
+  Keyboard,
 } from "lucide-react";
 import { Logo } from "./logo";
 import type { Route } from "./nav-main";

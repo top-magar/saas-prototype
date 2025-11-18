@@ -71,11 +71,7 @@ export default function LeadsPage() {
   return (
     <PageTransition>
       <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Leads</h1>
-          <p className="text-muted-foreground mt-1">Customers who abandoned their orders</p>
-        </div>
+      <div className="flex justify-end">
         <Button onClick={fetchLeads} variant="outline" size="sm">
           <RefreshCw className="h-4 w-4 mr-2" />
           Refresh

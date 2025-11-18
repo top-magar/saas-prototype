@@ -255,11 +255,7 @@ export default function CustomersPage() {
   return (
     <PageTransition>
       <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-          <p className="text-muted-foreground mt-1">Manage and view all your customers</p>
-        </div>
+      <div className="flex justify-end">
         <div className="text-sm text-muted-foreground">
           Customers are automatically created when they make purchases
         </div>

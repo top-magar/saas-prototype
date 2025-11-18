@@ -72,8 +72,7 @@ export default function WorkflowsPage() {
   return (
     
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold md:text-2xl">Workflows (Powered by Blaze)</h1>
+      <div className="flex justify-end">
         <Button>
                       <Plus className="mr-2 h-4 w-4" /> Create New Workflow        </Button>
       </div>

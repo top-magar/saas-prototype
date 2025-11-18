@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -547,98 +548,17 @@ export default function StoreBuilderPage() {
   );
 
   const loadStores = async () => {
-    if (!tenant?.id) return;
-    
-    try {
-      const response = await api.get(`/api/stores?tenantId=${tenant.id}`    
-  );
-      setStores(response.data    
-  );
-      if (response.data.length > 0 && !selectedStoreId) {
-        setSelectedStoreId(response.data[0].id    
-  );
-      }
-    } catch (error) {
-      console.error('[LOAD_STORES_ERROR]', error    
-  );
-      
-      if (error instanceof Error) {
-        if (error.message.includes('network') || error.message.includes('fetch')) {
-          alert('Network error: Unable to load stores. Using demo mode.'    
-  );
-        } else if (error.message.includes('unauthorized')) {
-          alert('Permission error: Unable to access stores. Using demo mode.'    
-  );
-        }
-      }
-      
-      setStores([{
-        id: 'demo-store',
-        storeName: 'Demo Store',
-        pages: []
-      }]    
-  );
-      setSelectedStoreId('demo-store'    
-  );
-    }
+    // Using demo data for now
+    setStores([{
+      id: 'demo-store',
+      storeName: 'Demo Store',
+      pages: []
+    }]);
+    setSelectedStoreId('demo-store');
   };
 
   const savePage = async () => {
-    if (!selectedStoreId || !tenant?.id) {
-      console.log('Save skipped - demo mode or missing data'    
-  );
-      return;
-    }
-    
-    setIsLoading(true    
-  );
-    try {
-      const pageData = {
-        storeId: selectedStoreId,
-        pageName: currentPage?.pageName || 'New Page',
-        pageSlug: currentPage?.pageSlug || 'new-page',
-        layoutData: { components },
-        seoMetadata: {
-          title: 'Store Page',
-          description: 'Custom store page'
-        }
-      };
-
-      if (currentPage?.id) {
-        await api.put(`/api/pages?tenantId=${tenant.id}&pageId=${currentPage.id}`, pageData    
-  );
-      } else {
-        const response = await api.post(`/api/pages?tenantId=${tenant.id}`, pageData    
-  );
-        setCurrentPage(response.data    
-  );
-      }
-      console.log('Page saved successfully'    
-  );
-    } catch (error) {
-      console.error('[SAVE_PAGE_ERROR]', error    
-  );
-      
-      // Show user-friendly error message
-      if (error instanceof Error) {
-        if (error.message.includes('network') || error.message.includes('fetch')) {
-          alert('Network error: Unable to save page. Please check your connection and try again.'    
-  );
-        } else if (error.message.includes('unauthorized') || error.message.includes('403')) {
-          alert('Permission error: You do not have permission to save this page.'    
-  );
-        } else {
-          alert('Save failed: Unable to save page. Please try again.'    
-  );
-        }
-      } else {
-        alert('Save failed: An unexpected error occurred.'    
-  );
-      }
-    } finally {
-      setIsLoading(false    
-  );
-    }
+    console.log('Page saved (demo mode)');
   };
 
   const selectedComponent = components.find(c => c.id === selectedComponentId) || null;
@@ -750,13 +670,7 @@ export default function StoreBuilderPage() {
     
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Store className="h-8 w-8" />
-            Store Builder
-          </h1>
-          <p className="text-muted-foreground">Create beautiful stores with drag and drop</p>
-        </div>
+        <div></div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Button
@@ -781,7 +695,7 @@ export default function StoreBuilderPage() {
               <Smartphone className="h-4 w-4" />
             </Button>
           </div>
-          <Separator orientation="vertical" className="h-6" />
+          <div className="h-6 w-px bg-border" />
           <Button variant="outline" size="sm">
             <Eye className="h-4 w-4 mr-2" />
             Preview

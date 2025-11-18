@@ -51,10 +51,7 @@ export default async function UserProfilePage() {
   return (
     
     <div className="flex flex-col gap-6 p-4 lg:p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Profile Settings</h1>
-        <p className="text-muted-foreground">Manage your account information and preferences</p>
-      </div>
+
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="md:col-span-1">

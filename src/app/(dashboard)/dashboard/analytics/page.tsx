@@ -36,25 +36,43 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
       ],
       revenue: {
         chartData: [
-          { month: "Jan", total: 45000, subscriptions: 28000, oneTime: 17000, refunds: 2000 },
-          { month: "Feb", total: 52000, subscriptions: 32000, oneTime: 20000, refunds: 1800 },
-          { month: "Mar", total: 48000, subscriptions: 30000, oneTime: 18000, refunds: 2200 },
-          { month: "Apr", total: 58000, subscriptions: 36000, oneTime: 22000, refunds: 1500 },
-          { month: "May", total: 62000, subscriptions: 38000, oneTime: 24000, refunds: 1200 },
-          { month: "Jun", total: 68000, subscriptions: 42000, oneTime: 26000, refunds: 1000 },
+          { month: "Jan", total: 45000, subscriptions: 28000, oneTime: 17000, refunds: 2000, upgrades: 3200, addons: 1800 },
+          { month: "Feb", total: 52000, subscriptions: 32000, oneTime: 20000, refunds: 1800, upgrades: 3800, addons: 2200 },
+          { month: "Mar", total: 48000, subscriptions: 30000, oneTime: 18000, refunds: 2200, upgrades: 3400, addons: 1800 },
+          { month: "Apr", total: 58000, subscriptions: 36000, oneTime: 22000, refunds: 1500, upgrades: 4200, addons: 2300 },
+          { month: "May", total: 62000, subscriptions: 38000, oneTime: 24000, refunds: 1200, upgrades: 4800, addons: 2400 },
+          { month: "Jun", total: 68000, subscriptions: 42000, oneTime: 26000, refunds: 1000, upgrades: 5200, addons: 2800 },
         ],
         sources: [
-          { source: "Subscriptions", amount: "$42,000", percentage: "61.8%", growth: "+12%" },
-          { source: "One-time Purchases", amount: "$26,000", percentage: "38.2%", growth: "+8%" },
-          { source: "Affiliate Commissions", amount: "$3,200", percentage: "4.7%", growth: "+25%" },
-          { source: "Refunds", amount: "-$1,000", percentage: "-1.5%", growth: "-15%" },
+          { source: "Subscriptions", amount: "$42,000", percentage: "61.8%", growth: "+12%", trend: [38, 42, 36, 45, 48, 52] },
+          { source: "One-time Purchases", amount: "$26,000", percentage: "38.2%", growth: "+8%", trend: [22, 24, 20, 26, 28, 30] },
+          { source: "Plan Upgrades", amount: "$5,200", percentage: "7.6%", growth: "+25%", trend: [3.2, 3.8, 3.4, 4.2, 4.8, 5.2] },
+          { source: "Add-ons", amount: "$2,800", percentage: "4.1%", growth: "+18%", trend: [1.8, 2.2, 1.8, 2.3, 2.4, 2.8] },
+          { source: "Refunds", amount: "-$1,000", percentage: "-1.5%", growth: "-15%", trend: [2.0, 1.8, 2.2, 1.5, 1.2, 1.0] },
         ],
         metrics: {
           mrr: 42000,
           arr: 504000,
           churnRate: 2.3,
           ltv: 1250,
-          cac: 85
+          cac: 85,
+          paybackPeriod: 3.2,
+          grossMargin: 78.5,
+          netRevenue: 67000,
+          recurringRevenue: 89.2
+        },
+        cohorts: [
+          { month: "Jan 2024", customers: 120, retention: [100, 92, 85, 78, 72, 68] },
+          { month: "Feb 2024", customers: 145, retention: [100, 94, 87, 81, 75] },
+          { month: "Mar 2024", customers: 132, retention: [100, 91, 84, 79] },
+          { month: "Apr 2024", customers: 168, retention: [100, 93, 86] },
+          { month: "May 2024", customers: 185, retention: [100, 95] },
+          { month: "Jun 2024", customers: 203, retention: [100] },
+        ],
+        forecasting: {
+          nextMonth: { predicted: 72500, confidence: 85, range: [68000, 77000] },
+          nextQuarter: { predicted: 225000, confidence: 78, range: [210000, 240000] },
+          yearEnd: { predicted: 850000, confidence: 72, range: [780000, 920000] }
         }
       },
       customers: {
