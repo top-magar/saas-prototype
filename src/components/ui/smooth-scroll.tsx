@@ -19,7 +19,7 @@ export function SmoothScroll({ children, className }: SmoothScrollProps) {
     element.style.scrollBehavior = "smooth";
 
     // Add scroll momentum for iOS
-    element.style.webkitOverflowScrolling = "touch";
+    (element.style as any).webkitOverflowScrolling = "touch";
 
     return () => {
       if (element) {

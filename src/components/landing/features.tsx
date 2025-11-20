@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import { BentoGrid, BentoGridItem } from '@/components/ui/bento-grid';
 import { Package, ShoppingCart, Workflow, BarChart3, Users, Zap, TrendingUp, Shield } from 'lucide-react';
+import { transitions, variants } from '@/lib/animations';
 
 const features = [
   {
@@ -39,7 +40,7 @@ function FeatureHeader({ icon: Icon, color }: { icon: any; color: string }) {
     <div className="flex flex-1 w-full h-full min-h-[8rem] rounded-xl bg-gradient-to-br from-muted to-background relative overflow-hidden group">
       <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 transition-opacity duration-500`} />
       <div className="absolute inset-0 bg-gradient-to-t from-background/50 to-transparent" />
-      <motion.div 
+      <motion.div
         whileHover={{ scale: 1.1, rotate: 5 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
         className="relative z-10 flex items-center justify-center w-full h-full"
@@ -56,16 +57,17 @@ export function Features() {
     <section className={`${features} py-24 relative overflow-hidden`}>
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          variants={variants.fadeInUp}
+          initial="initial"
+          whileInView="animate"
           viewport={{ once: true }}
+          transition={transitions.default}
           className="text-center mb-20"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ ...transitions.default, delay: 0.2 }}
             viewport={{ once: true }}
             className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6"
           >
@@ -82,21 +84,19 @@ export function Features() {
             Comprehensive tools and intelligent automation designed to transform your business operations and accelerate growth.
           </p>
         </motion.div>
-        
+
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.3 }}
+          variants={variants.staggerContainer}
+          initial="initial"
+          whileInView="animate"
           viewport={{ once: true }}
         >
           <BentoGrid className="max-w-6xl mx-auto">
             {features.map((item, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                viewport={{ once: true }}
+                variants={variants.fadeInUp}
+                transition={transitions.default}
               >
                 <BentoGridItem
                   title={item.title}

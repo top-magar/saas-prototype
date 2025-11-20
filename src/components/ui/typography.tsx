@@ -10,7 +10,7 @@ export function TypographyH1({ children, className }: TypographyProps) {
   return (
     <h1 className={cn(
       "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
-      fontClasses.geist,
+      fontClasses.sans,
       className
     )}>
       {children}
@@ -22,7 +22,7 @@ export function TypographyH2({ children, className }: TypographyProps) {
   return (
     <h2 className={cn(
       "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
-      fontClasses.geist,
+      fontClasses.sans,
       className
     )}>
       {children}
@@ -34,7 +34,7 @@ export function TypographyH3({ children, className }: TypographyProps) {
   return (
     <h3 className={cn(
       "scroll-m-20 text-2xl font-semibold tracking-tight",
-      fontClasses.geist,
+      fontClasses.sans,
       className
     )}>
       {children}
@@ -106,7 +106,7 @@ export function TypographyCode({ children, className }: TypographyProps) {
   return (
     <code className={cn(
       "relative rounded bg-muted px-[0.3rem] py-[0.2rem] text-sm",
-      fontClasses.mono,
+      "font-mono",
       className
     )}>
       {children}
@@ -118,7 +118,7 @@ export function TypographyBlockquote({ children, className }: TypographyProps) {
   return (
     <blockquote className={cn(
       "mt-6 border-l-2 pl-6 italic",
-      fontClasses.serif,
+      "font-serif",
       className
     )}>
       {children}

@@ -92,6 +92,8 @@ export default async function Image() {
               borderRadius: 15,
               color: 'white',
               textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             <div style={{ fontSize: 18, fontWeight: 'bold' }}>Free</div>
@@ -104,6 +106,8 @@ export default async function Image() {
               borderRadius: 15,
               color: '#3b82f6',
               textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             <div style={{ fontSize: 18, fontWeight: 'bold' }}>Pro</div>
@@ -116,6 +120,8 @@ export default async function Image() {
               borderRadius: 15,
               color: 'white',
               textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             <div style={{ fontSize: 18, fontWeight: 'bold' }}>Enterprise</div>

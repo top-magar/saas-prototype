@@ -31,7 +31,7 @@ export function NotificationsPopover({
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full"
+          className="!rounded-full bg-muted/50 hover:bg-muted focus-visible:ring-0 focus-visible:ring-offset-0"
           aria-label="Open notifications"
         >
           <BellIcon className="size-5" />

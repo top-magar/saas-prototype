@@ -19,6 +19,8 @@ import { EnhancedCustomersTab } from "./enhanced-customers-tab";
 import { EnhancedProductsTab } from "./enhanced-products-tab";
 import { EnhancedMarketingTab } from "./enhanced-marketing-tab";
 import { EnhancedReportsTab } from "./enhanced-reports-tab";
+import { CurrencyDisplay } from "@/components/currency-selector";
+
 
 interface AnalyticsData {
   overview: Array<{ month: string; totalSales: number; newCustomers: number; orders: number; avgOrderValue: number }>;
@@ -96,28 +98,16 @@ const productPerformanceConfig = {
 
 export default function AnalyticsClient({ data, timeRange }: AnalyticsClientProps) {
   const [selectedTimeRange, setSelectedTimeRange] = useState(timeRange);
-  const [reportName, setReportName] = useState("");
-  const [reportType, setReportType] = useState("");
-  const [includeCharts, setIncludeCharts] = useState(true);
-  
-  const handleTimeRangeChange = (value: string) => {
-    setSelectedTimeRange(value);
-    console.log('Time range changed');
-  };
 
-  const activityIcons = {
-    "Placed new order": ShoppingCart,
-    "Signed up for newsletter": User,
-    "Renewed subscription": RefreshCcw,
-    "Viewed product page": User,
-  };
+  
+
 
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
-        <Select value={selectedTimeRange} onValueChange={handleTimeRangeChange}>
+        <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a time range" />
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="7d">Last 7 days</SelectItem>
@@ -182,7 +172,7 @@ export default function AnalyticsClient({ data, timeRange }: AnalyticsClientProp
                 <CardDescription>+8% from last month</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${data.stats.avgOrderValue}</div>
+                <div className="text-2xl font-bold"><CurrencyDisplay amount={data.stats.avgOrderValue} /></div>
                 <div className="text-sm text-muted-foreground mt-1">Conversion: {data.stats.conversionRate}%</div>
                 <div className="mt-4">
                   <Progress value={data.stats.conversionRate * 12} />
@@ -233,15 +223,15 @@ export default function AnalyticsClient({ data, timeRange }: AnalyticsClientProp
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Monthly Recurring Revenue</span>
-                    <span className="text-lg font-bold">${data.revenue.metrics.mrr.toLocaleString()}</span>
+                    <span className="text-lg font-bold"><CurrencyDisplay amount={data.revenue.metrics.mrr} /></span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Customer Lifetime Value</span>
-                    <span className="text-lg font-bold">${data.revenue.metrics.ltv}</span>
+                    <span className="text-lg font-bold"><CurrencyDisplay amount={data.revenue.metrics.ltv} /></span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Customer Acquisition Cost</span>
-                    <span className="text-lg font-bold">${data.revenue.metrics.cac}</span>
+                    <span className="text-lg font-bold"><CurrencyDisplay amount={data.revenue.metrics.cac} /></span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">LTV:CAC Ratio</span>

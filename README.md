@@ -8,7 +8,7 @@ A production-ready, multi-tenant SaaS application built with Next.js 16, featuri
 - **⚡ High Performance** - Redis caching, optimized queries, CDN-ready
 - **📊 Monitoring** - Sentry error tracking, health checks, metrics
 - **🏗️ Multi-tenant** - Isolated data per tenant with RLS
-- **🧪 Quality Assured** - 100% test coverage, automated CI/CD
+- **🧪 Quality Assured** - 80%+ test coverage, automated CI/CD
 - **🐳 Production Ready** - Docker containerization, health monitoring
 
 ## 🛠️ Tech Stack
@@ -39,9 +39,9 @@ cd saas-prototype
 chmod +x scripts/setup-env.sh
 ./scripts/setup-env.sh
 
-# Update environment variables
-cp .env.example .env.local
-# Edit .env.local with your credentials
+# Setup environment
+cp .env.template .env.local
+# Edit .env.local with your credentials (see docs/ENVIRONMENT_SETUP.md)
 
 # Start development
 npm run dev
@@ -49,25 +49,21 @@ npm run dev
 
 ## 📋 Environment Variables
 
-```env
-# Database
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+See [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md) for detailed configuration.
 
-# Authentication
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
-
-# Caching (Optional)
-UPSTASH_REDIS_REST_URL=https://your-redis.upstash.io
-UPSTASH_REDIS_REST_TOKEN=your-redis-token
-
-# Monitoring (Optional)
-NEXT_PUBLIC_SENTRY_DSN=https://your-sentry-dsn
-SENTRY_ORG=your-org
-SENTRY_PROJECT=your-project
+**Quick Setup:**
+```bash
+cp .env.template .env.local
+# Edit .env.local with your credentials
 ```
+
+**Required:**
+- Supabase (Database)
+- Clerk (Authentication)
+
+**Optional:**
+- Upstash Redis (Caching & Rate Limiting)
+- Sentry (Error Tracking)
 
 ## 🏗️ Architecture
 
@@ -89,14 +85,16 @@ src/
 
 ## 🧪 Testing
 
+See [Testing Guide](docs/TESTING.md) for detailed information.
+
 ```bash
 # Run all tests
 npm test
 
-# Run tests in watch mode
+# Watch mode
 npm run test:watch
 
-# Generate coverage report
+# Coverage report (80%+ target)
 npm run test:coverage
 ```
 
@@ -131,7 +129,7 @@ chmod +x scripts/deploy.sh
 - **Rate Limiting** - Redis-based with configurable limits
 - **CSP Headers** - Content Security Policy protection
 - **Authentication** - Clerk integration with RBAC
-- **Audit Logging** - Comprehensive security event logging
+- **Audit Logging** - Security event tracking (auth, data access, changes)
 
 ## 📈 Performance Optimizations
 
@@ -156,6 +154,8 @@ MIT License - see LICENSE file for details
 ## 🆘 Support
 
 - **Documentation:** Check the `/docs` folder
+  - [Environment Setup](docs/ENVIRONMENT_SETUP.md)
+  - [Testing Guide](docs/TESTING.md)
 - **Issues:** GitHub Issues
 - **Security:** Report to security@yourcompany.com
 

@@ -1,283 +1,226 @@
 "use client";
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Field, FieldLabel, FieldContent, FieldDescription } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Building, Globe, Shield, Bell, Palette, Users, Upload, Trash2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Building, Shield, Palette, Upload, Trash2, Save, Globe, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 export default function WorkspaceSettingsPage() {
-  const [workspaceName, setWorkspaceName] = useState("PASAAL.IO");
-  const [workspaceDescription, setWorkspaceDescription] = useState("Multi-tenant SaaS platform for Nepal");
-  const [subdomain, setSubdomain] = useState("pasaal");
-  const [timezone, setTimezone] = useState("Asia/Kathmandu");
-  const [language, setLanguage] = useState("en");
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [slackNotifications, setSlackNotifications] = useState(false);
-  const [twoFactorRequired, setTwoFactorRequired] = useState(false);
-  const [publicWorkspace, setPublicWorkspace] = useState(false);
-  const [primaryColor, setPrimaryColor] = useState("#3b82f6");
+  const [isLoading, setIsLoading] = useState(false);
+  const [workspaceName, setWorkspaceName] = useState("Pasaal.io");
+  const [workspaceSlug, setWorkspaceSlug] = useState("pasaal");
+  const [brandColor, setBrandColor] = useState("#3b82f6");
+  const [require2FA, setRequire2FA] = useState(false);
+  const [publicAccess, setPublicAccess] = useState(true);
 
-  const handleSaveChanges = () => {
+  const handleSave = async () => {
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(false);
     toast.success("Workspace settings updated successfully");
   };
 
-  const handleUploadLogo = () => {
-    toast.success("Logo uploaded successfully");
-  };
-
-  const handleDeleteWorkspace = () => {
-    toast.error("Workspace deletion requires admin confirmation");
-  };
-
   return (
-    
-      <div className="flex flex-col gap-6 p-4 lg:p-6">
+    <div className="max-w-5xl mx-auto p-6 space-y-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Workspace Settings</h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your organization's profile and security configurations.
+          </p>
+        </div>
+        <Button onClick={handleSave} disabled={isLoading} className="rounded-full px-6">
+          {isLoading ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
 
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building className="h-5 w-5" />
-                General Information
-              </CardTitle>
-              <CardDescription>Basic workspace details and branding</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                <Avatar className="w-16 h-16">
-                  <AvatarImage src="/logos/pasaal-logo.png" alt="Workspace Logo" />
-                  <AvatarFallback className="text-lg">PA</AvatarFallback>
+      <div className="grid gap-8">
+        {/* Identity Section */}
+        <Card className="rounded-xl border-border/50 shadow-sm overflow-hidden">
+          <CardHeader className="border-b border-border/50 bg-muted/30">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Building className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <CardTitle>Identity</CardTitle>
+                <CardDescription>Set your workspace name and logo.</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row gap-6 items-start">
+              <div className="group relative">
+                <Avatar className="w-24 h-24 rounded-xl border-2 border-border shadow-sm">
+                  <AvatarImage src="/images/logos/company-logo.svg" />
+                  <AvatarFallback className="rounded-xl text-2xl font-bold bg-muted">PA</AvatarFallback>
                 </Avatar>
-                <div className="space-y-2">
-                  <Button variant="outline" onClick={handleUploadLogo}>
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload Logo
-                  </Button>
-                  <p className="text-xs text-muted-foreground">PNG, JPG up to 2MB</p>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl cursor-pointer">
+                  <Upload className="h-6 w-6 text-white" />
                 </div>
               </div>
-
-              <Field>
-                <FieldLabel>Workspace Name</FieldLabel>
-                <FieldContent>
-                  <Input value={workspaceName} onChange={(e) => setWorkspaceName(e.target.value)} />
-                  <FieldDescription>This name appears in your dashboard and emails</FieldDescription>
-                </FieldContent>
-              </Field>
-
-              <Field>
-                <FieldLabel>Description</FieldLabel>
-                <FieldContent>
-                  <Textarea value={workspaceDescription} onChange={(e) => setWorkspaceDescription(e.target.value)} rows={3} />
-                  <FieldDescription>Brief description of your workspace</FieldDescription>
-                </FieldContent>
-              </Field>
-
-              <Field>
-                <FieldLabel>Subdomain</FieldLabel>
-                <FieldContent>
-                  <div className="flex">
-                    <Input value={subdomain} onChange={(e) => setSubdomain(e.target.value)} className="rounded-r-none" />
-                    <div className="px-3 py-2 bg-muted border border-l-0 rounded-r-md text-sm text-muted-foreground">
+              <div className="space-y-4 flex-1 w-full">
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Workspace Name</label>
+                  <Input
+                    value={workspaceName}
+                    onChange={(e) => setWorkspaceName(e.target.value)}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Workspace URL</label>
+                  <div className="flex rounded-lg shadow-sm">
+                    <Input
+                      value={workspaceSlug}
+                      onChange={(e) => setWorkspaceSlug(e.target.value)}
+                      className="rounded-r-none border-r-0 focus-visible:ring-0"
+                    />
+                    <div className="px-4 py-2 bg-muted border border-l-0 rounded-r-lg text-sm text-muted-foreground font-mono flex items-center">
                       .pasaal.io
                     </div>
                   </div>
-                  <FieldDescription>Your unique workspace URL</FieldDescription>
-                </FieldContent>
-              </Field>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5" />
-                Localization
-              </CardTitle>
-              <CardDescription>Regional and language preferences</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <Field>
-                  <FieldLabel>Timezone</FieldLabel>
-                  <FieldContent>
-                    <Select value={timezone} onValueChange={setTimezone}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Asia/Kathmandu">Asia/Kathmandu (NPT)</SelectItem>
-                        <SelectItem value="UTC">UTC</SelectItem>
-                        <SelectItem value="America/New_York">America/New_York (EST)</SelectItem>
-                        <SelectItem value="Europe/London">Europe/London (GMT)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FieldContent>
-                </Field>
-
-                <Field>
-                  <FieldLabel>Language</FieldLabel>
-                  <FieldContent>
-                    <Select value={language} onValueChange={setLanguage}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="ne">नेपाली (Nepali)</SelectItem>
-                        <SelectItem value="hi">हिन्दी (Hindi)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FieldContent>
-                </Field>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Notifications
-              </CardTitle>
-              <CardDescription>Configure how you receive updates</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Email Notifications</p>
-                    <p className="text-sm text-muted-foreground">Receive updates via email</p>
-                  </div>
-                  <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Slack Integration</p>
-                    <p className="text-sm text-muted-foreground">Send notifications to Slack</p>
-                  </div>
-                  <Switch checked={slackNotifications} onCheckedChange={setSlackNotifications} />
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Security & Privacy
-              </CardTitle>
-              <CardDescription>Workspace security settings</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Require 2FA for all members</p>
-                    <p className="text-sm text-muted-foreground">Enforce two-factor authentication</p>
-                  </div>
-                  <Switch checked={twoFactorRequired} onCheckedChange={setTwoFactorRequired} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Public Workspace</p>
-                    <p className="text-sm text-muted-foreground">Allow public access to workspace</p>
-                  </div>
-                  <Switch checked={publicWorkspace} onCheckedChange={setPublicWorkspace} />
-                </div>
+        {/* Branding Section */}
+        <Card className="rounded-xl border-border/50 shadow-sm overflow-hidden">
+          <CardHeader className="border-b border-border/50 bg-muted/30">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Palette className="h-5 w-5 text-primary" />
               </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="h-5 w-5" />
-                Appearance
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Field>
-                <FieldLabel>Primary Color</FieldLabel>
-                <FieldContent>
-                  <div className="flex items-center gap-2">
-                    <Input type="color" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="w-12 h-10 p-1" />
-                    <Input value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="flex-1" />
-                  </div>
-                </FieldContent>
-              </Field>
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Color Presets</p>
-                <div className="flex gap-2">
-                  {["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"].map((color) => (
-                    <button
-                      key={color}
-                      className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
-                      style={{ backgroundColor: color }}
-                      onClick={() => setPrimaryColor(color)}
-                    />
-                  ))}
+              <div>
+                <CardTitle>Branding</CardTitle>
+                <CardDescription>Customize your workspace appearance.</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6 space-y-6">
+            <div>
+              <label className="text-sm font-medium mb-3 block">Brand Color</label>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { color: "#3b82f6", name: "Blue" },
+                  { color: "#10b981", name: "Green" },
+                  { color: "#f59e0b", name: "Orange" },
+                  { color: "#ef4444", name: "Red" },
+                  { color: "#8b5cf6", name: "Purple" },
+                  { color: "#06b6d4", name: "Cyan" },
+                  { color: "#000000", name: "Black" },
+                ].map(({ color, name }) => (
+                  <button
+                    key={color}
+                    onClick={() => setBrandColor(color)}
+                    className={`w-10 h-10 rounded-full border-2 transition-all ${brandColor === color ? "border-primary scale-110 ring-2 ring-primary/20" : "border-transparent hover:scale-105"
+                      }`}
+                    style={{ backgroundColor: color }}
+                    title={name}
+                  />
+                ))}
+                <div className="w-px h-10 bg-border mx-2" />
+                <div className="flex items-center gap-2">
+                  <div
+                    className="w-10 h-10 rounded-full border shadow-sm"
+                    style={{ backgroundColor: brandColor }}
+                  />
+                  <Input
+                    value={brandColor}
+                    onChange={(e) => setBrandColor(e.target.value)}
+                    className="w-28 font-mono rounded-lg"
+                  />
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Workspace Stats</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Total Members</span>
-                <Badge variant="secondary">12</Badge>
+        {/* Security Section */}
+        <Card className="rounded-xl border-border/50 shadow-sm overflow-hidden">
+          <CardHeader className="border-b border-border/50 bg-muted/30">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Shield className="h-5 w-5 text-primary" />
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Active Projects</span>
-                <Badge variant="secondary">8</Badge>
+              <div>
+                <CardTitle>Security</CardTitle>
+                <CardDescription>Manage access and security protocols.</CardDescription>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Storage Used</span>
-                <Badge variant="secondary">2.4 GB</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6 space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-muted-foreground" />
+                  <label className="text-base font-medium">Enforce 2FA</label>
+                </div>
+                <p className="text-sm text-muted-foreground pl-6">
+                  Require all workspace members to enable two-factor authentication.
+                </p>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Plan</span>
-                <Badge variant="default">PRO</Badge>
+              <Switch
+                checked={require2FA}
+                onCheckedChange={setRequire2FA}
+              />
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-muted-foreground" />
+                  <label className="text-base font-medium">Public Access</label>
+                </div>
+                <p className="text-sm text-muted-foreground pl-6">
+                  Allow anyone with the link to view public resources in this workspace.
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <Switch
+                checked={publicAccess}
+                onCheckedChange={setPublicAccess}
+              />
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-red-600">Danger Zone</CardTitle>
-              <CardDescription>Irreversible workspace actions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="destructive" onClick={handleDeleteWorkspace} className="w-full">
-                <Trash2 className="mr-2 h-4 w-4" />
+        {/* Danger Zone */}
+        <Card className="rounded-xl border-destructive/20 shadow-sm overflow-hidden bg-destructive/5">
+          <CardHeader className="border-b border-destructive/10">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-destructive/10 rounded-lg">
+                <Trash2 className="h-5 w-5 text-destructive" />
+              </div>
+              <div>
+                <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                <CardDescription>Irreversible actions for this workspace.</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium">Delete Workspace</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Permanently delete this workspace and all associated data.
+                </p>
+              </div>
+              <Button variant="destructive" className="rounded-full">
                 Delete Workspace
               </Button>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-
-      <div className="flex justify-end gap-3">
-        <Button variant="outline">Cancel</Button>
-        <Button onClick={handleSaveChanges}>Save Changes</Button>
-      </div>
-      </div>
-    
+    </div>
   );
 }

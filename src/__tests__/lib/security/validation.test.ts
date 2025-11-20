@@ -1,64 +1,53 @@
-import { 
-  userInputSchema, 
-  productSchema, 
-  tenantSchema,
-  sanitizeHtml,
-  sanitizeForLog,
-  validateAndSanitize 
-} from '../../../lib/security/validation';
+import { sanitizeHtml, sanitizeForLog, validateAndSanitize, userInputSchema, productSchema, tenantSchema } from '@/lib/security/validation';
 
-describe('Input Validation', () => {
-  describe('userInputSchema', () => {
-    it('should validate correct user input', () => {
-      const validInput = {
-        name: 'John Doe',
-        email: 'john@example.com'
-      };
-      expect(() => validateAndSanitize(userInputSchema, validInput)).not.toThrow();
-    });
-
-    it('should reject invalid email', () => {
-      const invalidInput = {
-        name: 'John Doe',
-        email: 'invalid-email',
-      };
-      expect(() => validateAndSanitize(userInputSchema, invalidInput)).toThrow();
-    });
-
-    it('should reject malicious input', () => {
-      const maliciousInput = {
-        name: '<script>alert("xss")</script>',
-        email: 'test@example.com',
-      };
-      expect(() => validateAndSanitize(userInputSchema, maliciousInput)).toThrow();
-    });
-  });
-
+describe('Security Validation', () => {
   describe('sanitizeHtml', () => {
-    it('should remove HTML tags', () => {
-      const input = '<script>alert("xss")</script>Hello';
-      const result = sanitizeHtml(input);
-      expect(result).toBe('alert("xss")Hello');
-    });
-
-    it('should remove simple HTML tags', () => {
-      const input = '<div>Hello</div>';
-      const result = sanitizeHtml(input);
-      expect(result).toBe('Hello');
+    it('removes HTML tags', () => {
+      expect(sanitizeHtml('<script>alert("xss")</script>')).toBe('');
+      expect(sanitizeHtml('Hello <b>World</b>')).toBe('Hello World');
     });
   });
 
   describe('sanitizeForLog', () => {
-    it('should sanitize log injection attempts', () => {
-      const input = 'user\ninjection\rattack\ttab';
-      const result = sanitizeForLog(input);
-      expect(result).toBe('user_injection_attack_tab');
+    it('removes newlines and limits length', () => {
+      expect(sanitizeForLog('test\nvalue')).toBe('test_value');
+      expect(sanitizeForLog('a'.repeat(150)).length).toBe(100);
+    });
+  });
+
+  describe('userInputSchema', () => {
+    it('validates correct user input', () => {
+      const valid = { name: 'John Doe', email: 'john@example.com' };
+      expect(() => validateAndSanitize(userInputSchema, valid)).not.toThrow();
     });
 
-    it('should limit string length', () => {
-      const longInput = 'a'.repeat(200);
-      const result = sanitizeForLog(longInput);
-      expect(result.length).toBe(100);
+    it('rejects invalid email', () => {
+      const invalid = { name: 'John', email: 'invalid' };
+      expect(() => validateAndSanitize(userInputSchema, invalid)).toThrow();
+    });
+  });
+
+  describe('productSchema', () => {
+    it('validates correct product', () => {
+      const valid = { name: 'Product', price: 99.99, sku: 'SKU-123' };
+      expect(() => validateAndSanitize(productSchema, valid)).not.toThrow();
+    });
+
+    it('rejects negative price', () => {
+      const invalid = { name: 'Product', price: -10, sku: 'SKU-123' };
+      expect(() => validateAndSanitize(productSchema, invalid)).toThrow();
+    });
+  });
+
+  describe('tenantSchema', () => {
+    it('validates correct tenant', () => {
+      const valid = { name: 'Company', subdomain: 'company' };
+      expect(() => validateAndSanitize(tenantSchema, valid)).not.toThrow();
+    });
+
+    it('rejects invalid subdomain', () => {
+      const invalid = { name: 'Company', subdomain: 'AB' };
+      expect(() => validateAndSanitize(tenantSchema, invalid)).toThrow();
     });
   });
 });

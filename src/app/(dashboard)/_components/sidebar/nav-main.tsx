@@ -22,6 +22,7 @@ export type Route = {
   title: string;
   icon?: React.ReactNode;
   link: string;
+  external?: boolean;
   subs?: {
     title: string;
     link: string;
@@ -75,7 +76,7 @@ export default function DashboardNavigation({ routes }: { routes: Route[] }) {
                         {route.icon}
                       </motion.div>
                       {!isCollapsed && (
-                        <motion.span 
+                        <motion.span
                           className="ml-2 flex-1 text-sm font-medium"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -85,7 +86,7 @@ export default function DashboardNavigation({ routes }: { routes: Route[] }) {
                         </motion.span>
                       )}
                       {!isCollapsed && hasSubRoutes && (
-                        <motion.span 
+                        <motion.span
                           className="ml-auto"
                           animate={{ rotate: isOpen ? 180 : 0 }}
                           transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -115,10 +116,10 @@ export default function DashboardNavigation({ routes }: { routes: Route[] }) {
                                   initial={{ x: -10, opacity: 0 }}
                                   animate={{ x: 0, opacity: 1 }}
                                   exit={{ x: -10, opacity: 0 }}
-                                  transition={{ 
-                                    duration: 0.2, 
+                                  transition={{
+                                    duration: 0.2,
                                     delay: index * 0.05,
-                                    ease: "easeOut" 
+                                    ease: "easeOut"
                                   }}
                                   whileHover={{ x: 2 }}
                                 >
@@ -140,7 +141,7 @@ export default function DashboardNavigation({ routes }: { routes: Route[] }) {
                                           title={subRoute.title}
                                         >
                                           {subRoute.icon && (
-                                            <motion.span 
+                                            <motion.span
                                               className="mr-2"
                                               animate={{ scale: isSubActive ? 1.1 : 1 }}
                                               transition={{ duration: 0.2 }}
@@ -169,34 +170,66 @@ export default function DashboardNavigation({ routes }: { routes: Route[] }) {
                   transition={{ duration: 0.1 }}
                 >
                   <SidebarMenuButton tooltip={route.title} asChild>
-                    <Link
-                      href={route.link}
-                      prefetch={true}
-                      className={cn(
-                        "flex items-center rounded-lg transition-all duration-200 no-underline",
-                        isActive
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                          : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                        isCollapsed ? "w-8 h-8 justify-center p-0" : "w-full px-2"
-                      )}
-                    >
-                      <motion.div
-                        animate={{ scale: isActive ? 1.1 : 1 }}
-                        transition={{ duration: 0.2 }}
+                    {route.external ? (
+                      <a
+                        href={route.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                          "flex items-center rounded-lg transition-all duration-200 no-underline",
+                          isActive
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                            : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                          isCollapsed ? "w-8 h-8 justify-center p-0" : "w-full px-2"
+                        )}
                       >
-                        {route.icon}
-                      </motion.div>
-                      {!isCollapsed && (
-                        <motion.span 
-                          className="ml-2 text-sm font-medium"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.1 }}
+                        <motion.div
+                          animate={{ scale: isActive ? 1.1 : 1 }}
+                          transition={{ duration: 0.2 }}
                         >
-                          {route.title}
-                        </motion.span>
-                      )}
-                    </Link>
+                          {route.icon}
+                        </motion.div>
+                        {!isCollapsed && (
+                          <motion.span
+                            className="ml-2 text-sm font-medium"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.1 }}
+                          >
+                            {route.title}
+                          </motion.span>
+                        )}
+                      </a>
+                    ) : (
+                      <Link
+                        href={route.link}
+                        prefetch={true}
+                        className={cn(
+                          "flex items-center rounded-lg transition-all duration-200 no-underline",
+                          isActive
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                            : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                          isCollapsed ? "w-8 h-8 justify-center p-0" : "w-full px-2"
+                        )}
+                      >
+                        <motion.div
+                          animate={{ scale: isActive ? 1.1 : 1 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {route.icon}
+                        </motion.div>
+                        {!isCollapsed && (
+                          <motion.span
+                            className="ml-2 text-sm font-medium"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.1 }}
+                          >
+                            {route.title}
+                          </motion.span>
+                        )}
+                      </Link>
+                    )}
                   </SidebarMenuButton>
                 </motion.div>
               )}

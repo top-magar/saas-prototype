@@ -62,12 +62,12 @@ export default function NewTenantPage() {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Failed to create tenant');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create tenant');
       }
 
-      await response.json();
-      router.push(`/dashboard`);
+      const result = await response.json();
+      router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {

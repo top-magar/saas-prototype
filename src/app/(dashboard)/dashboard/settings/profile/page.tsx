@@ -1,210 +1,343 @@
-import { currentUser } from "@clerk/nextjs/server";
-import { supabase } from "@/lib/database/supabase";
+'use client';
+
+import { useUser } from "@clerk/nextjs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, Calendar, Shield, Building, Crown, Settings } from "lucide-react";
+import { User, Mail, Calendar, Shield, Settings, Edit, Save, Moon, Sun, Monitor, Globe, Bell, Clock } from "lucide-react";
+import { useDateFormat } from "@/hooks/use-date-format";
+import { useTheme } from "next-themes";
+import { useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 
-export default async function UserProfilePage() {
-  const user = await currentUser();
+export default function UserProfilePage() {
+  const { user, isLoaded } = useUser();
+  const { formatDate } = useDateFormat();
+  const { theme, setTheme } = useTheme();
+
+  // Profile State
+  const [isEditing, setIsEditing] = useState(false);
+  const [firstName, setFirstName] = useState(user?.firstName || "");
+  const [lastName, setLastName] = useState(user?.lastName || "");
+
+  // Preferences State
+  const [language, setLanguage] = useState("en");
+  const [timezone, setTimezone] = useState("Asia/Kathmandu");
+  const [dateFormat, setDateFormat] = useState("YYYY-MM-DD");
+  const [emailNotifs, setEmailNotifs] = useState(true);
+  const [pushNotifs, setPushNotifs] = useState(false);
+  const [marketingEmails, setMarketingEmails] = useState(false);
+
+  if (!isLoaded) {
+    return <div className="p-6">Loading...</div>;
+  }
 
   if (!user) {
-    return <p>Not authenticated.</p>;
+    return <div className="p-6">Not authenticated.</div>;
   }
 
-  const { data: dbUser } = await supabase
-    .from('users')
-    .select('*, tenant:tenants(*)')
-    .eq('clerk_user_id', user.id)
-    .single();
-
-  if (!dbUser) {
-    return <p>User data not found.</p>;
-  }
-
-  const tenant = dbUser.tenant;
-  const joinedDate = new Date(user.createdAt).toLocaleDateString(    
-  );
-  const lastLogin = dbUser.lastLoginAt ? new Date(dbUser.lastLoginAt).toLocaleDateString() : "Never";
-
-  const getRoleBadge = (role: string) => {
-    const variants = {
-      ADMIN: "default" as const,
-      MANAGER: "secondary" as const,
-      USER: "outline" as const,
-    };
-    return <Badge variant={variants[role as keyof typeof variants]}>{role}</Badge>;
+  const handleSaveProfile = async () => {
+    try {
+      await user.update({ firstName, lastName });
+      setIsEditing(false);
+      toast.success("Profile updated successfully");
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      toast.error("Failed to update profile");
+    }
   };
 
-  const getTierBadge = (tier: string) => {
-    const variants = {
-      FREE: "outline" as const,
-      PRO: "default" as const,
-      ENTERPRISE: "destructive" as const,
-    };
-    return <Badge variant={variants[tier as keyof typeof variants]}>{tier}</Badge>;
+  const handleSavePreferences = () => {
+    toast.success("Preferences saved successfully");
   };
+
+  const joinedDate = user.createdAt ? formatDate(user.createdAt) : 'N/A';
 
   return (
-    
-    <div className="flex flex-col gap-6 p-4 lg:p-6">
+    <div className="max-w-5xl mx-auto p-6 space-y-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">My Settings</h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your personal information and application preferences.
+          </p>
+        </div>
+      </div>
 
-
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card className="md:col-span-1">
+      <div className="grid gap-8 md:grid-cols-[250px_1fr]">
+        {/* Sidebar / User Card */}
+        <Card className="h-fit rounded-xl border-border/50 shadow-sm">
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center space-y-4">
-              <Avatar className="w-24 h-24">
+              <Avatar className="w-24 h-24 rounded-xl border-2 border-border">
                 <AvatarImage src={user.imageUrl} alt={user.fullName || "User"} />
-                <AvatarFallback className="text-2xl">
+                <AvatarFallback className="rounded-xl text-2xl">
                   {user.firstName?.[0]}{user.lastName?.[0]}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <h3 className="text-xl font-semibold">{user.fullName}</h3>
-                <p className="text-muted-foreground">{user.emailAddresses[0]?.emailAddress}</p>
-                <div className="mt-2">
-                  {getRoleBadge(dbUser.role)}
+                <p className="text-sm text-muted-foreground break-all">{user.emailAddresses[0]?.emailAddress}</p>
+                <div className="mt-3">
+                  <Badge variant="secondary" className="rounded-full px-3">USER</Badge>
                 </div>
               </div>
-              <Button asChild className="w-full">
+              <Button asChild className="w-full rounded-full" variant="outline">
                 <Link href="/user">
                   <Settings className="mr-2 h-4 w-4" />
-                  Edit Profile
+                  Clerk Account
                 </Link>
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        <div className="md:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Personal Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <User className="h-4 w-4" />
-                    Full Name
-                  </div>
-                  <p className="text-muted-foreground">{user.fullName || "Not provided"}</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <Mail className="h-4 w-4" />
-                    Email Address
-                  </div>
-                  <p className="text-muted-foreground">{user.emailAddresses[0]?.emailAddress}</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <Calendar className="h-4 w-4" />
-                    Member Since
-                  </div>
-                  <p className="text-muted-foreground">{joinedDate}</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <Shield className="h-4 w-4" />
-                    Last Login
-                  </div>
-                  <p className="text-muted-foreground">{lastLogin}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="general" className="w-full">
+          <TabsList className="w-full justify-start h-auto p-1 bg-muted/50 rounded-xl mb-6">
+            <TabsTrigger value="general" className="rounded-lg px-4 py-2">General</TabsTrigger>
+            <TabsTrigger value="preferences" className="rounded-lg px-4 py-2">Preferences</TabsTrigger>
+            <TabsTrigger value="security" className="rounded-lg px-4 py-2">Security</TabsTrigger>
+          </TabsList>
 
-          {tenant && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building className="h-5 w-5" />
-                  Organization Details
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                      <Building className="h-4 w-4" />
-                      Organization Name
+          {/* General Tab */}
+          <TabsContent value="general" className="mt-0 space-y-6">
+            <Card className="rounded-xl border-border/50 shadow-sm">
+              <CardHeader className="border-b border-border/50 bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <User className="h-5 w-5 text-primary" />
                     </div>
-                    <p className="text-muted-foreground">{tenant.name}</p>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                      <Crown className="h-4 w-4" />
-                      Subscription Plan
+                    <div>
+                      <CardTitle>Personal Information</CardTitle>
+                      <CardDescription>Update your personal details.</CardDescription>
                     </div>
-                    <div>{getTierBadge(tenant.tier)}</div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium">Subdomain</div>
-                    <p className="text-muted-foreground">{tenant.subdomain}.pasaal.io</p>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium">Status</div>
-                    <Badge variant="default">{tenant.status}</Badge>
-                  </div>
+                  <Button
+                    variant={isEditing ? "default" : "outline"}
+                    size="sm"
+                    onClick={isEditing ? handleSaveProfile : () => setIsEditing(true)}
+                    className="rounded-full"
+                  >
+                    {isEditing ? <Save className="mr-2 h-4 w-4" /> : <Edit className="mr-2 h-4 w-4" />}
+                    {isEditing ? "Save" : "Edit"}
+                  </Button>
                 </div>
-                <Separator />
-                <div className="flex gap-3">
-                  <Button asChild variant="outline">
-                    <Link href="/dashboard/settings/workspace">
-                      Workspace Settings
-                    </Link>
-                  </Button>
-                  <Button asChild>
-                    <Link href="/dashboard/settings/billing">
-                      Manage Billing
-                    </Link>
-                  </Button>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">First Name</label>
+                    {isEditing ? (
+                      <Input
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        className="rounded-lg"
+                      />
+                    ) : (
+                      <div className="p-2.5 bg-muted/30 rounded-lg text-sm border border-transparent">
+                        {user.firstName || "Not provided"}
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Last Name</label>
+                    {isEditing ? (
+                      <Input
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        className="rounded-lg"
+                      />
+                    ) : (
+                      <div className="p-2.5 bg-muted/30 rounded-lg text-sm border border-transparent">
+                        {user.lastName || "Not provided"}
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Email Address</label>
+                    <div className="p-2.5 bg-muted/30 rounded-lg text-sm text-muted-foreground border border-transparent flex items-center gap-2">
+                      <Mail className="h-4 w-4" />
+                      {user.emailAddresses[0]?.emailAddress}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Member Since</label>
+                    <div className="p-2.5 bg-muted/30 rounded-lg text-sm text-muted-foreground border border-transparent flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      {joinedDate}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          )}
+          </TabsContent>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Security</CardTitle>
-              <CardDescription>Manage your security settings and authentication methods</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h4 className="font-medium">Two-Factor Authentication</h4>
-                  <p className="text-sm text-muted-foreground">Add an extra layer of security</p>
+          {/* Preferences Tab */}
+          <TabsContent value="preferences" className="mt-0 space-y-6">
+            <Card className="rounded-xl border-border/50 shadow-sm">
+              <CardHeader className="border-b border-border/50 bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Monitor className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle>Appearance & Localization</CardTitle>
+                      <CardDescription>Customize your experience.</CardDescription>
+                    </div>
+                  </div>
+                  <Button onClick={handleSavePreferences} size="sm" className="rounded-full">
+                    Save Changes
+                  </Button>
                 </div>
-                <Badge variant={dbUser.mfaEnabled ? "default" : "outline"}>
-                  {dbUser.mfaEnabled ? "Enabled" : "Disabled"}
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h4 className="font-medium">Email Verification</h4>
-                  <p className="text-sm text-muted-foreground">Verify your email address</p>
+              </CardHeader>
+              <CardContent className="p-6 space-y-8">
+                {/* Theme */}
+                <div className="space-y-4">
+                  <label className="text-sm font-medium">Theme</label>
+                  <div className="grid grid-cols-3 gap-4">
+                    <button
+                      onClick={() => setTheme("light")}
+                      className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${theme === "light" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                        }`}
+                    >
+                      <Sun className="h-6 w-6 text-orange-500" />
+                      <span className="text-xs font-medium">Light</span>
+                    </button>
+                    <button
+                      onClick={() => setTheme("dark")}
+                      className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${theme === "dark" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                        }`}
+                    >
+                      <Moon className="h-6 w-6 text-blue-400" />
+                      <span className="text-xs font-medium">Dark</span>
+                    </button>
+                    <button
+                      onClick={() => setTheme("system")}
+                      className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${theme === "system" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                        }`}
+                    >
+                      <Monitor className="h-6 w-6 text-muted-foreground" />
+                      <span className="text-xs font-medium">System</span>
+                    </button>
+                  </div>
                 </div>
-                <Badge variant="default">Verified</Badge>
-              </div>
-              <Button asChild className="w-full">
-                <Link href="/user">
-                  <Shield className="mr-2 h-4 w-4" />
-                  Manage Security Settings
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+
+                <Separator />
+
+                {/* Localization */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      Language
+                    </label>
+                    <Select value={language} onValueChange={setLanguage}>
+                      <SelectTrigger className="rounded-lg">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="en">English (US)</SelectItem>
+                        <SelectItem value="ne">Nepali</SelectItem>
+                        <SelectItem value="es">Spanish</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      Timezone
+                    </label>
+                    <Select value={timezone} onValueChange={setTimezone}>
+                      <SelectTrigger className="rounded-lg">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Asia/Kathmandu">Kathmandu (GMT+5:45)</SelectItem>
+                        <SelectItem value="America/New_York">New York (GMT-5:00)</SelectItem>
+                        <SelectItem value="Europe/London">London (GMT+0:00)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Notifications */}
+                <div className="space-y-4">
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Bell className="h-4 w-4 text-muted-foreground" />
+                    Notifications
+                  </label>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Email Notifications</span>
+                      <Switch checked={emailNotifs} onCheckedChange={setEmailNotifs} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Push Notifications</span>
+                      <Switch checked={pushNotifs} onCheckedChange={setPushNotifs} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Marketing Emails</span>
+                      <Switch checked={marketingEmails} onCheckedChange={setMarketingEmails} />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Security Tab */}
+          <TabsContent value="security" className="mt-0 space-y-6">
+            <Card className="rounded-xl border-border/50 shadow-sm">
+              <CardHeader className="border-b border-border/50 bg-muted/30">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Shield className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle>Security Settings</CardTitle>
+                    <CardDescription>Manage your account security.</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                <div className="flex items-center justify-between p-4 border rounded-xl bg-muted/10">
+                  <div>
+                    <h4 className="font-medium">Two-Factor Authentication</h4>
+                    <p className="text-sm text-muted-foreground">Add an extra layer of security to your account.</p>
+                  </div>
+                  <Badge variant={user.twoFactorEnabled ? "default" : "outline"} className="rounded-full">
+                    {user.twoFactorEnabled ? "Enabled" : "Disabled"}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between p-4 border rounded-xl bg-muted/10">
+                  <div>
+                    <h4 className="font-medium">Email Verification</h4>
+                    <p className="text-sm text-muted-foreground">Protect your account with a verified email.</p>
+                  </div>
+                  <Badge variant="default" className="rounded-full">Verified</Badge>
+                </div>
+                <Button asChild className="w-full rounded-full" variant="outline">
+                  <Link href="/user">
+                    Manage Security in Clerk
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
-      
   );
 }

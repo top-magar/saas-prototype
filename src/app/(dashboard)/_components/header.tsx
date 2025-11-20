@@ -39,21 +39,21 @@ import { cn } from "@/lib/utils";
 function generateBreadcrumbs(pathname: string) {
   const segments = pathname.split('/').filter(Boolean);
   const breadcrumbs = [];
-  
+
   for (let i = 0; i < segments.length; i++) {
     const segment = segments[i];
     const href = '/' + segments.slice(0, i + 1).join('/');
     const isLast = i === segments.length - 1;
-    
+
     // Format segment names
     let name = segment.charAt(0).toUpperCase() + segment.slice(1);
     if (name === 'Dashboard') name = 'Overview';
     if (name === 'Api-keys') name = 'API Keys';
     if (name === 'Store-builder') name = 'Store Builder';
-    
+
     breadcrumbs.push({ name, href, isLast });
   }
-  
+
   return breadcrumbs;
 }
 
@@ -82,7 +82,7 @@ export function Header() {
                     {crumb.isLast ? (
                       <BreadcrumbPage className="font-medium">{crumb.name}</BreadcrumbPage>
                     ) : (
-                      <BreadcrumbLink 
+                      <BreadcrumbLink
                         href={crumb.href}
                         className="text-muted-foreground hover:text-foreground transition-colors"
                       >
@@ -94,7 +94,7 @@ export function Header() {
               ))}
             </BreadcrumbList>
           </Breadcrumb>
-          
+
 
         </div>
 
@@ -125,26 +125,32 @@ export function Header() {
             },
           ]} />
           <ThemeToggle />
-          
+
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className="relative h-8 w-8 p-0 hover:bg-muted/50 transition-colors"
+              <Button
+                variant="ghost"
+                className="relative h-8 w-8 p-0 !rounded-full overflow-hidden bg-muted/50 hover:bg-muted transition-colors focus-visible:ring-0 focus-visible:ring-offset-0"
               >
-                <div className="h-7 w-7 bg-primary/10 flex items-center justify-center text-xs font-mono font-medium text-primary">
-                  {userInitials}
-                </div>
+                <Avatar className="h-8 w-8 rounded-full">
+                  <AvatarImage src={user?.imageUrl} alt={user?.fullName || "User"} />
+                  <AvatarFallback className="bg-primary/10 text-primary rounded-full">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-64 border-border/50" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-2">
                   <div className="flex items-center space-x-3">
-                    <div className="h-8 w-8 bg-primary/10 flex items-center justify-center text-xs font-mono font-medium text-primary">
-                      {userInitials}
-                    </div>
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user?.imageUrl} alt={user?.fullName || "User"} />
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {userInitials}
+                      </AvatarFallback>
+                    </Avatar>
                     <div className="flex flex-col">
                       <p className="text-sm font-medium font-mono">{user?.fullName}</p>
                       <p className="text-xs text-muted-foreground font-mono">
@@ -179,7 +185,7 @@ export function Header() {
                 Help & Support
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => signOut(() => router.push('/'))}
                 className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
               >

@@ -14,6 +14,9 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { NavigationProgress } from "@/components/_shared";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
+import { CurrencyProvider } from "@/hooks/use-currency";
+import { DateFormatProvider } from "@/hooks/use-date-format";
+import { LanguageProvider } from "@/hooks/use-language";
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { tenant, isLoading } = useTenant();
@@ -62,11 +65,17 @@ export default function DashboardLayout({
 }) {
   return (
     <SignedIn>
-      <TenantProvider>
-        <DashboardContent>
-          {children}
-        </DashboardContent>
-      </TenantProvider>
+      <LanguageProvider>
+        <CurrencyProvider>
+          <DateFormatProvider>
+            <TenantProvider>
+              <DashboardContent>
+                {children}
+              </DashboardContent>
+            </TenantProvider>
+          </DateFormatProvider>
+        </CurrencyProvider>
+      </LanguageProvider>
     </SignedIn>
   );
 }

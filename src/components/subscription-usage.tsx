@@ -17,7 +17,7 @@ interface UsageData {
 export function SubscriptionUsage({ usage }: { usage: UsageData }) {
   const { tenant } = useTenant();
   const tier = tenant?.tier || "FREE";
-  const limits = SUBSCRIPTION_LIMITS[tier];
+  const limits = SUBSCRIPTION_LIMITS[tier as keyof typeof SUBSCRIPTION_LIMITS];
 
   const usageItems = [
     {
@@ -61,9 +61,9 @@ export function SubscriptionUsage({ usage }: { usage: UsageData }) {
       <CardContent className="space-y-4">
         {usageItems.map((item) => {
           const Icon = item.icon;
-          const percentage = getUsagePercentage(tier, item.label.toLowerCase().replace(" ", "") as any, item.current);
+          const percentage = getUsagePercentage(tier as any, item.label.toLowerCase().replace(" ", "") as any, item.current);
           const isUnlimited = item.limit === -1;
-          
+
           return (
             <div key={item.label} className="space-y-2">
               <div className="flex items-center justify-between">
@@ -76,8 +76,8 @@ export function SubscriptionUsage({ usage }: { usage: UsageData }) {
                 </span>
               </div>
               {!isUnlimited && (
-                <Progress 
-                  value={percentage} 
+                <Progress
+                  value={percentage}
                   className="h-2"
                 />
               )}

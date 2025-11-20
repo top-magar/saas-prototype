@@ -2,29 +2,29 @@ import { cn } from "@/lib/utils";
 import { COMPONENT_CLASSES, VARIANTS, createClassName } from "@/lib/design-system";
 
 // Typography Components
-export function Heading({ 
-  level = 1, 
-  className, 
-  children, 
-  ...props 
-}: { 
+export function Heading({
+  level = 1,
+  className,
+  children,
+  ...props
+}: {
   level?: 1 | 2 | 3 | 4 | 5 | 6;
   className?: string;
   children: React.ReactNode;
 } & React.HTMLAttributes<HTMLHeadingElement>) {
-  const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+  const Tag = `h${level}` as React.ElementType;
   const sizeClasses = {
     1: 'text-2xl',
-    2: 'text-xl', 
+    2: 'text-xl',
     3: 'text-lg',
     4: 'text-base',
     5: 'text-sm',
     6: 'text-xs'
   };
-  
+
   return (
-    <Tag 
-      className={cn(COMPONENT_CLASSES.heading, sizeClasses[level], className)} 
+    <Tag
+      className={cn(COMPONENT_CLASSES.heading, sizeClasses[level], className)}
       {...props}
     >
       {children}
@@ -32,12 +32,12 @@ export function Heading({
   );
 }
 
-export function Text({ 
+export function Text({
   variant = 'primary',
   size = 'base',
-  className, 
-  children, 
-  ...props 
+  className,
+  children,
+  ...props
 }: {
   variant?: keyof typeof VARIANTS.text;
   size?: 'xs' | 'sm' | 'base' | 'lg';
@@ -50,15 +50,15 @@ export function Text({
     base: 'text-base',
     lg: 'text-lg'
   };
-  
+
   return (
-    <p 
+    <p
       className={cn(
-        COMPONENT_CLASSES.body, 
-        VARIANTS.text[variant], 
-        sizeClasses[size], 
+        COMPONENT_CLASSES.body,
+        VARIANTS.text[variant],
+        sizeClasses[size],
         className
-      )} 
+      )}
       {...props}
     >
       {children}
@@ -67,10 +67,10 @@ export function Text({
 }
 
 // Layout Components
-export function Container({ 
-  className, 
-  children, 
-  ...props 
+export function Container({
+  className,
+  children,
+  ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div className={cn(COMPONENT_CLASSES.container, className)} {...props}>
@@ -79,10 +79,10 @@ export function Container({
   );
 }
 
-export function Section({ 
-  className, 
-  children, 
-  ...props 
+export function Section({
+  className,
+  children,
+  ...props
 }: React.HTMLAttributes<HTMLElement>) {
   return (
     <section className={cn(COMPONENT_CLASSES.section, className)} {...props}>
@@ -91,11 +91,11 @@ export function Section({
   );
 }
 
-export function Grid({ 
+export function Grid({
   cols = 'auto',
-  className, 
-  children, 
-  ...props 
+  className,
+  children,
+  ...props
 }: {
   cols?: 'auto' | '2' | '3' | '4';
   className?: string;
@@ -107,10 +107,10 @@ export function Grid({
     '3': 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
     '4': 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
   };
-  
+
   return (
-    <div 
-      className={cn(COMPONENT_CLASSES.grid, colClasses[cols], className)} 
+    <div
+      className={cn(COMPONENT_CLASSES.grid, colClasses[cols], className)}
       {...props}
     >
       {children}
@@ -119,23 +119,23 @@ export function Grid({
 }
 
 // Geometric Card Component
-export function GeometricCard({ 
+export function GeometricCard({
   variant = 'default',
-  className, 
-  children, 
-  ...props 
+  className,
+  children,
+  ...props
 }: {
   variant?: keyof typeof VARIANTS.card;
   className?: string;
   children: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div 
+    <div
       className={cn(
-        COMPONENT_CLASSES.card, 
-        VARIANTS.card[variant], 
+        COMPONENT_CLASSES.card,
+        VARIANTS.card[variant],
         className
-      )} 
+      )}
       {...props}
     >
       {children}
@@ -144,38 +144,38 @@ export function GeometricCard({
 }
 
 // Status Indicator
-export function StatusIndicator({ 
+export function StatusIndicator({
   status,
-  className 
+  className
 }: {
   status: 'success' | 'warning' | 'error' | 'info';
   className?: string;
 }) {
   const colors = {
     success: 'bg-green-500',
-    warning: 'bg-yellow-500', 
+    warning: 'bg-yellow-500',
     error: 'bg-red-500',
     info: 'bg-blue-500'
   };
-  
+
   return (
-    <div 
+    <div
       className={cn(
-        'w-2 h-2 border border-border/50', 
-        colors[status], 
+        'w-2 h-2 border border-border/50',
+        colors[status],
         className
-      )} 
+      )}
     />
   );
 }
 
 // Metric Display
-export function Metric({ 
-  label, 
-  value, 
-  change, 
+export function Metric({
+  label,
+  value,
+  change,
   trend = 'neutral',
-  className 
+  className
 }: {
   label: string;
   value: string;
@@ -188,7 +188,7 @@ export function Metric({
     negative: 'text-red-600 border-red-200 bg-red-50',
     neutral: 'text-muted-foreground border-border bg-muted/50'
   };
-  
+
   return (
     <div className={cn('space-y-2', className)}>
       <Text variant="secondary" size="xs" className="uppercase tracking-wider">

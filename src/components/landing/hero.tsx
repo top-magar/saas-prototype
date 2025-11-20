@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Zap, Play } from 'lucide-react';
+import { transitions, variants } from '@/lib/animations';
 // import { OptimizedImage } from '@/components/optimized-image';
 // Styles moved to organized CSS structure
 
@@ -15,15 +16,16 @@ export function Hero() {
         <div className="max-w-6xl mx-auto text-center">
           {/* Problem-focused headline */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={transitions.default}
             className="mb-8"
           >
-            <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700 px-4 py-2 mb-6">
+            <Badge variant="outline" className="border-red-200 bg-red-50/50 text-red-700 px-4 py-2 mb-6 hover:bg-red-100/50 transition-colors">
               ⚠️ Business Problem Alert
             </Badge>
-            <h1 className="marketing-heading text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+            <h1 className="marketing-heading text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight" aria-label="Stop Losing Money to Manual Business Management">
               {"Stop Losing Money to Manual Business Management"
                 .split(" ")
                 .map((word, index) => (
@@ -32,10 +34,11 @@ export function Hero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
-                      duration: 0.5,
-                      delay: 0.3 + index * 0.1,
+                      ...transitions.default,
+                      delay: 0.2 + index * 0.05,
                     }}
                     className="mr-3 inline-block"
+                    aria-hidden="true"
                   >
                     {word}
                   </motion.span>
@@ -45,9 +48,10 @@ export function Hero() {
 
           {/* Solution-oriented subheading */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={{ ...transitions.default, delay: 0.6 }}
             className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-4xl mx-auto leading-relaxed"
           >
             Pasaal.io automates your inventory, sales, and customer management so you can focus on growing your business in Nepal&apos;s competitive market
@@ -55,14 +59,15 @@ export function Hero() {
 
           {/* Social proof */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1 }}
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={{ ...transitions.default, delay: 0.8 }}
             className="flex items-center justify-center gap-6 mb-10 text-sm text-muted-foreground"
           >
             <div className="flex items-center gap-2">
               <div className="flex -space-x-2">
-                {[1,2,3,4].map(i => (
+                {[1, 2, 3, 4].map(i => (
                   <div key={i} className="w-8 h-8 rounded-full bg-primary/20 border-2 border-background" />
                 ))}
               </div>
@@ -76,9 +81,10 @@ export function Hero() {
 
           {/* Risk-free CTA */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.2 }}
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={{ ...transitions.default, delay: 1 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
           >
             <Button size="lg" asChild className="marketing-cta h-14 px-8 text-lg group">
@@ -95,9 +101,10 @@ export function Hero() {
 
           {/* Product preview */}
           <motion.div
-            initial={{ opacity: 0, y: 40, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 1, delay: 1.5 }}
+            variants={variants.scaleIn}
+            initial="initial"
+            animate="animate"
+            transition={{ ...transitions.slow, delay: 1.2 }}
             className="relative group cursor-pointer"
           >
             <div className="relative rounded-2xl border-2 border-border bg-card p-4 shadow-2xl hover:shadow-3xl transition-all duration-500">

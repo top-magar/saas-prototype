@@ -63,29 +63,29 @@ const plans = [
 ];
 
 export default function BillingPage() {
-  const [currentPlan] = useState("PRO"    
+  const [currentPlan] = useState("PRO"
   );
   const [usage] = useState({
     products: { used: 247, limit: 1000 },
     users: { used: 3, limit: 5 },
     storage: { used: 12.4, limit: 50 },
     apiCalls: { used: 8450, limit: 10000 },
-  }    
+  }
   );
 
   const downloadInvoice = (invoiceId: string) => {
-    toast.success(`Invoice ${invoiceId} downloaded`    
-  );
+    toast.success(`Invoice ${invoiceId} downloaded`
+    );
   };
 
   const changePlan = (planName: string) => {
-    toast.success(`Plan changed to ${planName}`    
-  );
+    toast.success(`Plan changed to ${planName}`
+    );
   };
 
   const addPaymentMethod = () => {
-    toast.success("Payment method added successfully"    
-  );
+    toast.success("Payment method added successfully"
+    );
   };
 
   const getStatusBadge = (status: string) => {
@@ -97,13 +97,13 @@ export default function BillingPage() {
     const config = variants[status as keyof typeof variants];
     const Icon = config.icon;
     return (
-    
+
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
         {status}
       </Badge>
-        
-  );
+
+    );
   };
 
   const getPlanIcon = (planName: string) => {
@@ -116,7 +116,7 @@ export default function BillingPage() {
   };
 
   return (
-    
+
     <div className="flex flex-col gap-6 p-4 lg:p-6">
 
 
@@ -195,53 +195,175 @@ export default function BillingPage() {
         </TabsContent>
 
         <TabsContent value="plans" className="mt-6">
-          <div className="grid gap-6 md:grid-cols-3">
-            {plans.map((plan) => {
-              const Icon = getPlanIcon(plan.name    
-  );
-              return (
-    
-                <Card key={plan.name} className={`relative ${plan.current ? 'ring-2 ring-primary' : ''}`}>
-                  {plan.current && (
-                    <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                      Current Plan
-                    </Badge>
-                  )}
-                  <CardHeader>
-                    <div className="flex items-center gap-2">
-                      <Icon className="h-6 w-6" />
-                      <CardTitle>{plan.name}</CardTitle>
-                    </div>
-                    <CardDescription>{plan.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <span className="text-3xl font-bold">NPR {plan.price.toLocaleString()}</span>
-                        {plan.price > 0 && <span className="text-muted-foreground">/month</span>}
-                      </div>
-                      <ul className="space-y-2">
-                        {plan.features.map((feature, index) => (
-                          <li key={index} className="flex items-center gap-2 text-sm">
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                      <Button 
-                        className="w-full" 
-                        variant={plan.current ? "outline" : "default"}
-                        onClick={() => changePlan(plan.name)}
-                        disabled={plan.current}
-                      >
-                        {plan.current ? "Current Plan" : "Upgrade"}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                  
-  );
-            })}
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {/* BASIC PLAN */}
+            <Card className="relative flex flex-col overflow-hidden border-border/50 shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-blue-500 p-4 text-center">
+                <h3 className="text-xl font-bold text-white tracking-wide">BASIC</h3>
+              </div>
+              <CardContent className="flex-1 p-6 flex flex-col">
+                <div className="text-center mb-6 h-32 flex flex-col pt-4 gap-2">
+                  <div className="flex items-baseline justify-center gap-1 whitespace-nowrap">
+                    <span className="text-sm font-medium text-muted-foreground">NPR</span>
+                    <span className="text-4xl font-bold">24,000</span>
+                    <span className="text-sm text-muted-foreground">/yr</span>
+                  </div>
+                  <p className="text-sm font-bold tracking-wide text-muted-foreground mt-auto">FOR STARTERS</p>
+                </div>
+
+                <Button className="w-full mb-6 rounded-full border-blue-500 text-blue-600 hover:bg-blue-50" variant="outline">
+                  Purchase Now
+                </Button>
+
+                <ul className="space-y-3 text-sm flex-1">
+                  {[
+                    "Up to 5 Staff Accounts",
+                    "Up to 1000 Products",
+                    "Up to 10k Orders / year",
+                    "Website Customization",
+                    "Online Payments",
+                    "Online Payments",
+                    "Inventory Management",
+                    "Inventory Management",
+                    "Order Management System",
+                    "Custom Domain Integration",
+                    "250 SMS Credit"
+                  ].map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                      <span className="text-muted-foreground">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* PREMIUM PLAN */}
+            <Card className="relative flex flex-col overflow-hidden border-border/50 shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-pink-500 p-4 text-center">
+                <h3 className="text-xl font-bold text-white tracking-wide">PREMIUM</h3>
+              </div>
+              <CardContent className="flex-1 p-6 flex flex-col">
+                <div className="text-center mb-6 h-32 flex flex-col pt-4 gap-1">
+                  <div className="flex items-baseline justify-center gap-1 whitespace-nowrap">
+                    <span className="text-sm font-medium text-muted-foreground">NPR</span>
+                    <span className="text-4xl font-bold">28,000</span>
+                    <span className="text-sm text-muted-foreground">/yr</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground line-through decoration-red-500/50">35,000</span>
+                  <p className="text-sm font-bold tracking-wide text-muted-foreground mt-auto">FOR GROWING BUSINESS</p>
+                </div>
+
+                <Button className="w-full mb-6 rounded-full border-pink-500 text-pink-600 hover:bg-pink-50" variant="outline">
+                  Purchase Now
+                </Button>
+
+                <ul className="space-y-3 text-sm flex-1">
+                  {[
+                    "Everything from Basic",
+                    "25 Staff Accounts",
+                    "Up to 2500 Products",
+                    "Up to 50k Orders / year",
+                    "Product Reviews",
+                    "Product Reviews",
+                    "Blogs - Launching Soon",
+                    "Blogs - Launching Soon",
+                    "500 SMS Credit",
+                    "Advance Analytics",
+                    "Remote Training",
+                    "Self Payment Gateway Integration"
+                  ].map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                      <span className="text-muted-foreground">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* BUSINESS PLUS PLAN */}
+            <Card className="relative flex flex-col overflow-hidden border-border/50 shadow-md hover:shadow-lg transition-shadow ring-2 ring-pink-500/20">
+              <div className="bg-pink-500 p-4 text-center">
+                <h3 className="text-xl font-bold text-white tracking-wide">BUSINESS PLUS</h3>
+              </div>
+              <CardContent className="flex-1 p-6 flex flex-col">
+                <div className="text-center mb-6 h-32 flex flex-col pt-4 gap-2">
+                  <div className="flex items-baseline justify-center gap-1 whitespace-nowrap">
+                    <span className="text-sm font-medium text-muted-foreground">NPR</span>
+                    <span className="text-4xl font-bold">38,000</span>
+                    <span className="text-sm text-muted-foreground">/yr</span>
+                  </div>
+                  <p className="text-sm font-bold tracking-wide text-muted-foreground mt-auto">MOST POPULAR CHOICE</p>
+                </div>
+
+                <Button className="w-full mb-6 rounded-full bg-pink-600 hover:bg-pink-700 text-white shadow-md">
+                  Purchase Now
+                </Button>
+
+                <ul className="space-y-3 text-sm flex-1">
+                  {[
+                    "Everything from Basic",
+                    "25 Staff Accounts",
+                    "Up to 3000 Products",
+                    "Up to 75k Orders / year",
+                    "Website Design- 5 to 6 Banners Included",
+                    "Landing Page Setup",
+                    "Product Reviews",
+                    "Product Reviews",
+                    "Blogs - Launching Soon",
+                    "Blogs - Launching Soon",
+                    "700 SMS Credit",
+                    "Advance Analytics",
+                    "Remote Training"
+                  ].map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                      <span className="text-muted-foreground">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* PLATINUM PLAN */}
+            <Card className="relative flex flex-col overflow-hidden border-border/50 shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-yellow-500 p-4 text-center">
+                <h3 className="text-xl font-bold text-white tracking-wide">PLATINUM</h3>
+              </div>
+              <CardContent className="flex-1 p-6 flex flex-col">
+                <div className="text-center mb-6 h-32 flex flex-col pt-4 gap-2">
+                  <div className="flex items-baseline justify-center gap-1 whitespace-nowrap">
+                    <span className="text-sm font-medium text-muted-foreground">NPR</span>
+                    <span className="text-4xl font-bold">48,000</span>
+                    <span className="text-sm text-muted-foreground">/yr</span>
+                  </div>
+                  <p className="text-sm font-bold tracking-wide text-muted-foreground mt-auto">FOR BIG D2C BRANDS</p>
+                </div>
+
+                <Button className="w-full mb-6 rounded-full border-yellow-500 text-yellow-600 hover:bg-yellow-50" variant="outline">
+                  Purchase Now
+                </Button>
+
+                <ul className="space-y-3 text-sm flex-1">
+                  {[
+                    "Everything from Business Plus",
+                    "50 Staff Accounts",
+                    "Up to 5000 Products",
+                    "Unlimited Orders",
+                    "Custom Built Features (If any)",
+                    "1000 SMS Credit",
+                    "POS (Point of Sales)",
+                    "Barcode for Inventory"
+                  ].map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                      <span className="text-muted-foreground">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
 
@@ -280,9 +402,9 @@ export default function BillingPage() {
                       <TableCell>NPR {invoice.amount.toLocaleString()}</TableCell>
                       <TableCell>{getStatusBadge(invoice.status)}</TableCell>
                       <TableCell>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => downloadInvoice(invoice.id)}
                         >
                           <Download className="h-4 w-4" />
@@ -354,6 +476,6 @@ export default function BillingPage() {
         </TabsContent>
       </Tabs>
     </div>
-      
+
   );
 }

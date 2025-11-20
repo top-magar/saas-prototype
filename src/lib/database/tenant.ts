@@ -66,6 +66,7 @@ export async function createTenantAndAssociateUser({
   primaryColor,
 }: CreateTenantAndAssociateUserParams) {
   const now = new Date().toISOString();
+  
   const { data: newTenant, error: tenantError } = await supabaseAdmin
     .from('tenants')
     .insert({
@@ -82,19 +83,39 @@ export async function createTenantAndAssociateUser({
     throw new Error(`Failed to create tenant: ${tenantError?.message || 'Unknown error'}`);
   }
 
-  const { error: userError } = await supabaseAdmin
+  const { data: existingUser } = await supabaseAdmin
     .from('users')
-    .upsert({
-      id: crypto.randomUUID(),
-      clerkUserId: clerkUserId,
-      tenantId: newTenant.id,
-      email,
-      name: userName,
-      updatedAt: now,
-    });
+    .select('id')
+    .eq('clerkUserId', clerkUserId)
+    .single();
 
-  if (userError) {
-    throw new Error(`Failed to create user: ${userError.message}`);
+  if (existingUser) {
+    const { error: updateError } = await supabaseAdmin
+      .from('users')
+      .update({
+        tenantId: newTenant.id,
+        updatedAt: now,
+      })
+      .eq('clerkUserId', clerkUserId);
+
+    if (updateError) {
+      throw new Error(`Failed to update user: ${updateError.message}`);
+    }
+  } else {
+    const { error: insertError } = await supabaseAdmin
+      .from('users')
+      .insert({
+        id: crypto.randomUUID(),
+        clerkUserId: clerkUserId,
+        tenantId: newTenant.id,
+        email,
+        name: userName,
+        updatedAt: now,
+      });
+
+    if (insertError) {
+      throw new Error(`Failed to create user: ${insertError.message}`);
+    }
   }
 
   return newTenant;

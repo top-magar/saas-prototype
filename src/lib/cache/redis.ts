@@ -8,8 +8,8 @@ export function getRedisClient(): Redis | null {
   }
 
   if (!redis) {
-    redis = new Redis(process.env.UPSTASH_REDIS_REST_URL, {
-      retryDelayOnFailover: 100,
+    redis = new Redis(process.env.UPSTASH_REDIS_REST_URL as string, {
+
       maxRetriesPerRequest: 3,
       lazyConnect: true,
     });

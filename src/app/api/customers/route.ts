@@ -19,11 +19,11 @@ export async function GET() {
       .eq('role', 'user')
       .order('created_at', { ascending: false });
 
-    const formattedCustomers = customers.map(customer => {
+    const formattedCustomers = (customers || []).map(customer => {
       const totalOrders = customer.orders.length;
-      const totalSpent = customer.orders.reduce((sum, order) => sum + Number(order.total), 0);
+      const totalSpent = customer.orders.reduce((sum: number, order: any) => sum + Number(order.total), 0);
       const lastOrder = customer.orders[0];
-      
+
       return {
         id: customer.id,
         name: customer.name || 'Unknown',

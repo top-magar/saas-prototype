@@ -48,17 +48,26 @@ async function getDashboardData(): Promise<DashboardData | null> {
 }
 
 export default async function DashboardPage() {
-  let data = null;
+  const user = await currentUser();
   
-  try {
-    const [, dashboardData] = await Promise.all([
-      currentUser(),
-      getDashboardData()
-    ]);
-    data = dashboardData;
-  } catch {
-    // Error handled by returning null data
+  if (!user) {
+    return null;
   }
 
+  // Check if user has a tenant
+  const { supabaseAdmin } = await import('@/lib/database/supabase');
+  const { data: userRecord } = await supabaseAdmin
+    .from('users')
+    .select('tenantId')
+    .eq('clerkUserId', user.id)
+    .single();
+
+  // Redirect to tenant creation if no tenant
+  if (!userRecord?.tenantId) {
+    const { redirect } = await import('next/navigation');
+    redirect('/tenant/new');
+  }
+
+  const data = await getDashboardData();
   return <DashboardClientPage data={data} />;
 }
