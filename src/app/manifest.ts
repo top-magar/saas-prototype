@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'PASAAL.IO - Multi-tenant SaaS Platform',
-    short_name: 'PASAAL.IO',
+    name: 'PASAAL - Multi-tenant SaaS Platform',
+    short_name: 'PASAAL',
     description: 'Automate your inventory, sales, and customer management with PASAAL.IO',
     start_url: '/',
     display: 'standalone',

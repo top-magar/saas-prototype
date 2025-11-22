@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Image, Navigation, Type, Grid3X3 } from 'lucide-react';
 import { PageComponent } from '@/lib/store-builder/types';
 import { DeviceType } from '@/lib/store-builder/types';
+import { useCurrency } from '@/hooks/use-currency';
 
 interface PageRendererProps {
   components: PageComponent[];
@@ -15,12 +16,13 @@ interface PageRendererProps {
   onSelectComponent?: (id: string) => void;
 }
 
-export function PageRenderer({ 
-  components, 
+export function PageRenderer({
+  components,
   deviceType,
   selectedComponentId,
   onSelectComponent
 }: PageRendererProps) {
+  const { formatCurrency } = useCurrency();
   const handleComponentClick = (e: React.MouseEvent, componentId: string) => {
     e.stopPropagation();
     onSelectComponent?.(componentId);
@@ -29,7 +31,7 @@ export function PageRenderer({
   const renderComponent = (component: PageComponent): React.ReactNode => {
     const { props, styles } = component;
     const isSelected = selectedComponentId === component.id;
-    
+
     const mergedStyles = {
       ...styles.base,
       ...(styles.responsive?.[deviceType] || {})
@@ -84,7 +86,7 @@ export function PageRenderer({
                   <div key={i} className="border rounded-lg p-4 bg-white">
                     <div className="bg-gray-200 h-32 rounded mb-2"></div>
                     <h3 className="font-semibold">Product {i}</h3>
-                    <p className="text-sm text-gray-600">$99.99</p>
+                    <p className="text-sm text-gray-600">{formatCurrency(99.99)}</p>
                   </div>
                 ))}
               </div>
@@ -117,17 +119,16 @@ export function PageRenderer({
             </Badge>
           </div>
         )}
-        
+
         {/* Component Content */}
         {componentElement}
-        
+
         {/* Hover Overlay */}
         {onSelectComponent && (
-          <div className={`absolute inset-0 border-2 border-dashed transition-opacity ${
-            isSelected 
-              ? 'border-primary bg-primary/5 opacity-100' 
-              : 'border-transparent group-hover:border-primary/50 group-hover:bg-primary/5 opacity-0 group-hover:opacity-100'
-          }`} />
+          <div className={`absolute inset-0 border-2 border-dashed transition-opacity ${isSelected
+            ? 'border-primary bg-primary/5 opacity-100'
+            : 'border-transparent group-hover:border-primary/50 group-hover:bg-primary/5 opacity-0 group-hover:opacity-100'
+            }`} />
         )}
       </div>
     );

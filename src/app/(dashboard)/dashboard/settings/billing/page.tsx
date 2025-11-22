@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreditCard, Download, Calendar, AlertTriangle, CheckCircle, Crown, Zap, Users } from "lucide-react";
 import { toast } from "sonner";
+import { useCurrency } from "@/hooks/use-currency";
 
 interface Invoice {
   id: string;
@@ -63,6 +64,7 @@ const plans = [
 ];
 
 export default function BillingPage() {
+  const { formatCurrency, convertPrice, currencySymbol } = useCurrency();
   const [currentPlan] = useState("PRO"
   );
   const [usage] = useState({
@@ -142,7 +144,7 @@ export default function BillingPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-2xl font-bold">{currentPlan} Plan</h3>
-                      <p className="text-muted-foreground">NPR 2,999/month</p>
+                      <p className="text-muted-foreground">{formatCurrency(2999)}/month</p>
                     </div>
                     <Badge variant="default">Active</Badge>
                   </div>
@@ -204,8 +206,8 @@ export default function BillingPage() {
               <CardContent className="flex-1 p-6 flex flex-col">
                 <div className="text-center mb-6 h-32 flex flex-col pt-4 gap-2">
                   <div className="flex items-baseline justify-center gap-1 whitespace-nowrap">
-                    <span className="text-sm font-medium text-muted-foreground">NPR</span>
-                    <span className="text-4xl font-bold">24,000</span>
+                    <span className="text-sm font-medium text-muted-foreground">{currencySymbol}</span>
+                    <span className="text-4xl font-bold">{convertPrice(24000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                     <span className="text-sm text-muted-foreground">/yr</span>
                   </div>
                   <p className="text-sm font-bold tracking-wide text-muted-foreground mt-auto">FOR STARTERS</p>
@@ -246,11 +248,11 @@ export default function BillingPage() {
               <CardContent className="flex-1 p-6 flex flex-col">
                 <div className="text-center mb-6 h-32 flex flex-col pt-4 gap-1">
                   <div className="flex items-baseline justify-center gap-1 whitespace-nowrap">
-                    <span className="text-sm font-medium text-muted-foreground">NPR</span>
-                    <span className="text-4xl font-bold">28,000</span>
+                    <span className="text-sm font-medium text-muted-foreground">{currencySymbol}</span>
+                    <span className="text-4xl font-bold">{convertPrice(28000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                     <span className="text-sm text-muted-foreground">/yr</span>
                   </div>
-                  <span className="text-sm text-muted-foreground line-through decoration-red-500/50">35,000</span>
+                  <span className="text-sm text-muted-foreground line-through decoration-red-500/50">{convertPrice(35000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                   <p className="text-sm font-bold tracking-wide text-muted-foreground mt-auto">FOR GROWING BUSINESS</p>
                 </div>
 
@@ -290,8 +292,8 @@ export default function BillingPage() {
               <CardContent className="flex-1 p-6 flex flex-col">
                 <div className="text-center mb-6 h-32 flex flex-col pt-4 gap-2">
                   <div className="flex items-baseline justify-center gap-1 whitespace-nowrap">
-                    <span className="text-sm font-medium text-muted-foreground">NPR</span>
-                    <span className="text-4xl font-bold">38,000</span>
+                    <span className="text-sm font-medium text-muted-foreground">{currencySymbol}</span>
+                    <span className="text-4xl font-bold">{convertPrice(38000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                     <span className="text-sm text-muted-foreground">/yr</span>
                   </div>
                   <p className="text-sm font-bold tracking-wide text-muted-foreground mt-auto">MOST POPULAR CHOICE</p>
@@ -334,8 +336,8 @@ export default function BillingPage() {
               <CardContent className="flex-1 p-6 flex flex-col">
                 <div className="text-center mb-6 h-32 flex flex-col pt-4 gap-2">
                   <div className="flex items-baseline justify-center gap-1 whitespace-nowrap">
-                    <span className="text-sm font-medium text-muted-foreground">NPR</span>
-                    <span className="text-4xl font-bold">48,000</span>
+                    <span className="text-sm font-medium text-muted-foreground">{currencySymbol}</span>
+                    <span className="text-4xl font-bold">{convertPrice(48000).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                     <span className="text-sm text-muted-foreground">/yr</span>
                   </div>
                   <p className="text-sm font-bold tracking-wide text-muted-foreground mt-auto">FOR BIG D2C BRANDS</p>
@@ -399,7 +401,7 @@ export default function BillingPage() {
                       <TableCell className="font-medium">{invoice.id}</TableCell>
                       <TableCell>{invoice.date}</TableCell>
                       <TableCell>{invoice.description}</TableCell>
-                      <TableCell>NPR {invoice.amount.toLocaleString()}</TableCell>
+                      <TableCell>{formatCurrency(invoice.amount)}</TableCell>
                       <TableCell>{getStatusBadge(invoice.status)}</TableCell>
                       <TableCell>
                         <Button

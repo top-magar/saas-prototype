@@ -23,6 +23,7 @@ import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/u
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { cn } from '@/lib/utils';
 import { MoreHorizontal } from 'lucide-react';
+import { useCurrency } from '@/hooks/use-currency';
 
 interface Order {
   id: string;
@@ -34,6 +35,7 @@ interface Order {
 }
 
 export function RecentOrders({ data }: { data: Order[] }) {
+  const { formatCurrency } = useCurrency();
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 5;
 
@@ -48,9 +50,9 @@ export function RecentOrders({ data }: { data: Order[] }) {
           <Empty>
             <EmptyHeader>
               <EmptyTitle>No Orders Found</EmptyTitle>
-            <EmptyDescription>
-              You haven&apos;t received any orders yet. Start by adding products and sharing your store!
-            </EmptyDescription>
+              <EmptyDescription>
+                You haven&apos;t received any orders yet. Start by adding products and sharing your store!
+              </EmptyDescription>
             </EmptyHeader>
           </Empty>
         </CardContent>
@@ -71,74 +73,144 @@ export function RecentOrders({ data }: { data: Order[] }) {
         <CardDescription>Keep track of all orders here.</CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Product Name</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {currentOrders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell className="font-medium">{order.id}</TableCell>
-                <TableCell>{order.product}</TableCell>
-                <TableCell>{order.customer}</TableCell>
-                <TableCell>{order.date}</TableCell>
-                <TableCell>NPR {order.amount.toFixed(2)}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      order.status === 'Completed' && 'bg-green-100 text-green-800 border-green-200',
-                      order.status === 'Pending' && 'bg-yellow-100 text-yellow-800 border-yellow-200',
-                      order.status === 'Cancelled' && 'bg-red-100 text-red-800 border-red-200'
-                    )}
-                  >
-                    {order.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <AlertDialog>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>View Order</DropdownMenuItem>
-                        <DropdownMenuItem>View Customer</DropdownMenuItem>
-                        <AlertDialogTrigger asChild>
-                          <DropdownMenuItem>Delete Order</DropdownMenuItem>
-                        </AlertDialogTrigger>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete the order.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction>Delete</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </TableCell>
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order ID</TableHead>
+                <TableHead>Product Name</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {currentOrders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell className="font-medium">{order.id}</TableCell>
+                  <TableCell>{order.product}</TableCell>
+                  <TableCell>{order.customer}</TableCell>
+                  <TableCell>{order.date}</TableCell>
+                  <TableCell>{formatCurrency(order.amount)}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        order.status === 'Completed' && 'bg-green-100 text-green-800 border-green-200',
+                        order.status === 'Pending' && 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                        order.status === 'Cancelled' && 'bg-red-100 text-red-800 border-red-200'
+                      )}
+                    >
+                      {order.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <AlertDialog>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem>View Order</DropdownMenuItem>
+                          <DropdownMenuItem>View Customer</DropdownMenuItem>
+                          <AlertDialogTrigger asChild>
+                            <DropdownMenuItem>Delete Order</DropdownMenuItem>
+                          </AlertDialogTrigger>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the order.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction>Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden space-y-3">
+          {currentOrders.map((order) => (
+            <div key={order.id} className="border rounded-lg p-4 space-y-3">
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">{order.product}</p>
+                  <p className="text-xs text-muted-foreground">{order.id}</p>
+                </div>
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-xs",
+                    order.status === 'Completed' && 'bg-green-100 text-green-800 border-green-200',
+                    order.status === 'Pending' && 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                    order.status === 'Cancelled' && 'bg-red-100 text-red-800 border-red-200'
+                  )}
+                >
+                  {order.status}
+                </Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <p className="text-xs text-muted-foreground">Customer</p>
+                  <p className="font-medium">{order.customer}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Date</p>
+                  <p className="font-medium">{order.date}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t">
+                <p className="text-sm font-semibold">{formatCurrency(order.amount)}</p>
+                <AlertDialog>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem>View Order</DropdownMenuItem>
+                      <DropdownMenuItem>View Customer</DropdownMenuItem>
+                      <AlertDialogTrigger asChild>
+                        <DropdownMenuItem>Delete Order</DropdownMenuItem>
+                      </AlertDialogTrigger>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete the order.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          ))}
+        </div>
       </CardContent>
       <CardFooter>
         <Pagination>

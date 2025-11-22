@@ -2,7 +2,7 @@
 
 import { CommandMenu } from "@/components/command-menu";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@clerk/nextjs";
+import { useSession, signOut } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -12,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useClerk } from "@clerk/nextjs";
 import { useRouter, usePathname } from "next/navigation";
 import { NotificationsPopover } from "./sidebar/nav-notifications";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -33,7 +32,14 @@ import {
   LogOut,
   Keyboard,
   HelpCircle,
+  Bell,
+  Sun,
 } from "lucide-react";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+
+
+// ... existing imports
+
 import { cn } from "@/lib/utils";
 
 function generateBreadcrumbs(pathname: string) {
@@ -58,22 +64,22 @@ function generateBreadcrumbs(pathname: string) {
 }
 
 export function Header() {
-  const { user } = useUser();
-  const { signOut } = useClerk();
+  const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
-  // const { tenant } = useTenant();
-  const tenant = null; // Temporarily disabled until tenant context is properly set up
+  const tenant = null;
 
-  const userInitials = `${user?.firstName?.charAt(0) || ''}${user?.lastName?.charAt(0) || ''}`;
+  const user = session?.user;
+  const userName = user?.name || '';
+  const userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
   const breadcrumbs = generateBreadcrumbs(pathname);
 
   return (
-    <header className="sticky top-2 z-50 w-full bg-background  ">
-      <div className="flex h-14 items-center justify-between pl-6 pr-6">
-        {/* Left side - Breadcrumbs */}
-        <div className="flex items-center space-x-4">
-          <Breadcrumb>
+    <header className="sticky top-2 z-50 w-full bg-background border-b">
+      <div className="flex h-14 items-center justify-between px-3 sm:px-6 gap-2">
+        {/* Left side - Page Title */}
+        <div className="flex items-center space-x-3 min-w-0 flex-1">
+          <Breadcrumb className="hidden md:block">
             <BreadcrumbList>
               {breadcrumbs.map((crumb, index) => (
                 <div key={crumb.href} className="flex items-center">
@@ -94,37 +100,44 @@ export function Header() {
               ))}
             </BreadcrumbList>
           </Breadcrumb>
+          <span className="font-semibold md:hidden">
+            {breadcrumbs[breadcrumbs.length - 1]?.name || 'Dashboard'}
+          </span>
 
 
         </div>
 
         {/* Right side - Actions */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1 md:space-x-2">
           <CommandMenu />
-          <NotificationsPopover notifications={[
-            {
-              id: "1",
-              avatar: "/avatars/01.png",
-              fallback: "OM",
-              text: "New order received.",
-              time: "10m ago",
-            },
-            {
-              id: "2",
-              avatar: "/avatars/02.png",
-              fallback: "JL",
-              text: "Server upgrade completed.",
-              time: "1h ago",
-            },
-            {
-              id: "3",
-              avatar: "/avatars/03.png",
-              fallback: "HH",
-              text: "New user signed up.",
-              time: "2h ago",
-            },
-          ]} />
-          <ThemeToggle />
+          <div className="hidden md:flex">
+            <NotificationsPopover notifications={[
+              {
+                id: "1",
+                avatar: "/avatars/01.png",
+                fallback: "OM",
+                text: "New order received.",
+                time: "10m ago",
+              },
+              {
+                id: "2",
+                avatar: "/avatars/02.png",
+                fallback: "JL",
+                text: "Server upgrade completed.",
+                time: "1h ago",
+              },
+              {
+                id: "3",
+                avatar: "/avatars/03.png",
+                fallback: "HH",
+                text: "New user signed up.",
+                time: "2h ago",
+              },
+            ]} />
+          </div>
+          <div className="hidden md:flex">
+            <ThemeToggle />
+          </div>
 
           {/* User Menu */}
           <DropdownMenu>
@@ -134,27 +147,27 @@ export function Header() {
                 className="relative h-8 w-8 p-0 !rounded-full overflow-hidden bg-muted/50 hover:bg-muted transition-colors focus-visible:ring-0 focus-visible:ring-offset-0"
               >
                 <Avatar className="h-8 w-8 rounded-full">
-                  <AvatarImage src={user?.imageUrl} alt={user?.fullName || "User"} />
+                  <AvatarImage src={user?.image || ''} alt={user?.name || "User"} />
                   <AvatarFallback className="bg-primary/10 text-primary rounded-full">
                     {userInitials}
                   </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64 border-border/50" align="end" forceMount>
+            <DropdownMenuContent className="w-64 md:w-72 border-border/50" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-2">
                   <div className="flex items-center space-x-3">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.imageUrl} alt={user?.fullName || "User"} />
+                      <AvatarImage src={user?.image || ''} alt={user?.name || "User"} />
                       <AvatarFallback className="bg-primary/10 text-primary">
                         {userInitials}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col">
-                      <p className="text-sm font-medium font-mono">{user?.fullName}</p>
-                      <p className="text-xs text-muted-foreground font-mono">
-                        {user?.primaryEmailAddress?.emailAddress}
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <p className="text-sm font-medium truncate">{user?.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {user?.email}
                       </p>
                     </div>
                   </div>
@@ -162,6 +175,22 @@ export function Header() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+
+              {/* Mobile-only items */}
+              <div className="md:hidden">
+                <DropdownMenuItem>
+                  <Bell className="mr-2 h-4 w-4" />
+                  Notifications
+                  <Badge variant="secondary" className="ml-auto text-xs">3</Badge>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Sun className="mr-2 h-4 w-4" />
+                  Theme
+                  <Badge variant="outline" className="ml-auto text-xs">Auto</Badge>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </div>
+
               <DropdownMenuItem onClick={() => router.push('/dashboard/settings/profile')}>
                 <User className="mr-2 h-4 w-4" />
                 Profile
@@ -175,18 +204,18 @@ export function Header() {
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem className="md:flex hidden">
                 <Keyboard className="mr-2 h-4 w-4" />
-                Keyboard shortcuts
+                Shortcuts
                 <Badge variant="secondary" className="ml-auto text-xs">⌘K</Badge>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <HelpCircle className="mr-2 h-4 w-4" />
-                Help & Support
+                Help
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={() => signOut(() => router.push('/'))}
+                onClick={() => signOut({ callbackUrl: '/' })}
                 className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
               >
                 <LogOut className="mr-2 h-4 w-4" />

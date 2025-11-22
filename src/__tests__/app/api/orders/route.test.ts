@@ -147,7 +147,7 @@ describe('Orders API', () => {
 
             expect(supabase.from).toHaveBeenCalledWith('orders');
             expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({
-                tenant_id: mockTenantId,
+                tenantId: mockTenantId,
                 user_id: mockCustomer.id,
                 total: validBody.total
             }));

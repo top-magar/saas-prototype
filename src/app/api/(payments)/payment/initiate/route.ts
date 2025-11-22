@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth";
 import { supabase } from "@/lib/database/supabase";
 
 // Payment amounts mapping
@@ -123,9 +123,9 @@ async function initiateFonepayPayment(tierId: string, tenantId: string, userId: 
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await currentUser();
+    const session = await getServerSession();
 
-    if (!user || !user.id || !user.emailAddresses[0]?.emailAddress) {
+    if (!session?.user?.email) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
     const { data: dbUser } = await supabase
       .from('users')
       .select('*, tenant:tenants(*)')
-      .eq('clerk_user_id', user.id)
+      .eq('email', session.user.email)
       .single();
 
     if (!dbUser || !dbUser.tenant) {
@@ -164,13 +164,13 @@ export async function POST(req: NextRequest) {
     try {
       switch (paymentMethod) {
         case "esewa":
-          redirectUrl = await initiateEsewaPayment(tierId, tenant.id, user.id);
+          redirectUrl = await initiateEsewaPayment(tierId, tenant.id, dbUser.id);
           break;
         case "khalti":
-          redirectUrl = await initiateKhaltiPayment(tierId, tenant.id, user.id);
+          redirectUrl = await initiateKhaltiPayment(tierId, tenant.id, dbUser.id);
           break;
         case "fonepay":
-          redirectUrl = await initiateFonepayPayment(tierId, tenant.id, user.id);
+          redirectUrl = await initiateFonepayPayment(tierId, tenant.id, dbUser.id);
           break;
         default:
           return new NextResponse("Invalid payment method. Supported methods: esewa, khalti, fonepay", { status: 400 });

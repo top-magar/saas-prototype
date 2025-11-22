@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
+import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import { navigationConfig, adminNavigationConfig, NavItem, NavSection } from '@/lib/navigation';
 import {
@@ -19,9 +19,9 @@ import { TenantTier } from '@/lib/types';
 
 export const SidebarNav = React.memo(() => {
   const pathname = usePathname();
-  const { user } = useUser();
-  const userRoles = React.useMemo(() => (user?.publicMetadata?.role as string[]) || [], [user?.publicMetadata?.role]);
-  const isAdmin = userRoles.includes('admin');
+  const { data: session } = useSession();
+  const userRole = (session?.user as any)?.role || 'user';
+  const isAdmin = userRole === 'admin';
   const [openAccordionItem, setOpenAccordionItem] = React.useState<string | undefined>(undefined);
 
   const [dynamicBadges, setDynamicBadges] = React.useState<Record<string, string>>({});
@@ -29,7 +29,7 @@ export const SidebarNav = React.memo(() => {
   // Dummy function to check user roles and tenant tiers
   const userHasAccess = React.useCallback((itemOrSection: NavItem | NavSection) => {
     // Temporarily override currentTenantTier to ENTERPRISE for development purposes
-    const effectiveTenantTier: TenantTier = 'enterprise'; 
+    const effectiveTenantTier: TenantTier = 'enterprise';
 
     // Check roles
     // if (itemOrSection.roles && itemOrSection.roles.length > 0) {
@@ -46,7 +46,7 @@ export const SidebarNav = React.memo(() => {
     // }
 
     return true; // User has access
-  }, [userRoles]);
+  }, [userRole]);
 
   // Simulate fetching dynamic badge data
   React.useEffect(() => {
@@ -150,11 +150,11 @@ export const SidebarNav = React.memo(() => {
   };
 
   return (
-      <nav className="grid items-start gap-1 px-2">
-        {filteredNavigationConfig.map(renderNavSection)}
-        {isAdmin && filteredAdminNavigationConfig.length > 0 && <Separator className="my-4" />}
-        {isAdmin && filteredAdminNavigationConfig.map(renderNavSection)}
-      </nav>
+    <nav className="grid items-start gap-1 px-2">
+      {filteredNavigationConfig.map(renderNavSection)}
+      {isAdmin && filteredAdminNavigationConfig.length > 0 && <Separator className="my-4" />}
+      {isAdmin && filteredAdminNavigationConfig.map(renderNavSection)}
+    </nav>
   )
 });
 

@@ -7,6 +7,7 @@ interface FileDropzoneProps {
   handleDragOver: (e: React.DragEvent) => void;
   handleDrop: (e: React.DragEvent) => void;
   handleFileSelect: (files: FileList | null) => void;
+  multiple?: boolean;
 }
 
 export function FileDropzone({
@@ -15,6 +16,7 @@ export function FileDropzone({
   handleDragOver,
   handleDrop,
   handleFileSelect,
+  multiple = true,
 }: FileDropzoneProps) {
   return (
     <div className="px-6">
@@ -39,6 +41,7 @@ export function FileDropzone({
           ref={fileInputRef}
           className="hidden"
           accept="image/*"
+          multiple={multiple}
           onChange={(e) => handleFileSelect(e.target.files)}
         />
       </div>

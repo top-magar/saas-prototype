@@ -1,12 +1,14 @@
-import { currentUser } from '@clerk/nextjs/server';
+
 import { NextRequest } from 'next/server';
 import { createTenantAndAssociateUser } from '@/lib/database/tenant';
 import { createErrorResponse, createSuccessResponse, validateRequest } from '@/lib/server/api-helpers';
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await currentUser();
-    if (!user?.id) {
+    const { getServerSession } = await import('next-auth');
+    const session = await getServerSession();
+    
+    if (!session?.user) {
       return createErrorResponse('Unauthorized', 401);
     }
 
@@ -18,11 +20,10 @@ export async function POST(req: NextRequest) {
     }
 
     const tenant = await createTenantAndAssociateUser({
-      clerkUserId: user.id,
+      email: session.user.email || '',
       name,
       subdomain,
-      email: user.emailAddresses[0]?.emailAddress || '',
-      userName: user.firstName || user.username || 'User',
+      userName: session.user.name || 'User',
       primaryColor: primaryColor || '#3B82F6',
     });
 

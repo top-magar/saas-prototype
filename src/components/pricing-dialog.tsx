@@ -21,7 +21,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { Banknote, Check, CreditCard, DollarSign, Star, Zap, Shield } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
@@ -106,12 +106,13 @@ type PricingDialogProps = {
 
 export function PricingDialog({ trigger, currentPlan = TenantTier.FREE, showPaymentMethods = false }: PricingDialogProps) {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("esewa");
-  const { isSignedIn } = useUser();
+  const { status } = useSession();
+  const isSignedIn = status === 'authenticated';
   const router = useRouter();
 
   const handleAction = async (tier: (typeof pricingTiers)[0]) => {
     if (tier.tierId === "FREE" || tier.tierId === currentPlan) return;
-    
+
     if (tier.tierId === "ENTERPRISE") {
       toast.info("Please contact sales to learn more about our Enterprise plan.");
       return;
@@ -169,25 +170,25 @@ export function PricingDialog({ trigger, currentPlan = TenantTier.FREE, showPaym
                   onValueChange={setSelectedPaymentMethod}
                   className="grid grid-cols-1 sm:grid-cols-3 gap-4"
                 >
-                  <PaymentMethodRadio 
-                    id="esewa" 
-                    value="esewa" 
-                    icon={DollarSign} 
-                    label="eSewa" 
+                  <PaymentMethodRadio
+                    id="esewa"
+                    value="esewa"
+                    icon={DollarSign}
+                    label="eSewa"
                     description="Digital wallet"
                   />
-                  <PaymentMethodRadio 
-                    id="khalti" 
-                    value="khalti" 
-                    icon={CreditCard} 
-                    label="Khalti" 
+                  <PaymentMethodRadio
+                    id="khalti"
+                    value="khalti"
+                    icon={CreditCard}
+                    label="Khalti"
                     description="Mobile payment"
                   />
-                  <PaymentMethodRadio 
-                    id="fonepay" 
-                    value="fonepay" 
-                    icon={Banknote} 
-                    label="FonePay" 
+                  <PaymentMethodRadio
+                    id="fonepay"
+                    value="fonepay"
+                    icon={Banknote}
+                    label="FonePay"
                     description="Bank transfer"
                   />
                 </RadioGroup>
@@ -217,18 +218,18 @@ export function PricingDialog({ trigger, currentPlan = TenantTier.FREE, showPaym
 
 // --- Helper Components for Cleaner Code ---
 
-const PaymentMethodRadio = ({ 
-  id, 
-  value, 
-  icon: Icon, 
-  label, 
-  description 
-}: { 
-  id: string, 
-  value: string, 
-  icon: React.ElementType, 
+const PaymentMethodRadio = ({
+  id,
+  value,
+  icon: Icon,
+  label,
+  description
+}: {
+  id: string,
+  value: string,
+  icon: React.ElementType,
   label: string,
-  description?: string 
+  description?: string
 }) => (
   <div>
     <RadioGroupItem value={value} id={id} className="peer sr-only" />
@@ -273,13 +274,13 @@ const PricingCard = ({ tier, isCurrent, onSelect }: { tier: (typeof pricingTiers
           Recommended
         </Badge>
       )}
-      
+
       <CardTitle className="text-xl font-bold flex items-center gap-2">
         {tier.name}
         {tier.tierId === "PRO" && <Zap className="h-5 w-5 text-primary" />}
       </CardTitle>
       <CardDescription className="text-sm">{tier.description}</CardDescription>
-      
+
       <div className="mt-6">
         <div className="flex items-baseline gap-1">
           <span className="text-3xl font-bold">{tier.price}</span>
@@ -292,7 +293,7 @@ const PricingCard = ({ tier, isCurrent, onSelect }: { tier: (typeof pricingTiers
         )}
       </div>
     </CardHeader>
-    
+
     <CardContent className="flex-grow">
       <ul role="list" className="space-y-3 text-sm">
         {tier.features.map((feature: string) => (
@@ -303,7 +304,7 @@ const PricingCard = ({ tier, isCurrent, onSelect }: { tier: (typeof pricingTiers
         ))}
       </ul>
     </CardContent>
-    
+
     <CardFooter className="pt-6">
       <Button
         className={cn(
@@ -324,7 +325,7 @@ const PricingCard = ({ tier, isCurrent, onSelect }: { tier: (typeof pricingTiers
           tier.buttonText
         )}
       </Button>
-      
+
       {tier.tierId !== "FREE" && tier.tierId !== "ENTERPRISE" && !isCurrent && (
         <p className="text-xs text-muted-foreground text-center mt-2">
           14-day free trial • Cancel anytime

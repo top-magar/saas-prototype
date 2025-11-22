@@ -5,7 +5,8 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLe
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { Package, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
+import { Package, TrendingUp, DollarSign, BarChart3, AlertTriangle, CheckCircle } from "lucide-react";
+import { CurrencyDisplay } from "@/components/currency-selector";
 
 interface EnhancedProductsTabProps {
   data: {
@@ -36,11 +37,11 @@ export function EnhancedProductsTab({ data }: EnhancedProductsTabProps) {
               <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Total Sales</div>
               <Badge variant="secondary" className="text-xs font-mono">+18%</Badge>
             </div>
-            <div className="text-2xl font-mono font-bold">${totalSales.toLocaleString()}</div>
+            <div className="text-2xl font-mono font-bold"><CurrencyDisplay amount={totalSales} /></div>
             <div className="text-xs font-mono text-muted-foreground mt-1">Product Revenue</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-background border border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
@@ -51,7 +52,7 @@ export function EnhancedProductsTab({ data }: EnhancedProductsTabProps) {
             <div className="text-xs font-mono text-muted-foreground mt-1">Total Units</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-background border border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
@@ -62,7 +63,7 @@ export function EnhancedProductsTab({ data }: EnhancedProductsTabProps) {
             <div className="text-xs font-mono text-muted-foreground mt-1">Profit Margin</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-background border border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
@@ -116,7 +117,7 @@ export function EnhancedProductsTab({ data }: EnhancedProductsTabProps) {
                   <Badge variant="secondary" className="text-xs font-mono">{product.margin}% margin</Badge>
                 </div>
                 <div className="flex items-center justify-between text-xs font-mono">
-                  <span>Sales: ${product.sales.toLocaleString()}</span>
+                  <span>Sales: <CurrencyDisplay amount={product.sales} /></span>
                   <span>Units: {product.units}</span>
                 </div>
                 <div className="space-y-1">
@@ -144,7 +145,7 @@ export function EnhancedProductsTab({ data }: EnhancedProductsTabProps) {
                   <div className="text-xs font-mono text-muted-foreground">{category.count} products</div>
                 </div>
                 <div className="text-right space-y-1">
-                  <div className="text-sm font-mono font-bold">${category.sales.toLocaleString()}</div>
+                  <div className="text-sm font-mono font-bold"><CurrencyDisplay amount={category.sales} /></div>
                   <div className="flex gap-2">
                     <Badge variant="secondary" className="text-xs font-mono">{category.margin}%</Badge>
                     <Badge variant={category.growth.startsWith('+') ? 'default' : 'destructive'} className="text-xs font-mono">
@@ -169,19 +170,19 @@ export function EnhancedProductsTab({ data }: EnhancedProductsTabProps) {
                 <div className="text-2xl font-mono font-bold text-orange-600">{data.inventory.lowStock}</div>
                 <div className="text-xs font-mono font-medium">Low Stock</div>
               </div>
-              
+
               <div className="text-center p-4 border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20">
                 <AlertTriangle className="h-6 w-6 text-red-600 mx-auto mb-2" />
                 <div className="text-2xl font-mono font-bold text-red-600">{data.inventory.outOfStock}</div>
                 <div className="text-xs font-mono font-medium">Out of Stock</div>
               </div>
-              
+
               <div className="text-center p-4 border border-border/50">
                 <Package className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
                 <div className="text-2xl font-mono font-bold">{data.inventory.totalProducts}</div>
                 <div className="text-xs font-mono font-medium">Total Products</div>
               </div>
-              
+
               <div className="text-center p-4 border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20">
                 <CheckCircle className="h-6 w-6 text-green-600 mx-auto mb-2" />
                 <div className="text-2xl font-mono font-bold text-green-600">{data.inventory.avgStockLevel}%</div>

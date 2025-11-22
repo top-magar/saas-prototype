@@ -1,6 +1,8 @@
 'use client';
 import { TenantProvider } from '../providers/tenant-provider';
+import { CurrencyProvider } from '@/hooks/use-currency';
 import { ThemeProvider } from '@/components/providers/theme-provider';
+import { PreferencesProvider } from '@/app/context/preferences-context';
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -11,7 +13,11 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
     >
       <TenantProvider>
-        {children}
+        <PreferencesProvider>
+          <CurrencyProvider>
+            {children}
+          </CurrencyProvider>
+        </PreferencesProvider>
       </TenantProvider>
     </ThemeProvider>
   );

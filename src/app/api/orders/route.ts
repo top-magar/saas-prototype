@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/database/supabase";
 import { NextRequest, NextResponse } from 'next/server';
 import { findOrCreateCustomer } from '@/lib/database/customers';
+import type { OrderFilter, OrdersResponse, PaymentStatus, FulfillmentStatus, OrderSortKey } from '@/types/orders';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -13,14 +14,61 @@ export async function GET(req: NextRequest) {
   try {
     const { authorize } = await import('@/lib/server/auth');
     await authorize(tenantId, ['admin', 'manager', 'user']);
-    
-    const { data: orders } = await supabase
+
+    // Parse filter parameters
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '50');
+    const paymentStatus = searchParams.get('payment_status') as PaymentStatus | 'all' | null;
+    const fulfillmentStatus = searchParams.get('fulfillment_status') as FulfillmentStatus | 'all' | null;
+    const search = searchParams.get('search');
+    const sortBy = (searchParams.get('sort') as OrderSortKey) || 'created_at';
+    const sortOrder = (searchParams.get('order') as 'asc' | 'desc') || 'desc';
+
+    // Build query
+    let query = supabase
       .from('orders')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .order('created_at', { ascending: false })
-      .limit(100);
-    return NextResponse.json(orders);
+      .select('*', { count: 'exact' })
+      .eq('tenant_id', tenantId);
+
+    // Apply filters
+    if (paymentStatus && paymentStatus !== 'all') {
+      query = query.eq('payment_status', paymentStatus);
+    }
+
+    if (fulfillmentStatus && fulfillmentStatus !== 'all') {
+      query = query.eq('fulfillment_status', fulfillmentStatus);
+    }
+
+    // Search functionality
+    if (search) {
+      query = query.or(`order_number.ilike.%${search}%,customer_name.ilike.%${search}%,customer_email.ilike.%${search}%`);
+    }
+
+    // Apply sorting
+    const ascending = sortOrder === 'asc';
+    query = query.order(sortBy, { ascending });
+
+    // Apply pagination
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+    query = query.range(from, to);
+
+    const { data: orders, error, count } = await query;
+
+    if (error) {
+      console.error('[ORDERS_GET]', error);
+      return new NextResponse('Database error', { status: 500 });
+    }
+
+    const response: OrdersResponse = {
+      orders: orders || [],
+      total: count || 0,
+      page,
+      limit,
+      totalPages: Math.ceil((count || 0) / limit)
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error('[ORDERS_GET]', error);
     if (error instanceof Error && error.message.includes('Unauthorized')) {
@@ -54,7 +102,7 @@ export async function POST(req: NextRequest) {
       .eq('tenant_id', tenantId);
     const orderNumber = `ORD-${Date.now()}-${(orderCount || 0) + 1}`;
 
-    // Create order with customer
+    // Create order with enhanced fields
     const { data: order } = await supabase
       .from('orders')
       .insert({
@@ -66,9 +114,11 @@ export async function POST(req: NextRequest) {
         customer_phone: customerPhone,
         subtotal: total,
         total,
+        total_minor_units: total * 100, // Convert to minor units
         payment_method: paymentMethod || 'online',
-        status: 'pending',
-        payment_status: 'pending'
+        payment_status: 'pending',
+        fulfillment_status: 'unfulfilled',
+        status: 'pending'
       })
       .select()
       .single();

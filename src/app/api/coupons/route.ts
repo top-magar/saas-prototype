@@ -12,7 +12,7 @@ export async function GET() {
     const { data: coupons } = await supabase
       .from('coupons')
       .select('*')
-      .eq('tenant_id', tenant.id)
+      .eq('tenantId', tenant.id)
       .order('created_at', { ascending: false });
 
     return NextResponse.json(coupons);
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     const { data: coupon } = await supabase
       .from('coupons')
       .insert({
-        tenant_id: tenant.id,
+        tenantId: tenant.id,
         code: code.toUpperCase(),
         type,
         value,

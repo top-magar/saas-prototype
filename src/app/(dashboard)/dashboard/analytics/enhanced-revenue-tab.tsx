@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { TrendingUp, DollarSign, Users, Target, Activity, Calendar } from "lucide-react";
+import { CurrencyDisplay } from "@/components/currency-selector";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 interface EnhancedRevenueTabProps {
@@ -38,22 +40,22 @@ export function EnhancedRevenueTab({ data }: EnhancedRevenueTabProps) {
               <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">MRR</div>
               <Badge variant="secondary" className="text-xs font-mono">+12%</Badge>
             </div>
-            <div className="text-2xl font-mono font-bold">${data.metrics.mrr.toLocaleString()}</div>
+            <div className="text-2xl font-mono font-bold"><CurrencyDisplay amount={data.metrics.mrr} /></div>
             <div className="text-xs font-mono text-muted-foreground mt-1">Monthly Recurring</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-background border border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">ARR</div>
               <Badge variant="secondary" className="text-xs font-mono">+15%</Badge>
             </div>
-            <div className="text-2xl font-mono font-bold">${data.metrics.arr.toLocaleString()}</div>
+            <div className="text-2xl font-mono font-bold"><CurrencyDisplay amount={data.metrics.arr} /></div>
             <div className="text-xs font-mono text-muted-foreground mt-1">Annual Recurring</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-background border border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
@@ -64,7 +66,7 @@ export function EnhancedRevenueTab({ data }: EnhancedRevenueTabProps) {
             <div className="text-xs font-mono text-muted-foreground mt-1">Lifetime Value</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-background border border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
@@ -145,7 +147,7 @@ export function EnhancedRevenueTab({ data }: EnhancedRevenueTabProps) {
           <div className="grid gap-6 md:grid-cols-3">
             <div className="space-y-3">
               <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">NEXT MONTH</div>
-              <div className="text-xl font-mono font-bold">${data.forecasting.nextMonth.predicted.toLocaleString()}</div>
+              <div className="text-xl font-mono font-bold"><CurrencyDisplay amount={data.forecasting.nextMonth.predicted} /></div>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-mono">
                   <span>Confidence</span>
@@ -153,14 +155,14 @@ export function EnhancedRevenueTab({ data }: EnhancedRevenueTabProps) {
                 </div>
                 <Progress value={data.forecasting.nextMonth.confidence} className="h-1" />
                 <div className="text-xs font-mono text-muted-foreground">
-                  Range: ${data.forecasting.nextMonth.range[0].toLocaleString()} - ${data.forecasting.nextMonth.range[1].toLocaleString()}
+                  Range: <CurrencyDisplay amount={data.forecasting.nextMonth.range[0]} /> - <CurrencyDisplay amount={data.forecasting.nextMonth.range[1]} />
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-3">
               <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">NEXT QUARTER</div>
-              <div className="text-xl font-mono font-bold">${data.forecasting.nextQuarter.predicted.toLocaleString()}</div>
+              <div className="text-xl font-mono font-bold"><CurrencyDisplay amount={data.forecasting.nextQuarter.predicted} /></div>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-mono">
                   <span>Confidence</span>
@@ -168,14 +170,14 @@ export function EnhancedRevenueTab({ data }: EnhancedRevenueTabProps) {
                 </div>
                 <Progress value={data.forecasting.nextQuarter.confidence} className="h-1" />
                 <div className="text-xs font-mono text-muted-foreground">
-                  Range: ${data.forecasting.nextQuarter.range[0].toLocaleString()} - ${data.forecasting.nextQuarter.range[1].toLocaleString()}
+                  Range: <CurrencyDisplay amount={data.forecasting.nextQuarter.range[0]} /> - <CurrencyDisplay amount={data.forecasting.nextQuarter.range[1]} />
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-3">
               <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">YEAR END</div>
-              <div className="text-xl font-mono font-bold">${data.forecasting.yearEnd.predicted.toLocaleString()}</div>
+              <div className="text-xl font-mono font-bold"><CurrencyDisplay amount={data.forecasting.yearEnd.predicted} /></div>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-mono">
                   <span>Confidence</span>
@@ -183,7 +185,7 @@ export function EnhancedRevenueTab({ data }: EnhancedRevenueTabProps) {
                 </div>
                 <Progress value={data.forecasting.yearEnd.confidence} className="h-1" />
                 <div className="text-xs font-mono text-muted-foreground">
-                  Range: ${data.forecasting.yearEnd.range[0].toLocaleString()} - ${data.forecasting.yearEnd.range[1].toLocaleString()}
+                  Range: <CurrencyDisplay amount={data.forecasting.yearEnd.range[0]} /> - <CurrencyDisplay amount={data.forecasting.yearEnd.range[1]} />
                 </div>
               </div>
             </div>
@@ -214,12 +216,11 @@ export function EnhancedRevenueTab({ data }: EnhancedRevenueTabProps) {
                 {cohort.retention.map((rate, index) => (
                   <div
                     key={index}
-                    className={`text-center p-1 border ${
-                      rate >= 90 ? 'bg-green-50 border-green-200 text-green-700 dark:bg-green-950/20 dark:border-green-800 dark:text-green-400' :
-                      rate >= 80 ? 'bg-yellow-50 border-yellow-200 text-yellow-700 dark:bg-yellow-950/20 dark:border-yellow-800 dark:text-yellow-400' :
-                      rate >= 70 ? 'bg-orange-50 border-orange-200 text-orange-700 dark:bg-orange-950/20 dark:border-orange-800 dark:text-orange-400' :
-                      'bg-red-50 border-red-200 text-red-700 dark:bg-red-950/20 dark:border-red-800 dark:text-red-400'
-                    }`}
+                    className={`text-center p-1 border ${rate >= 90 ? 'bg-green-50 border-green-200 text-green-700 dark:bg-green-950/20 dark:border-green-800 dark:text-green-400' :
+                        rate >= 80 ? 'bg-yellow-50 border-yellow-200 text-yellow-700 dark:bg-yellow-950/20 dark:border-yellow-800 dark:text-yellow-400' :
+                          rate >= 70 ? 'bg-orange-50 border-orange-200 text-orange-700 dark:bg-orange-950/20 dark:border-orange-800 dark:text-orange-400' :
+                            'bg-red-50 border-red-200 text-red-700 dark:bg-red-950/20 dark:border-red-800 dark:text-red-400'
+                      }`}
                   >
                     {rate}%
                   </div>

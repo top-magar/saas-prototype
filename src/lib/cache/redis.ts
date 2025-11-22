@@ -1,4 +1,5 @@
 import Redis from 'ioredis';
+import { logger } from '@/lib/monitoring/logger';
 
 let redis: Redis | null = null;
 
@@ -26,7 +27,7 @@ export async function cacheGet<T>(key: string): Promise<T | null> {
     const cached = await client.get(key);
     return cached ? JSON.parse(cached) : null;
   } catch (error) {
-    console.error('Cache get error:', error);
+    logger.error('Cache get error', error, { key });
     return null;
   }
 }
@@ -38,7 +39,7 @@ export async function cacheSet(key: string, value: unknown, ttl: number = 3600):
 
     await client.setex(key, ttl, JSON.stringify(value));
   } catch (error) {
-    console.error('Cache set error:', error);
+    logger.error('Cache set error', error, { key });
   }
 }
 
@@ -49,6 +50,6 @@ export async function cacheDelete(key: string): Promise<void> {
 
     await client.del(key);
   } catch (error) {
-    console.error('Cache delete error:', error);
+    logger.error('Cache delete error', error, { key });
   }
 }

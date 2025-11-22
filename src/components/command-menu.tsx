@@ -12,12 +12,12 @@ import {
 } from '@/components/ui/command';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Search, 
-  Clock, 
-  Settings, 
-  User, 
-  CreditCard, 
+import {
+  Search,
+  Clock,
+  Settings,
+  User,
+  CreditCard,
   LogOut,
   BarChart3,
   Package,
@@ -25,7 +25,7 @@ import {
   ShoppingCart
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useClerk } from '@clerk/nextjs';
+import { signOut } from 'next-auth/react';
 import { navigationConfig, adminNavigationConfig, NavItem } from '@/lib/navigation';
 
 interface RecentSearch {
@@ -39,7 +39,6 @@ export const CommandMenu = () => {
   const [open, setOpen] = React.useState(false);
   const [recentSearches, setRecentSearches] = React.useState<RecentSearch[]>([]);
   const router = useRouter();
-  const { signOut } = useClerk();
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -70,7 +69,7 @@ export const CommandMenu = () => {
       href: item.href,
       timestamp: Date.now(),
     };
-    
+
     setRecentSearches(prev => {
       const filtered = prev.filter(i => i.href !== item.href);
       const updated = [newItem, ...filtered].slice(0, 5);
@@ -108,12 +107,11 @@ export const CommandMenu = () => {
     <>
       <Button
         variant="outline"
-        className="relative h-9 w-full justify-start rounded-md bg-muted/50 text-sm font-normal text-muted-foreground shadow-none sm:pr-12 md:w-40 lg:w-56"
+        className="relative h-9 w-9 md:w-40 lg:w-56 justify-center md:justify-start rounded-md bg-muted/50 text-sm font-normal text-muted-foreground shadow-none sm:pr-12"
         onClick={() => setOpen(true)}
       >
-        <Search className="mr-2 h-4 w-4" />
-        <span className="hidden lg:inline-flex">Search...</span>
-        <span className="inline-flex lg:hidden">Search</span>
+        <Search className="h-4 w-4 md:mr-2" />
+        <span className="hidden md:inline-flex">Search...</span>
         <kbd className="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
           <span className="text-xs">⌘</span>K
         </kbd>
@@ -122,7 +120,7 @@ export const CommandMenu = () => {
         <CommandInput placeholder="Search for pages, actions, or settings..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          
+
           {recentSearches.length > 0 && (
             <>
               <CommandGroup heading="Recent">
@@ -139,7 +137,7 @@ export const CommandMenu = () => {
               <CommandSeparator />
             </>
           )}
-          
+
           <CommandGroup heading="Quick Actions">
             {quickActions.map((action) => (
               <CommandItem
@@ -154,9 +152,9 @@ export const CommandMenu = () => {
               </CommandItem>
             ))}
           </CommandGroup>
-          
+
           <CommandSeparator />
-          
+
           <CommandGroup heading="Navigation">
             {allNavItems.map((item) => (
               <CommandItem
@@ -168,9 +166,9 @@ export const CommandMenu = () => {
               </CommandItem>
             ))}
           </CommandGroup>
-          
+
           <CommandSeparator />
-          
+
           <CommandGroup heading="Settings & Account">
             <CommandItem
               onSelect={() => {
@@ -205,7 +203,7 @@ export const CommandMenu = () => {
             <CommandSeparator />
             <CommandItem
               onSelect={() => {
-                signOut(() => router.push('/'));
+                signOut({ callbackUrl: '/' });
                 setOpen(false);
               }}
               className="text-red-600"

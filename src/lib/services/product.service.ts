@@ -26,7 +26,7 @@ export class ProductService {
     const { data: product, error } = await supabase
       .from('products')
       .insert({
-        tenant_id: tenantId,
+        tenantId: tenantId,
         name,
         slug,
         description,
@@ -77,7 +77,7 @@ export class ProductService {
         status,
       })
       .eq('id', productId)
-      .eq('tenant_id', tenantId)
+      .eq('tenantId', tenantId)
       .select()
       .single();
 
@@ -90,7 +90,7 @@ export class ProductService {
       .from('products')
       .delete()
       .eq('id', productId)
-      .eq('tenant_id', tenantId);
+      .eq('tenantId', tenantId);
 
     if (error) throw new Error('Failed to delete product');
     return { success: true };
@@ -106,7 +106,7 @@ export class ProductService {
         product_variants(*)
       `)
       .eq('id', productId)
-      .eq('tenant_id', tenantId)
+      .eq('tenantId', tenantId)
       .single();
 
     if (error) return null;
@@ -128,7 +128,7 @@ export class ProductService {
         product_categories(categories(id, name)),
         product_variants(id, price, quantity)
       `)
-      .eq('tenant_id', tenantId);
+      .eq('tenantId', tenantId);
 
     if (searchTerm) {
       query = query.ilike('name', `%${searchTerm}%`);

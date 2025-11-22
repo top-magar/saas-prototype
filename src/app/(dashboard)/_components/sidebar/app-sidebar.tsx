@@ -202,7 +202,7 @@ export function AppSidebar() {
           <Logo className="h-8 w-8 text-sidebar-header-foreground" />
           {!isCollapsed && (
             <span className="font-semibold text-sidebar-header-foreground">
-              Pasaal.Io
+              Pasaal
             </span>
           )}
         </a>

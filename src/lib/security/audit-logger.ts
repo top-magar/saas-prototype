@@ -20,7 +20,7 @@ interface AuditLogEntry {
 export async function logAudit(entry: AuditLogEntry): Promise<void> {
   try {
     await supabaseServerClient.from('audit_logs').insert({
-      tenant_id: entry.tenantId,
+      tenantId: entry.tenantId,
       user_id: entry.userId,
       action: entry.action,
       resource: entry.resource,

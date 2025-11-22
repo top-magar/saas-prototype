@@ -1,0 +1,21 @@
+-- Reset tenants and related data
+DELETE FROM audit_logs;
+DELETE FROM order_items;
+DELETE FROM payments;
+DELETE FROM orders;
+DELETE FROM product_variant_option_values;
+DELETE FROM product_variants;
+DELETE FROM product_option_values;
+DELETE FROM product_options;
+DELETE FROM media;
+DELETE FROM product_categories;
+DELETE FROM products;
+DELETE FROM categories;
+DELETE FROM coupons;
+DELETE FROM stores;
+DELETE FROM workflows;
+DELETE FROM webhooks;
+DELETE FROM api_keys;
+DELETE FROM sessions;
+DELETE FROM users;
+DELETE FROM tenants;

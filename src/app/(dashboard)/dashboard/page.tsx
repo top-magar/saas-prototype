@@ -1,10 +1,10 @@
-import { currentUser } from '@clerk/nextjs/server';
+
 import DashboardClientPage, { DashboardData } from './dashboard-client-page';
 
 async function getDashboardData(): Promise<DashboardData | null> {
   try {
     await new Promise(resolve => setTimeout(resolve, 500));
-    
+
     return {
       stats: {
         totalSales: 18750,
@@ -48,25 +48,21 @@ async function getDashboardData(): Promise<DashboardData | null> {
 }
 
 export default async function DashboardPage() {
-  const user = await currentUser();
-  
-  if (!user) {
-    return null;
+  const { getServerSession } = await import('next-auth');
+  const { authOptions } = await import('@/lib/auth/options');
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    const { redirect } = await import('next/navigation');
+    redirect('/sign-in');
   }
 
-  // Check if user has a tenant
   const { supabaseAdmin } = await import('@/lib/database/supabase');
   const { data: userRecord } = await supabaseAdmin
     .from('users')
     .select('tenantId')
-    .eq('clerkUserId', user.id)
+    .eq('email', session?.user?.email || '')
     .single();
-
-  // Redirect to tenant creation if no tenant
-  if (!userRecord?.tenantId) {
-    const { redirect } = await import('next/navigation');
-    redirect('/tenant/new');
-  }
 
   const data = await getDashboardData();
   return <DashboardClientPage data={data} />;

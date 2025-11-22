@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { Check, Star, Zap, ArrowRight, Shield, Users, Headphones, Globe } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { toast } from "sonner";
@@ -103,7 +103,8 @@ const features = [
 ];
 
 export default function PricingPage() {
-  const { isSignedIn } = useUser();
+  const { status } = useSession();
+  const isSignedIn = status === 'authenticated';
   const router = useRouter();
 
   const handleAction = async (tier: (typeof pricingTiers)[0]) => {
@@ -115,7 +116,7 @@ export default function PricingPage() {
       }
       return;
     }
-    
+
     if (tier.tierId === "ENTERPRISE") {
       toast.info("Please contact sales to learn more about our Enterprise plan.");
       return;
@@ -163,7 +164,7 @@ export default function PricingPage() {
               Built for modern businesses with enterprise-grade features and startup-friendly pricing.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             {features.map((feature) => (
               <div key={feature.title} className="text-center">
@@ -182,18 +183,18 @@ export default function PricingPage() {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
         </div>
-        
+
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="bg-card rounded-lg p-6 border">
             <h3 className="font-semibold mb-2">Can I change plans anytime?</h3>
             <p className="text-muted-foreground">Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
           </div>
-          
+
           <div className="bg-card rounded-lg p-6 border">
             <h3 className="font-semibold mb-2">Is there a free trial?</h3>
             <p className="text-muted-foreground">All paid plans come with a 14-day free trial. No credit card required to start.</p>
           </div>
-          
+
           <div className="bg-card rounded-lg p-6 border">
             <h3 className="font-semibold mb-2">What payment methods do you accept?</h3>
             <p className="text-muted-foreground">We accept eSewa, Khalti, and FonePay for convenient local payments in Nepal.</p>
@@ -207,8 +208,8 @@ export default function PricingPage() {
           <p className="text-lg mb-8 opacity-90">
             Join thousands of businesses already using Pasaal.io to grow their operations.
           </p>
-          <Button 
-            size="lg" 
+          <Button
+            size="lg"
             variant="secondary"
             onClick={() => router.push(isSignedIn ? "/dashboard" : "/sign-up")}
             className="bg-background text-foreground hover:bg-background/90"
@@ -243,13 +244,13 @@ const PricingCard = ({ tier, onSelect }: { tier: (typeof pricingTiers)[0], onSel
           Recommended
         </Badge>
       )}
-      
+
       <CardTitle className="text-xl font-bold flex items-center gap-2">
         {tier.name}
         {tier.tierId === "PRO" && <Zap className="h-5 w-5 text-primary" />}
       </CardTitle>
       <CardDescription className="text-sm">{tier.description}</CardDescription>
-      
+
       <div className="mt-6">
         <div className="flex items-baseline gap-1">
           <span className="text-3xl font-bold">{tier.price}</span>
@@ -262,7 +263,7 @@ const PricingCard = ({ tier, onSelect }: { tier: (typeof pricingTiers)[0], onSel
         )}
       </div>
     </CardHeader>
-    
+
     <CardContent className="flex-grow">
       <ul role="list" className="space-y-3 text-sm">
         {tier.features.map((feature: string) => (
@@ -273,7 +274,7 @@ const PricingCard = ({ tier, onSelect }: { tier: (typeof pricingTiers)[0], onSel
         ))}
       </ul>
     </CardContent>
-    
+
     <CardFooter className="pt-6">
       <Button
         className={cn(
@@ -286,7 +287,7 @@ const PricingCard = ({ tier, onSelect }: { tier: (typeof pricingTiers)[0], onSel
       >
         {tier.buttonText}
       </Button>
-      
+
       {tier.tierId !== "FREE" && tier.tierId !== "ENTERPRISE" && (
         <p className="text-xs text-muted-foreground text-center mt-2">
           14-day free trial • Cancel anytime

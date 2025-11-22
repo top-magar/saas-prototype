@@ -7,11 +7,11 @@ interface TenantLayoutProps {
   params: Promise<{ subdomain: string }>;
 }
 
-async function getTenant(subdomain: string) {
+async function getTenant(domain: string) {
   const { data: tenant } = await supabase
     .from('tenants')
     .select('id, name, subdomain, tier, primaryColor')
-    .eq('subdomain', subdomain)
+    .or(`subdomain.eq.${domain},custom_domain.eq.${domain}`)
     .single();
 
   return tenant;

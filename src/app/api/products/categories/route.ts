@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     const { data: categories } = await supabase
       .from('categories')
       .select('id, name, description, created_at, updated_at')
-      .eq('tenant_id', tenantId)
+      .eq('tenantId', tenantId)
       .order('name', { ascending: true });
 
     return NextResponse.json(categories);
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     const { data: category } = await supabase
       .from('categories')
       .insert({
-        tenant_id: tenantId,
+        tenantId: tenantId,
         name: name.trim(),
         description: description?.trim() || null,
       })

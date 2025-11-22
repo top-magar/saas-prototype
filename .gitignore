@@ -49,3 +49,7 @@ yarn-error.log*
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Debug
+DEBUG-ORDERS.md
+sample-orders.sql

@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { SignedIn } from "@clerk/nextjs";
+import { useEffect, useState } from 'react';
+import { useSession } from "next-auth/react";
 import { TenantProvider } from "@/components/_shared";
 import { useTenant } from "@/lib/tenant-context";
 import dynamic from 'next/dynamic';
@@ -17,22 +17,30 @@ import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import { CurrencyProvider } from "@/hooks/use-currency";
 import { DateFormatProvider } from "@/hooks/use-date-format";
 import { LanguageProvider } from "@/hooks/use-language";
+import { PreferencesProvider } from "@/app/context/preferences-context";
+import { MobileNav } from "@/components/mobile-nav";
+
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { tenant, isLoading } = useTenant();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (!isLoading && !tenant) {
-      router.push('/tenant/new');
-    }
-  }, [isLoading, tenant, router]);
 
-  if (isLoading || !tenant) {
+  if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
-        <p className="text-muted-foreground">Loading your workspace...</p>
+        <p className="text-muted-foreground">Loading...</p>
       </div>
+    );
+  }
+
+  if (!tenant) {
+    return (
+      <>
+
+        <div className="flex h-screen w-full items-center justify-center bg-background">
+          <p className="text-muted-foreground">Setting up your store...</p>
+        </div>
+      </>
     );
   }
 
@@ -46,13 +54,14 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           <SmoothScroll className="flex-1 overflow-auto">
             <main>
               <ErrorBoundary>
-                <div className="h-full w-full max-w-full p-4 sm:p-6  ">
+                <div className="h-full w-full max-w-full p-4 sm:p-6 pb-20 md:pb-6">
                   {children}
                 </div>
               </ErrorBoundary>
             </main>
           </SmoothScroll>
         </SidebarInset>
+        <MobileNav />
       </div>
     </SidebarProvider>
   );
@@ -63,9 +72,28 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/sign-in');
+    }
+  }, [status, router]);
+
+  if (status === 'loading') {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!session) return null;
+
   return (
-    <SignedIn>
-      <LanguageProvider>
+    <LanguageProvider>
+      <PreferencesProvider>
         <CurrencyProvider>
           <DateFormatProvider>
             <TenantProvider>
@@ -75,7 +103,7 @@ export default function DashboardLayout({
             </TenantProvider>
           </DateFormatProvider>
         </CurrencyProvider>
-      </LanguageProvider>
-    </SignedIn>
+      </PreferencesProvider>
+    </LanguageProvider>
   );
 }

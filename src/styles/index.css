@@ -65,12 +65,12 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  
+
   /* Spacing Scale */
   --section-spacing-sm: 4rem;
   --section-spacing-md: 6rem;
   --section-spacing-lg: 8rem;
-  
+
   /* Animation Variables */
   --animate-accordion-down: accordion-down 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --animate-accordion-up: accordion-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -84,24 +84,27 @@
   * {
     @apply border-border;
   }
-  
-  
-  
+
+
+
   html {
     @apply scroll-smooth;
   }
-  
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     font-variation-settings: 'opsz' 32;
   }
-  
-  button, [role="button"] {
+
+  button,
+  [role="button"] {
     @apply transition-all duration-200;
   }
-  
-  input, textarea, select {
+
+  input,
+  textarea,
+  select {
     @apply transition-colors duration-200;
   }
 }

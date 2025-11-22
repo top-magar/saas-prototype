@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Target, TrendingUp, DollarSign, Users } from "lucide-react";
+import { CurrencyDisplay } from "@/components/currency-selector";
 
 interface EnhancedMarketingTabProps {
   data: {
@@ -32,7 +33,7 @@ export function EnhancedMarketingTab({ data }: EnhancedMarketingTabProps) {
             <div className="text-xs font-mono text-muted-foreground mt-1">Website Traffic</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-background border border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
@@ -43,7 +44,7 @@ export function EnhancedMarketingTab({ data }: EnhancedMarketingTabProps) {
             <div className="text-xs font-mono text-muted-foreground mt-1">Total Conversions</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-background border border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
@@ -54,14 +55,14 @@ export function EnhancedMarketingTab({ data }: EnhancedMarketingTabProps) {
             <div className="text-xs font-mono text-muted-foreground mt-1">Overall Rate</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-background border border-border/50">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Ad Spend</div>
               <Badge variant="destructive" className="text-xs font-mono">+15%</Badge>
             </div>
-            <div className="text-2xl font-mono font-bold">${totalCost.toLocaleString()}</div>
+            <div className="text-2xl font-mono font-bold"><CurrencyDisplay amount={totalCost} /></div>
             <div className="text-xs font-mono text-muted-foreground mt-1">Total Cost</div>
           </CardContent>
         </Card>
@@ -79,7 +80,7 @@ export function EnhancedMarketingTab({ data }: EnhancedMarketingTabProps) {
         <CardContent className="space-y-4">
           {data.channels.map((channel) => {
             const channelConversionRate = ((channel.conversions / channel.visitors) * 100).toFixed(1);
-            
+
             return (
               <div key={channel.channel} className="space-y-3 p-4 border border-border/50 hover:border-border transition-all">
                 <div className="flex items-center justify-between">
@@ -87,11 +88,11 @@ export function EnhancedMarketingTab({ data }: EnhancedMarketingTabProps) {
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary" className="text-xs font-mono">ROAS: {channel.roas}</Badge>
                     {channel.cost > 0 && (
-                      <Badge variant="outline" className="text-xs font-mono">${channel.cost}</Badge>
+                      <Badge variant="outline" className="text-xs font-mono"><CurrencyDisplay amount={channel.cost} /></Badge>
                     )}
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-3 gap-4 text-xs font-mono">
                   <div>
                     <div className="text-muted-foreground">Visitors</div>
@@ -106,7 +107,7 @@ export function EnhancedMarketingTab({ data }: EnhancedMarketingTabProps) {
                     <div className="font-bold">{channelConversionRate}%</div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-1">
                   <Progress value={parseFloat(channelConversionRate)} className="h-2" />
                   <div className="text-xs font-mono text-muted-foreground">
@@ -132,31 +133,31 @@ export function EnhancedMarketingTab({ data }: EnhancedMarketingTabProps) {
           {data.campaigns.map((campaign) => {
             const spendPercentage = (campaign.spent / campaign.budget) * 100;
             const costPerConversion = campaign.conversions > 0 ? (campaign.spent / campaign.conversions).toFixed(0) : '0';
-            
+
             return (
               <div key={campaign.name} className="space-y-3 p-4 border border-border/50 hover:border-border transition-all">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-mono font-medium">{campaign.name}</div>
-                  <Badge 
+                  <Badge
                     variant={
-                      campaign.status === 'Active' ? 'default' : 
-                      campaign.status === 'Completed' ? 'secondary' : 
-                      'outline'
-                    } 
+                      campaign.status === 'Active' ? 'default' :
+                        campaign.status === 'Completed' ? 'secondary' :
+                          'outline'
+                    }
                     className="text-xs font-mono"
                   >
                     {campaign.status}
                   </Badge>
                 </div>
-                
+
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono">
                   <div>
                     <div className="text-muted-foreground">Budget</div>
-                    <div className="font-bold">${campaign.budget.toLocaleString()}</div>
+                    <div className="font-bold"><CurrencyDisplay amount={campaign.budget} /></div>
                   </div>
                   <div>
                     <div className="text-muted-foreground">Spent</div>
-                    <div className="font-bold">${campaign.spent.toLocaleString()}</div>
+                    <div className="font-bold"><CurrencyDisplay amount={campaign.spent} /></div>
                   </div>
                   <div>
                     <div className="text-muted-foreground">Conversions</div>
@@ -167,7 +168,7 @@ export function EnhancedMarketingTab({ data }: EnhancedMarketingTabProps) {
                     <div className="font-bold">{campaign.roas}</div>
                   </div>
                 </div>
-                
+
                 {campaign.status === 'Active' && (
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs font-mono">
@@ -176,7 +177,7 @@ export function EnhancedMarketingTab({ data }: EnhancedMarketingTabProps) {
                     </div>
                     <Progress value={spendPercentage} className="h-2" />
                     <div className="text-xs font-mono text-muted-foreground">
-                      Cost per conversion: ${costPerConversion}
+                      Cost per conversion: <CurrencyDisplay amount={parseFloat(costPerConversion)} />
                     </div>
                   </div>
                 )}
@@ -196,16 +197,16 @@ export function EnhancedMarketingTab({ data }: EnhancedMarketingTabProps) {
             <div className="text-xs font-mono text-muted-foreground mt-1">from organic channels</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-background border border-border/50">
           <CardContent className="p-6 text-center">
             <DollarSign className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
-            <div className="text-lg font-mono font-bold">$85</div>
+            <div className="text-lg font-mono font-bold"><CurrencyDisplay amount={85} /></div>
             <div className="text-xs font-mono text-muted-foreground">Avg CAC</div>
             <div className="text-xs font-mono text-muted-foreground mt-1">customer acquisition cost</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-background border border-border/50">
           <CardContent className="p-6 text-center">
             <Target className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />

@@ -21,7 +21,7 @@ export async function getProductsWithCache(tenantId: string, page = 1, limit = 2
       media!inner(url, alt_text),
       product_variants!inner(price, stock)
     `, { count: 'exact' })
-    .eq('tenant_id', tenantId)
+    .eq('tenantId', tenantId)
     .range((page - 1) * limit, page * limit - 1)
     .order('created_at', { ascending: false });
 
@@ -58,20 +58,20 @@ export async function getTenantAnalytics(tenantId: string, timeRange = '30d') {
       supabase
         .from('orders')
         .select('id', { count: 'exact', head: true })
-        .eq('tenant_id', tenantId)
+        .eq('tenantId', tenantId)
         .gte('created_at', dateFilter.gte.toISOString()),
       
       supabase
         .from('orders')
         .select('total')
-        .eq('tenant_id', tenantId)
+        .eq('tenantId', tenantId)
         .eq('status', 'completed')
         .gte('created_at', dateFilter.gte.toISOString()),
       
       supabase
         .from('users')
         .select('id', { count: 'exact', head: true })
-        .eq('tenant_id', tenantId)
+        .eq('tenantId', tenantId)
         .gte('created_at', dateFilter.gte.toISOString())
     ]);
   } catch (error) {

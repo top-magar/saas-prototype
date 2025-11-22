@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth/options';
 import { createTenantAndAssociateUser } from '@/lib/database/tenant';
 import { isValidSubdomain } from '@/lib/database/tenant';
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
-    
+    const session = await getServerSession(authOptions);
+    const userId = (session?.user as any)?.id;
+
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -21,7 +23,6 @@ export async function POST(request: NextRequest) {
     }
 
     const tenant = await createTenantAndAssociateUser({
-      clerkUserId: userId,
       name,
       subdomain,
       email,
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
         { status: 409 }
       );
     }
-    
+
     return NextResponse.json(
       { error: 'Failed to create tenant' },
       { status: 500 }

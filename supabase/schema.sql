@@ -8,12 +8,12 @@ CREATE TYPE tenant_tier AS ENUM ('FREE', 'STARTER', 'PRO', 'ENTERPRISE');
 CREATE TABLE tenants (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     subdomain VARCHAR UNIQUE NOT NULL,
+    custom_domain VARCHAR UNIQUE,
     name VARCHAR NOT NULL,
     tier tenant_tier DEFAULT 'STARTER',
     status VARCHAR DEFAULT 'active',
     logo_url VARCHAR,
     primary_color VARCHAR DEFAULT '#3B82F6',
-    monthly_budget DECIMAL(12,2) NOT NULL,
     current_spend DECIMAL(12,2) DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -260,6 +260,7 @@ CREATE TABLE coupons (
 
 -- Create indexes
 CREATE INDEX idx_tenants_subdomain ON tenants(subdomain);
+CREATE INDEX idx_tenants_custom_domain ON tenants(custom_domain);
 CREATE INDEX idx_tenants_status ON tenants(status);
 CREATE INDEX idx_users_tenant_id ON users(tenant_id);
 CREATE INDEX idx_users_email ON users(email);

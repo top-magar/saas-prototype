@@ -11,7 +11,7 @@ export async function validateCoupon(
       .from('coupons')
       .select('*')
       .eq('code', code.toUpperCase())
-      .eq('tenant_id', tenantId)
+      .eq('tenantId', tenantId)
       .eq('is_active', true)
       .single();
 

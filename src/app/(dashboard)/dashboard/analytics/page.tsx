@@ -1,4 +1,5 @@
-import { currentUser } from '@clerk/nextjs/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth/options';
 import { calculateAnalytics } from '@/lib/server-only-utils';
 import AnalyticsClient from './analytics-client';
 
@@ -7,23 +8,24 @@ interface AnalyticsPageProps {
 }
 
 export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps) {
-  const user = await currentUser();
+  const session = await getServerSession(authOptions);
+  const user = session?.user;
   const { timeRange = '30d' } = await searchParams;
-  
+
   if (!user) {
     return <div>Unauthorized</div>;
   }
 
-  const tenantId = (user.publicMetadata?.tenantId as string) || 
-                   (user.privateMetadata?.tenantId as string) || 
-                   user.id;
+  const tenantId = ((user as any)?.publicMetadata?.tenantId as string) ||
+    ((user as any)?.privateMetadata?.tenantId as string) ||
+    (user as any)?.id;
 
   let analyticsData: any = null;
   let hasError = false;
 
   try {
     const analytics = await calculateAnalytics(tenantId, timeRange);
-    
+
     analyticsData = {
       overview: [
         { month: "Jan", totalSales: 45000, newCustomers: 240, orders: 180, avgOrderValue: 250 },
@@ -159,7 +161,7 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
         ]
       },
       stats: {
-        totalSales: `$${analytics.revenue.toLocaleString()}`,
+        totalSales: analytics.revenue >= 1000 ? `${(analytics.revenue / 1000).toFixed(1)}k` : analytics.revenue.toString(),
         newCustomers: `+${analytics.customers.toLocaleString()}`,
         conversionRate: 6.2,
         avgOrderValue: 250,
@@ -175,25 +177,25 @@ export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps
 
   if (hasError) {
     return (
-      
-        <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-          <h1 className="text-xl font-semibold md:text-2xl">Analytics Overview</h1>
-          <div className="text-center py-8 text-muted-foreground">
-            Failed to load analytics data
-          </div>
+
+      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <h1 className="text-xl font-semibold md:text-2xl">Analytics Overview</h1>
+        <div className="text-center py-8 text-muted-foreground">
+          Failed to load analytics data
         </div>
-      
+      </div>
+
     );
   }
 
   return (
-    
-      <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-        <AnalyticsClient 
-          data={analyticsData!} 
-          timeRange={timeRange}
-        />
-      </div>
-    
+
+    <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+      <AnalyticsClient
+        data={analyticsData!}
+        timeRange={timeRange}
+      />
+    </div>
+
   );
 }

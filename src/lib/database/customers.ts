@@ -10,7 +10,7 @@ export async function findOrCreateCustomer(data: CustomerData) {
       .from('users')
       .select('*')
       .eq('email', email)
-      .eq('tenant_id', tenantId)
+      .eq('tenantId', tenantId)
       .eq('role', 'user')
       .single();
 
@@ -21,7 +21,7 @@ export async function findOrCreateCustomer(data: CustomerData) {
         .insert({
           email,
           name: name || email.split('@')[0],
-          tenant_id: tenantId,
+          tenantId: tenantId,
           role: 'user',
           status: 'active'
         })

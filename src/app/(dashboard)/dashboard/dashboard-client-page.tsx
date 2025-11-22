@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useUser } from '@clerk/nextjs';
+import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { StatCard } from './_components/stat-card';
 import { RecentOrders } from './_components/recent-orders';
@@ -11,6 +11,7 @@ import { Empty, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent, EmptyHea
 import { motion } from 'framer-motion';
 import { ChartConfig } from '@/components/ui/chart';
 import { InteractiveBarChart } from './_components/interactive-bar-chart';
+import { useCurrency } from '@/hooks/use-currency';
 
 const OverviewChart = dynamic(() => import('./_components/overview-chart').then(mod => mod.OverviewChart), {
   ssr: false,
@@ -65,7 +66,8 @@ const salesByChannelConfig = {
 } satisfies ChartConfig;
 
 export default function DashboardClientPage({ data }: { data: DashboardData | null }) {
-  const { user } = useUser();
+  const { data: session } = useSession();
+  const { formatCurrency } = useCurrency();
   const [timeframe, setTimeframe] = useState("30d");
 
   const getTimeBasedGreeting = () => {
@@ -140,17 +142,17 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="mb-6">
-        <div className="flex items-start justify-between mb-6">
+      <div className="mb-4 md:mb-6">
+        <div className="flex flex-col md:flex-row items-start md:items-start justify-between gap-3 md:gap-0 mb-4 md:mb-6">
           <div className="space-y-1">
-            <h1 className="text-3xl font-bold tracking-tight">
-              {getTimeBasedGreeting()}, {user?.firstName || 'User'}!
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+              {getTimeBasedGreeting()}, {session?.user?.name?.split(' ')[0] || 'User'}!
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-sm md:text-lg text-muted-foreground">
               Here are your stats for today — {getTodayDate()}
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hidden md:flex">
             <ExternalLink className="h-4 w-4 mr-2" />
             Visit Website
           </Button>
@@ -169,7 +171,7 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
           />
           <StatCard
             name="Total Revenue"
-            value={`NPR ${data.stats.totalRevenue.toLocaleString()}`}
+            value={formatCurrency(data.stats.totalRevenue)}
             change="+18.2%"
             changeType="positive"
             index={1}
@@ -194,7 +196,7 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
         </div>
       )}
 
-      <div className="bg-background border border-border/50 p-8">
+      <div className="bg-background border border-border/50 p-4 md:p-8">
         <div className="text-sm font-mono font-semibold uppercase tracking-wide mb-6">PERFORMANCE</div>
         {data.overview && data.overview.length > 0 ? (
           <OverviewChart data={data.overview} />
@@ -215,7 +217,7 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
         )}
       </div>
 
-      <div className="bg-background border border-border/50 p-4">
+      <div className="bg-background border border-border/50 p-3 md:p-4">
         <div className="text-sm font-mono font-semibold uppercase tracking-wide mb-4">RECENT ACTIVITY</div>
         {data.recentOrders && data.recentOrders.length > 0 ? (
           <RecentOrders data={data.recentOrders} />

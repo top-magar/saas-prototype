@@ -98,15 +98,32 @@ const productPerformanceConfig = {
 
 export default function AnalyticsClient({ data, timeRange }: AnalyticsClientProps) {
   const [selectedTimeRange, setSelectedTimeRange] = useState(timeRange);
+  const [selectedView, setSelectedView] = useState("overview");
 
-  
+
 
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
+      {/* Filters Row */}
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+        {/* Mobile: Dropdown */}
+        <Select value={selectedView} onValueChange={setSelectedView}>
+          <SelectTrigger className="w-full sm:w-[200px] md:hidden">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="overview">Overview</SelectItem>
+            <SelectItem value="revenue">Revenue</SelectItem>
+            <SelectItem value="customers">Customers</SelectItem>
+            <SelectItem value="products">Products</SelectItem>
+            <SelectItem value="marketing">Marketing</SelectItem>
+            <SelectItem value="reports">Reports</SelectItem>
+          </SelectContent>
+        </Select>
+
         <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -118,8 +135,9 @@ export default function AnalyticsClient({ data, timeRange }: AnalyticsClientProp
         </Select>
       </div>
 
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+      <Tabs value={selectedView} onValueChange={setSelectedView} className="w-full">
+        {/* Desktop: Tabs */}
+        <TabsList className="hidden md:grid w-full grid-cols-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="revenue">Revenue</TabsTrigger>
           <TabsTrigger value="customers">Customers</TabsTrigger>
@@ -127,7 +145,7 @@ export default function AnalyticsClient({ data, timeRange }: AnalyticsClientProp
           <TabsTrigger value="marketing">Marketing</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="overview" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
@@ -242,7 +260,7 @@ export default function AnalyticsClient({ data, timeRange }: AnalyticsClientProp
             </Card>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="revenue" className="mt-4">
           <EnhancedRevenueTab data={data.revenue} />
         </TabsContent>

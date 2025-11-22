@@ -34,6 +34,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Search, FileText, Mail } from "lucide-react";
+import { useCurrency } from "@/hooks/use-currency";
 
 interface Invoice {
   id: string;
@@ -58,29 +59,29 @@ const allInvoices: Invoice[] = [
 const ITEMS_PER_PAGE = 5;
 
 export default function InvoicesPage() {
-  const [searchTerm, setSearchTerm] = useState(""    
+  const { formatCurrency } = useCurrency();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("All"
   );
-  const [filterStatus, setFilterStatus] = useState("All"    
-  );
-  const [currentPage, setCurrentPage] = useState(1    
+  const [currentPage, setCurrentPage] = useState(1
   );
 
   const filteredInvoices = allInvoices.filter((invoice) => {
     const matchesSearch =
       invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoice.customer.toLowerCase().includes(searchTerm.toLowerCase()    
-  );
+      invoice.customer.toLowerCase().includes(searchTerm.toLowerCase()
+      );
     const matchesStatus =
       filterStatus === "All" || invoice.status === filterStatus;
     return matchesSearch && matchesStatus;
-  }    
+  }
   );
 
-  const totalPages = Math.ceil(filteredInvoices.length / ITEMS_PER_PAGE    
+  const totalPages = Math.ceil(filteredInvoices.length / ITEMS_PER_PAGE
   );
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentInvoices = filteredInvoices.slice(startIndex, endIndex    
+  const currentInvoices = filteredInvoices.slice(startIndex, endIndex
   );
 
   const handleSendReminder = (invoiceId: string) => {
@@ -89,7 +90,7 @@ export default function InvoicesPage() {
   };
 
   return (
-    
+
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
 
       <Card>
@@ -138,15 +139,15 @@ export default function InvoicesPage() {
                 <TableRow key={invoice.id}>
                   <TableCell className="font-medium">{invoice.id}</TableCell>
                   <TableCell>{invoice.customer}</TableCell>
-                  <TableCell>${invoice.amount.toFixed(2)}</TableCell>
+                  <TableCell>{formatCurrency(invoice.amount)}</TableCell>
                   <TableCell>
                     <Badge
                       variant={
                         invoice.status === "Paid"
                           ? "default"
                           : invoice.status === "Overdue"
-                          ? "destructive"
-                          : "secondary"
+                            ? "destructive"
+                            : "secondary"
                       }
                     >
                       {invoice.status}
@@ -198,6 +199,6 @@ export default function InvoicesPage() {
         </CardContent>
       </Card>
     </div>
-      
+
   );
 }

@@ -1,11 +1,14 @@
-import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
 import { supabase } from "@/lib/database/supabase";
 import { getTenant } from '@/lib/database/tenant';
+import { authOptions } from '@/lib/auth/options';
 
 async function getDashboardData() {
   try {
-    const user = await currentUser();
+    const session = await getServerSession(authOptions);
+    const user = session?.user;
+
     if (!user) {
       return { error: 'Unauthorized' };
     }
@@ -17,7 +20,7 @@ async function getDashboardData() {
       console.error('[TENANT_FETCH_ERROR]', tenantError);
       return { error: 'Failed to retrieve tenant' };
     }
-    
+
     if (!tenant) {
       return { error: 'Tenant not found' };
     }
@@ -28,45 +31,45 @@ async function getDashboardData() {
     const { count: totalSales } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true })
-      .eq('tenant_id', tenant.id);
+      .eq('tenantId', tenant.id);
 
     const { data: revenueData } = await supabase
       .from('orders')
       .select('total')
-      .eq('tenant_id', tenant.id)
+      .eq('tenantId', tenant.id)
       .eq('status', 'completed');
     const totalRevenue = revenueData?.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
 
     const { count: activeCustomers } = await supabase
       .from('users')
       .select('*', { count: 'exact', head: true })
-      .eq('tenant_id', tenant.id)
+      .eq('tenantId', tenant.id)
       .gte('last_login_at', lastWeek.toISOString());
 
     const { count: refundRequests } = await supabase
       .from('payments')
-      .select('*, orders!inner(tenant_id)', { count: 'exact', head: true })
-      .eq('orders.tenant_id', tenant.id)
+      .select('*, orders!inner(tenantId)', { count: 'exact', head: true })
+      .eq('orders.tenantId', tenant.id)
       .eq('status', 'refunded');
 
     const { data: profitData } = await supabase
       .from('orders')
       .select('created_at, total')
-      .eq('tenant_id', tenant.id)
+      .eq('tenantId', tenant.id)
       .eq('status', 'completed')
       .order('created_at', { ascending: true });
 
     const { data: recentOrders } = await supabase
       .from('orders')
       .select('*, users(name)')
-      .eq('tenant_id', tenant.id)
+      .eq('tenantId', tenant.id)
       .order('created_at', { ascending: false })
       .limit(5);
 
     const { data: orderItems } = await supabase
       .from('order_items')
-      .select('product_id, subtotal, orders!inner(tenant_id)')
-      .eq('orders.tenant_id', tenant.id);
+      .select('product_id, subtotal, orders!inner(tenantId)')
+      .eq('orders.tenantId', tenant.id);
 
     const productSales = orderItems?.reduce((acc, item) => {
       acc[item.product_id] = (acc[item.product_id] || 0) + (item.subtotal || 0);
@@ -74,7 +77,7 @@ async function getDashboardData() {
     }, {} as Record<string, number>) || {};
 
     const topProductIds = Object.entries(productSales)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
       .map(([id]) => id);
 
@@ -108,13 +111,13 @@ async function getDashboardData() {
       topProducts: topProductIds.map((productId, index) => {
         const product = productDetails?.find((pd) => pd.id === productId);
         const earnings = productSales[productId] || 0;
-        
-        const revenuePercentage = totalProductRevenue > 0 
+
+        const revenuePercentage = totalProductRevenue > 0
           ? Math.round((earnings / totalProductRevenue) * 100)
           : 0;
-        
+
         return {
-          name: product?.name || `Product ${index + 1}`,
+          name: product?.name || `Product ${index + 1} `,
           percent: revenuePercentage,
           earnings: earnings,
           rank: index + 1,
@@ -139,10 +142,10 @@ export async function GET() {
         { status: 500 }
       );
     }
-    
+
     if ('error' in data) {
       console.error('[DASHBOARD_ERROR]', data.error);
-      
+
       // Return appropriate status codes based on error type
       if (data.error === 'Unauthorized') {
         return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
@@ -150,14 +153,14 @@ export async function GET() {
       if (data.error === 'Tenant not found') {
         return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
       }
-      
+
       return NextResponse.json({ error: data.error }, { status: 400 });
     }
-    
+
     return NextResponse.json(data);
   } catch (error) {
     console.error('Dashboard API error:', error);
-    
+
     // Handle specific error types
     if (error instanceof Error) {
       // Database connection errors
@@ -167,7 +170,7 @@ export async function GET() {
           { status: 503 } // Service Unavailable
         );
       }
-      
+
       // Prisma query errors
       if (error.message.includes('Invalid') || error.message.includes('constraint')) {
         return NextResponse.json(
@@ -175,7 +178,7 @@ export async function GET() {
           { status: 400 }
         );
       }
-      
+
       // Permission/access errors
       if (error.message.includes('permission') || error.message.includes('access')) {
         return NextResponse.json(
@@ -184,7 +187,7 @@ export async function GET() {
         );
       }
     }
-    
+
     // Generic fallback for unexpected errors
     return NextResponse.json(
       { error: 'Internal server error. Please try again later.' },

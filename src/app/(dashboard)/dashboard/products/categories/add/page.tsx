@@ -64,7 +64,7 @@ export default function AddCategoryPage() {
         toast.error('File size must be less than 4MB');
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -100,10 +100,10 @@ export default function AddCategoryPage() {
             Back to Categories
           </Button>
           <div className="text-center">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-xl font-semibold md:text-2xl">
               Add Category
             </h1>
-            <p className="text-lg text-muted-foreground mt-2">Create a new product category</p>
+            <p className="text-sm text-muted-foreground mt-1">Create a new product category</p>
           </div>
         </div>
 
@@ -111,13 +111,13 @@ export default function AddCategoryPage() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border overflow-hidden">
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 px-8 py-6 border-b">
+            <div className="px-6 py-4 border-b">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-foreground">
+                  <h2 className="text-lg font-semibold">
                     Category Information
                   </h2>
-                  <p className="text-muted-foreground mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Fill in the details for your new category
                   </p>
                 </div>
@@ -164,7 +164,7 @@ export default function AddCategoryPage() {
                       <button
                         type="button"
                         onClick={() => removeImage('category')}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                        className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -231,7 +231,7 @@ export default function AddCategoryPage() {
                       <button
                         type="button"
                         onClick={() => removeImage('seo')}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                        className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -244,7 +244,7 @@ export default function AddCategoryPage() {
                   <Checkbox
                     id="hideOnProductPages"
                     checked={formData.hideOnProductPages}
-                    onCheckedChange={(checked) => 
+                    onCheckedChange={(checked) =>
                       setFormData(prev => ({ ...prev, hideOnProductPages: checked as boolean }))
                     }
                   />
@@ -264,12 +264,12 @@ export default function AddCategoryPage() {
                 >
                   Cancel
                 </Button>
-                
-                <Button 
-                  type="button" 
-                  onClick={handleSubmit} 
+
+                <Button
+                  type="button"
+                  onClick={handleSubmit}
                   disabled={isSubmitting || !formData.name.trim()}
-                  className="px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                  className="px-6"
                 >
                   {isSubmitting ? 'Creating...' : 'Create Category'}
                 </Button>

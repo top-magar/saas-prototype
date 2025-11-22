@@ -2,6 +2,7 @@
 
 import { useEditorStore } from '@/lib/store-builder/editor-store';
 import { cn } from '@/lib/utils';
+import { useCurrency } from '@/hooks/use-currency';
 
 interface RecursiveElementProps {
   element: any;
@@ -14,7 +15,7 @@ export function RecursiveElement({ element }: RecursiveElementProps) {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     const componentType = e.dataTransfer.getData('componentType');
     if (componentType && Array.isArray(element.content)) {
       const newElement = {
@@ -24,7 +25,7 @@ export function RecursiveElement({ element }: RecursiveElementProps) {
         styles: {},
         content: componentType === 'container' || componentType === 'two-column' ? [] : {}
       };
-      
+
       // Add to this container
       useEditorStore.getState().addElement(newElement, element.id);
     }
@@ -54,12 +55,12 @@ export function RecursiveElement({ element }: RecursiveElementProps) {
     >
       {/* Render element based on type */}
       <ElementRenderer element={element} />
-      
+
       {/* Render children if recursive */}
       {isRecursive && element.content.map((child: any) => (
         <RecursiveElement key={child.id} element={child} />
       ))}
-      
+
       {/* Selection indicator */}
       {isSelected && (
         <div className="absolute -top-6 left-0 bg-blue-500 text-white px-2 py-1 text-xs rounded">
@@ -71,6 +72,8 @@ export function RecursiveElement({ element }: RecursiveElementProps) {
 }
 
 function ElementRenderer({ element }: { element: any }) {
+  const { formatCurrency } = useCurrency();
+
   switch (element.type) {
     case 'body':
       return null;
@@ -102,7 +105,7 @@ function ElementRenderer({ element }: { element: any }) {
       );
     case 'hero-banner':
       return (
-        <div 
+        <div
           className="relative bg-gray-900 text-white py-20 px-6"
           style={{ backgroundImage: element.content.backgroundImage ? `url(${element.content.backgroundImage})` : undefined }}
         >
@@ -129,12 +132,12 @@ function ElementRenderer({ element }: { element: any }) {
         <div className="py-12 px-6">
           <h2 className="text-3xl font-bold text-center mb-8">{element.content.title || 'Featured Products'}</h2>
           <div className={`grid gap-6 max-w-6xl mx-auto`} style={{ gridTemplateColumns: `repeat(${element.content.columns || 3}, 1fr)` }}>
-            {[1,2,3,4,5,6].slice(0, element.content.columns || 3).map(i => (
+            {[1, 2, 3, 4, 5, 6].slice(0, element.content.columns || 3).map(i => (
               <div key={i} className="bg-white border rounded-lg overflow-hidden shadow-sm">
                 <div className="h-48 bg-gray-200"></div>
                 <div className="p-4">
                   <h3 className="font-semibold mb-2">Product {i}</h3>
-                  {element.content.showPrices && <p className="text-blue-600 font-bold">$99.99</p>}
+                  {element.content.showPrices && <p className="text-blue-600 font-bold">{formatCurrency(99.99)}</p>}
                   {element.content.showCartButton && (
                     <button className="w-full mt-3 bg-blue-600 text-white py-2 rounded">Add to Cart</button>
                   )}

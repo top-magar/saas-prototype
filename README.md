@@ -15,7 +15,7 @@ A production-ready, multi-tenant SaaS application built with Next.js 16, featuri
 
 - **Framework:** Next.js 16 (App Router)
 - **Database:** Supabase (PostgreSQL)
-- **Authentication:** Clerk
+- **Authentication:** NextAuth.js (Google OAuth + Credentials)
 - **Caching:** Redis (Upstash)
 - **Monitoring:** Sentry + Vercel Analytics
 - **Testing:** Jest + Testing Library
@@ -27,7 +27,7 @@ A production-ready, multi-tenant SaaS application built with Next.js 16, featuri
 - Node.js 18+
 - npm or yarn
 - Supabase account
-- Clerk account
+- Google OAuth credentials (for authentication)
 
 ### Setup
 ```bash
@@ -59,7 +59,7 @@ cp .env.template .env.local
 
 **Required:**
 - Supabase (Database)
-- Clerk (Authentication)
+- NextAuth.js with Google OAuth (Authentication)
 
 **Optional:**
 - Upstash Redis (Caching & Rate Limiting)
@@ -128,7 +128,7 @@ chmod +x scripts/deploy.sh
 - **Input Validation** - Zod schemas with sanitization
 - **Rate Limiting** - Redis-based with configurable limits
 - **CSP Headers** - Content Security Policy protection
-- **Authentication** - Clerk integration with RBAC
+- **Authentication** - NextAuth.js with OAuth (Google) and credentials providers
 - **Audit Logging** - Security event tracking (auth, data access, changes)
 
 ## 📈 Performance Optimizations

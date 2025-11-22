@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,22 +11,28 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, Calendar, Shield, Settings, Edit, Save, Moon, Sun, Monitor, Globe, Bell, Clock } from "lucide-react";
+import { User, Mail, Calendar, Shield, Settings, Edit, Save, Moon, Sun, Monitor, Globe, Bell, Clock, CreditCard } from "lucide-react";
 import { useDateFormat } from "@/hooks/use-date-format";
 import { useTheme } from "next-themes";
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { CurrencySelector } from "@/components/currency-selector";
+import { LanguageSelector } from "@/components/language-selector";
+import { TimezoneSelector } from "@/components/timezone-selector";
 
 export default function UserProfilePage() {
-  const { user, isLoaded } = useUser();
+  const { data: session, status } = useSession();
   const { formatDate } = useDateFormat();
   const { theme, setTheme } = useTheme();
 
+  const user = session?.user;
+  const isLoaded = status !== "loading";
+
   // Profile State
   const [isEditing, setIsEditing] = useState(false);
-  const [firstName, setFirstName] = useState(user?.firstName || "");
-  const [lastName, setLastName] = useState(user?.lastName || "");
+  const [name, setName] = useState(user?.name || "");
+
 
   // Preferences State
   const [language, setLanguage] = useState("en");
@@ -45,7 +52,8 @@ export default function UserProfilePage() {
 
   const handleSaveProfile = async () => {
     try {
-      await user.update({ firstName, lastName });
+      // In a real app, you would call an API to update the user profile here
+      // await updateProfile({ name });
       setIsEditing(false);
       toast.success("Profile updated successfully");
     } catch (error) {
@@ -58,7 +66,8 @@ export default function UserProfilePage() {
     toast.success("Preferences saved successfully");
   };
 
-  const joinedDate = user.createdAt ? formatDate(user.createdAt) : 'N/A';
+  // const joinedDate = user.createdAt ? formatDate(user.createdAt) : 'N/A';
+  const joinedDate = 'N/A'; // NextAuth session doesn't usually have createdAt by default
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-8">
@@ -77,14 +86,14 @@ export default function UserProfilePage() {
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center space-y-4">
               <Avatar className="w-24 h-24 rounded-xl border-2 border-border">
-                <AvatarImage src={user.imageUrl} alt={user.fullName || "User"} />
+                <AvatarImage src={user.image || ""} alt={user.name || "User"} />
                 <AvatarFallback className="rounded-xl text-2xl">
-                  {user.firstName?.[0]}{user.lastName?.[0]}
+                  {user.name?.[0] || "U"}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="text-xl font-semibold">{user.fullName}</h3>
-                <p className="text-sm text-muted-foreground break-all">{user.emailAddresses[0]?.emailAddress}</p>
+                <h3 className="text-xl font-semibold">{user.name}</h3>
+                <p className="text-sm text-muted-foreground break-all">{user.email}</p>
                 <div className="mt-3">
                   <Badge variant="secondary" className="rounded-full px-3">USER</Badge>
                 </div>
@@ -135,30 +144,16 @@ export default function UserProfilePage() {
               <CardContent className="p-6 space-y-6">
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">First Name</label>
+                    <label className="text-sm font-medium">Full Name</label>
                     {isEditing ? (
                       <Input
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                         className="rounded-lg"
                       />
                     ) : (
                       <div className="p-2.5 bg-muted/30 rounded-lg text-sm border border-transparent">
-                        {user.firstName || "Not provided"}
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Last Name</label>
-                    {isEditing ? (
-                      <Input
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        className="rounded-lg"
-                      />
-                    ) : (
-                      <div className="p-2.5 bg-muted/30 rounded-lg text-sm border border-transparent">
-                        {user.lastName || "Not provided"}
+                        {user.name || "Not provided"}
                       </div>
                     )}
                   </div>
@@ -166,7 +161,7 @@ export default function UserProfilePage() {
                     <label className="text-sm font-medium">Email Address</label>
                     <div className="p-2.5 bg-muted/30 rounded-lg text-sm text-muted-foreground border border-transparent flex items-center gap-2">
                       <Mail className="h-4 w-4" />
-                      {user.emailAddresses[0]?.emailAddress}
+                      {user.email}
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -208,7 +203,7 @@ export default function UserProfilePage() {
                     <button
                       onClick={() => setTheme("light")}
                       className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${theme === "light" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
-                        }`}
+                        } `}
                     >
                       <Sun className="h-6 w-6 text-orange-500" />
                       <span className="text-xs font-medium">Light</span>
@@ -216,7 +211,7 @@ export default function UserProfilePage() {
                     <button
                       onClick={() => setTheme("dark")}
                       className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${theme === "dark" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
-                        }`}
+                        } `}
                     >
                       <Moon className="h-6 w-6 text-blue-400" />
                       <span className="text-xs font-medium">Dark</span>
@@ -224,7 +219,7 @@ export default function UserProfilePage() {
                     <button
                       onClick={() => setTheme("system")}
                       className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${theme === "system" ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
-                        }`}
+                        } `}
                     >
                       <Monitor className="h-6 w-6 text-muted-foreground" />
                       <span className="text-xs font-medium">System</span>
@@ -235,38 +230,29 @@ export default function UserProfilePage() {
                 <Separator />
 
                 {/* Localization */}
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2">
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      Language
-                    </label>
-                    <Select value={language} onValueChange={setLanguage}>
-                      <SelectTrigger className="rounded-lg">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="en">English (US)</SelectItem>
-                        <SelectItem value="ne">Nepali</SelectItem>
-                        <SelectItem value="es">Spanish</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      Timezone
-                    </label>
-                    <Select value={timezone} onValueChange={setTimezone}>
-                      <SelectTrigger className="rounded-lg">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Asia/Kathmandu">Kathmandu (GMT+5:45)</SelectItem>
-                        <SelectItem value="America/New_York">New York (GMT-5:00)</SelectItem>
-                        <SelectItem value="Europe/London">London (GMT+0:00)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-muted-foreground" />
+                    Language
+                  </label>
+                  <LanguageSelector />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    Timezone
+                  </label>
+                  <TimezoneSelector />
+                </div>
+
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    Currency
+                  </label>
+                  <div className="w-full max-w-[200px]">
+                    <CurrencySelector />
                   </div>
                 </div>
 
@@ -317,8 +303,8 @@ export default function UserProfilePage() {
                     <h4 className="font-medium">Two-Factor Authentication</h4>
                     <p className="text-sm text-muted-foreground">Add an extra layer of security to your account.</p>
                   </div>
-                  <Badge variant={user.twoFactorEnabled ? "default" : "outline"} className="rounded-full">
-                    {user.twoFactorEnabled ? "Enabled" : "Disabled"}
+                  <Badge variant="outline" className="rounded-full">
+                    Disabled
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between p-4 border rounded-xl bg-muted/10">

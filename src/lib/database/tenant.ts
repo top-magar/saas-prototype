@@ -4,34 +4,44 @@ import { supabase, supabaseAdmin } from './supabase';
 export async function getTenant() {
   const headersList = await headers();
   const tenantSubdomain = headersList.get('x-tenant-subdomain');
-  
-  if (!tenantSubdomain) {
+  const tenantCustomDomain = headersList.get('x-tenant-custom-domain');
+
+  if (!tenantSubdomain && !tenantCustomDomain) {
     return null;
   }
 
-  const { data } = await supabase
-    .from('tenants')
-    .select('*')
-    .eq('subdomain', tenantSubdomain)
-    .single();
-  
+  let query = supabase.from('tenants').select('*');
+
+  if (tenantSubdomain) {
+    query = query.eq('subdomain', tenantSubdomain);
+  } else if (tenantCustomDomain) {
+    query = query.eq('custom_domain', tenantCustomDomain);
+  }
+
+  const { data } = await query.single();
+
   return data;
 }
 
 export async function getCurrentTenant() {
   const headersList = await headers();
   const tenantSubdomain = headersList.get('x-tenant-subdomain');
-  
-  if (!tenantSubdomain) {
+  const tenantCustomDomain = headersList.get('x-tenant-custom-domain');
+
+  if (!tenantSubdomain && !tenantCustomDomain) {
     return null;
   }
 
-  const { data } = await supabase
-    .from('tenants')
-    .select('*, users(*)')
-    .eq('subdomain', tenantSubdomain)
-    .single();
-  
+  let query = supabase.from('tenants').select('*, users(*)');
+
+  if (tenantSubdomain) {
+    query = query.eq('subdomain', tenantSubdomain);
+  } else if (tenantCustomDomain) {
+    query = query.eq('custom_domain', tenantCustomDomain);
+  }
+
+  const { data } = await query.single();
+
   return data;
 }
 
@@ -39,7 +49,7 @@ export function getTenantUrl(subdomain: string, path: string = '') {
   const domain = process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000';
   const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
   const baseUrl = `${protocol}://${subdomain}.${domain}`;
-  
+
   return `${baseUrl}${path}`;
 }
 
@@ -49,32 +59,33 @@ export function isValidSubdomain(subdomain: string): boolean {
 }
 
 interface CreateTenantAndAssociateUserParams {
-  clerkUserId: string;
+  email: string;
   name: string;
   subdomain: string;
-  email: string;
   userName: string;
   primaryColor?: string;
 }
 
 export async function createTenantAndAssociateUser({
-  clerkUserId,
+  email,
   name,
   subdomain,
-  email,
   userName,
   primaryColor,
 }: CreateTenantAndAssociateUserParams) {
   const now = new Date().toISOString();
-  
+
   const { data: newTenant, error: tenantError } = await supabaseAdmin
     .from('tenants')
     .insert({
       id: crypto.randomUUID(),
       name,
       subdomain,
-      monthlyBudget: 0,
-      updatedAt: now,
+      monthlyBudget: 0, // Default budget
+      tier: 'STARTER', // Default tier
+      status: 'active', // Default status
+      createdAt: now, // Timestamp
+      updatedAt: now, // Timestamp
     })
     .select()
     .single();
@@ -86,7 +97,7 @@ export async function createTenantAndAssociateUser({
   const { data: existingUser } = await supabaseAdmin
     .from('users')
     .select('id')
-    .eq('clerkUserId', clerkUserId)
+    .eq('email', email)
     .single();
 
   if (existingUser) {
@@ -96,7 +107,7 @@ export async function createTenantAndAssociateUser({
         tenantId: newTenant.id,
         updatedAt: now,
       })
-      .eq('clerkUserId', clerkUserId);
+      .eq('email', email);
 
     if (updateError) {
       throw new Error(`Failed to update user: ${updateError.message}`);
@@ -106,10 +117,11 @@ export async function createTenantAndAssociateUser({
       .from('users')
       .insert({
         id: crypto.randomUUID(),
-        clerkUserId: clerkUserId,
-        tenantId: newTenant.id,
         email,
         name: userName,
+        tenantId: newTenant.id,
+        email_verified: true,
+        createdAt: now,
         updatedAt: now,
       });
 
@@ -119,4 +131,14 @@ export async function createTenantAndAssociateUser({
   }
 
   return newTenant;
+}
+
+export async function getTenantByCustomDomain(customDomain: string) {
+  const { data } = await supabase
+    .from('tenants')
+    .select('*')
+    .eq('custom_domain', customDomain)
+    .single();
+
+  return data;
 }
