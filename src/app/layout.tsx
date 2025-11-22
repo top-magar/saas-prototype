@@ -5,6 +5,8 @@ import "../styles/geometric.css";
 // import { QueryProvider } from '@/lib/providers/query-provider';
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { AuthProvider } from "@/components/providers/session-provider";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: {
@@ -29,6 +31,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ThemeProvider>
           {/* </QueryProvider> */}
         </AuthProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
