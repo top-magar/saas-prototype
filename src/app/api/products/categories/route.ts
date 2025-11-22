@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const authResult = await authorize(tenantId, ['admin', 'manager', 'user']);
-    
+
     if (!authResult.user) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     const { data: categories } = await supabase
       .from('categories')
       .select('id, name, description, created_at, updated_at')
-      .eq('tenantId', tenantId)
+      .eq('tenant_id', tenantId)
       .order('name', { ascending: true });
 
     return NextResponse.json(categories);
@@ -46,11 +46,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const authResult = await authorize(tenantId, ['admin', 'manager']);
-    
+
     if (!authResult.user) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
-    
+
     const body = await req.json();
     const { name, description } = body;
 

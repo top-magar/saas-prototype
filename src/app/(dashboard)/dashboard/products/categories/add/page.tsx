@@ -96,7 +96,7 @@ export default function AddCategoryPage() {
         {/* Header */}
         <div className="mb-8">
           <Button variant="ghost" onClick={() => router.back()} className="mb-4">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Categories
           </Button>
           <div className="text-center">

@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 import { checkDatabaseHealth } from '@/lib/database/connection-pool';
-import { getRedisClient } from '@/lib/cache/redis';
+import { getRedisClient } from '@/lib/cache/upstash-client';
 
 export async function GET() {
   const startTime = Date.now();
-  
+
   try {
     // Check database connectivity
     const dbHealthy = await checkDatabaseHealth();
-    
+
     // Check Redis connectivity
     let redisHealthy = true;
     try {
@@ -19,10 +19,10 @@ export async function GET() {
     } catch {
       redisHealthy = false;
     }
-    
+
     const responseTime = Date.now() - startTime;
     const isHealthy = dbHealthy && redisHealthy;
-    
+
     const healthStatus = {
       status: isHealthy ? 'healthy' : 'unhealthy',
       timestamp: new Date().toISOString(),
@@ -33,7 +33,7 @@ export async function GET() {
       responseTime: `${responseTime}ms`,
       version: process.env.npm_package_version || '1.0.0',
     };
-    
+
     return NextResponse.json(healthStatus, {
       status: isHealthy ? 200 : 503,
       headers: {

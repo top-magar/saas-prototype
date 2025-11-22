@@ -3,16 +3,16 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ArrowLeft, 
-  Smartphone, 
-  Tablet, 
+import {
+  ArrowLeft,
+  Smartphone,
+  Tablet,
   Monitor,
   ExternalLink,
   Share2
 } from 'lucide-react';
-import { PageRenderer, PageComponent } from '@/components/store-builder/page-renderer';
-import type { DeviceType } from '@/components/store-builder/store-builder';
+import { PageRenderer } from '@/components/store-builder/enhanced/page-renderer';
+import type { DeviceType, PageComponent } from '@/lib/store-builder/types';
 
 export default function StorePreviewPage() {
   const [previewData, setPreviewData] = useState<{
@@ -96,7 +96,7 @@ export default function StorePreviewPage() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Editor
           </Button>
-          
+
           <div className="flex items-center gap-2">
             <Badge variant="secondary">Preview</Badge>
             <span className="text-sm font-medium">
@@ -104,7 +104,7 @@ export default function StorePreviewPage() {
             </span>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
           {/* Device Selector */}
           <div className="flex items-center border rounded-lg p-1">
@@ -125,7 +125,7 @@ export default function StorePreviewPage() {
             <Share2 className="mr-2 h-4 w-4" />
             Share
           </Button>
-          
+
           <Button onClick={() => window.open('/', '_blank')}>
             <ExternalLink className="mr-2 h-4 w-4" />
             Open Live Site
@@ -135,9 +135,9 @@ export default function StorePreviewPage() {
 
       {/* Preview Content */}
       <div className="flex-1 overflow-auto p-4">
-        <div 
+        <div
           className="mx-auto bg-white shadow-lg transition-all duration-300"
-          style={{ 
+          style={{
             width: getDeviceWidth(currentDevice),
             minHeight: '100vh'
           }}
@@ -146,7 +146,6 @@ export default function StorePreviewPage() {
             <PageRenderer
               components={previewData.components}
               deviceType={currentDevice}
-              isPreview={true}
             />
           ) : (
             <div className="flex items-center justify-center h-96">

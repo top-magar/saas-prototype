@@ -1,10 +1,10 @@
 import { supabase } from './supabase';
-import { cacheGet, cacheSet } from '../cache/redis';
+import { cacheGet, cacheSet } from '../cache/upstash-client';
 
 // Optimized product queries with caching
 export async function getProductsWithCache(tenantId: string, page = 1, limit = 20) {
   const cacheKey = `products:${tenantId}:${page}:${limit}`;
-  
+
   // Try cache first
   const cached = await cacheGet(cacheKey);
   if (cached) return cached;
@@ -21,7 +21,7 @@ export async function getProductsWithCache(tenantId: string, page = 1, limit = 2
       media!inner(url, alt_text),
       product_variants!inner(price, stock)
     `, { count: 'exact' })
-    .eq('tenantId', tenantId)
+    .eq('tenant_id', tenantId)
     .range((page - 1) * limit, page * limit - 1)
     .order('created_at', { ascending: false });
 
@@ -45,12 +45,12 @@ export async function getProductsWithCache(tenantId: string, page = 1, limit = 2
 // Optimized tenant analytics with caching
 export async function getTenantAnalytics(tenantId: string, timeRange = '30d') {
   const cacheKey = `analytics:${tenantId}:${timeRange}`;
-  
+
   const cached = await cacheGet(cacheKey);
   if (cached) return cached;
 
   const dateFilter = getDateFilter(timeRange);
-  
+
   // Parallel queries for better performance
   let ordersResult, revenueResult, customersResult;
   try {
@@ -58,20 +58,20 @@ export async function getTenantAnalytics(tenantId: string, timeRange = '30d') {
       supabase
         .from('orders')
         .select('id', { count: 'exact', head: true })
-        .eq('tenantId', tenantId)
+        .eq('tenant_id', tenantId)
         .gte('created_at', dateFilter.gte.toISOString()),
-      
+
       supabase
         .from('orders')
         .select('total')
-        .eq('tenantId', tenantId)
+        .eq('tenant_id', tenantId)
         .eq('status', 'completed')
         .gte('created_at', dateFilter.gte.toISOString()),
-      
+
       supabase
         .from('users')
         .select('id', { count: 'exact', head: true })
-        .eq('tenantId', tenantId)
+        .eq('tenant_id', tenantId)
         .gte('created_at', dateFilter.gte.toISOString())
     ]);
   } catch (error) {
@@ -99,6 +99,6 @@ function getDateFilter(timeRange: string) {
   const now = new Date();
   const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
   const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-  
+
   return { gte: startDate };
 }

@@ -92,7 +92,7 @@ export const CommandMenu = () => {
 
   const quickActions = [
     { name: 'View Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-    { name: 'Add Product', href: '/dashboard/products/add', icon: Package },
+
     { name: 'View Customers', href: '/dashboard/customers', icon: Users },
     { name: 'Recent Orders', href: '/dashboard/orders', icon: ShoppingCart },
   ];

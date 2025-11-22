@@ -77,7 +77,7 @@ export class ProductService {
         status,
       })
       .eq('id', productId)
-      .eq('tenantId', tenantId)
+      .eq('tenant_id', tenantId)
       .select()
       .single();
 
@@ -90,7 +90,7 @@ export class ProductService {
       .from('products')
       .delete()
       .eq('id', productId)
-      .eq('tenantId', tenantId);
+      .eq('tenant_id', tenantId);
 
     if (error) throw new Error('Failed to delete product');
     return { success: true };
@@ -106,7 +106,7 @@ export class ProductService {
         product_variants(*)
       `)
       .eq('id', productId)
-      .eq('tenantId', tenantId)
+      .eq('tenant_id', tenantId)
       .single();
 
     if (error) return null;
@@ -128,7 +128,7 @@ export class ProductService {
         product_categories(categories(id, name)),
         product_variants(id, price, quantity)
       `)
-      .eq('tenantId', tenantId);
+      .eq('tenant_id', tenantId);
 
     if (searchTerm) {
       query = query.ilike('name', `%${searchTerm}%`);

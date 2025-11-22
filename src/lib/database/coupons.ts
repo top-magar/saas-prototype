@@ -2,8 +2,8 @@ import { supabase } from './supabase';
 import type { CouponValidation } from '../shared/types';
 
 export async function validateCoupon(
-  code: string, 
-  tenantId: string, 
+  code: string,
+  tenantId: string,
   orderTotal: number
 ): Promise<CouponValidation> {
   try {
@@ -11,7 +11,7 @@ export async function validateCoupon(
       .from('coupons')
       .select('*')
       .eq('code', code.toUpperCase())
-      .eq('tenantId', tenantId)
+      .eq('tenant_id', tenantId)
       .eq('is_active', true)
       .single();
 
@@ -31,11 +31,11 @@ export async function validateCoupon(
 
     // Check minimum amount
     if (coupon.minimum_amount && orderTotal < Number(coupon.minimum_amount)) {
-      return { 
-        isValid: false, 
-        discount: 0, 
-        freeShipping: false, 
-        message: `Minimum order amount is $${coupon.minimum_amount}` 
+      return {
+        isValid: false,
+        discount: 0,
+        freeShipping: false,
+        message: `Minimum order amount is $${coupon.minimum_amount}`
       };
     }
 
@@ -69,7 +69,7 @@ export async function applyCoupon(couponId: string) {
       .select('used_count')
       .eq('id', couponId)
       .single();
-    
+
     await supabase
       .from('coupons')
       .update({ used_count: (currentCoupon?.used_count || 0) + 1 })

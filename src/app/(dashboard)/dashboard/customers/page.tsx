@@ -275,7 +275,7 @@ export default function CustomersPage() {
                 <div className="flex gap-2">
                   <span className="text-sm font-medium text-muted-foreground">{selectedCustomers.length} selected</span>
                   <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
-                    <Trash2 className="h-4 w-4 mr-1" /> Delete
+                    <Trash2 className="mr-1 h-4 w-4" /> Delete
                   </Button>
                 </div>
               )}
@@ -386,13 +386,13 @@ export default function CustomersPage() {
                           </DropdownMenuTrigger>
                           <AnimatedDropdownContent align="end">
                             <DropdownMenuItem onClick={() => setSelectedCustomerDetail(customer)}>
-                              <Eye className="h-4 w-4 mr-2" /> View Details
+                              <Eye className="mr-2 h-4 w-4" /> View Details
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => setEditingCustomer(customer)}>
-                              <Edit2 className="h-4 w-4 mr-2" /> Edit
+                              <Edit2 className="mr-2 h-4 w-4" /> Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDeleteCustomer(customer.id)} className="text-destructive">
-                              <Trash2 className="h-4 w-4 mr-2" /> Delete
+                              <Trash2 className="mr-2 h-4 w-4" /> Delete
                             </DropdownMenuItem>
                           </AnimatedDropdownContent>
                         </DropdownMenu>

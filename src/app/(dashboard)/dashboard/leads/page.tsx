@@ -75,7 +75,7 @@ export default function LeadsPage() {
       <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
         <div className="flex justify-end">
           <Button onClick={fetchLeads} variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
           </Button>
         </div>
@@ -165,12 +165,12 @@ export default function LeadsPage() {
                           </DropdownMenuTrigger>
                           <AnimatedDropdownContent align="end">
                             <DropdownMenuItem onClick={() => handleSendReminder(lead.id)}>
-                              <Mail className="h-4 w-4 mr-2" />
+                              <Mail className="mr-2 h-4 w-4" />
                               Send Email Reminder
                             </DropdownMenuItem>
                             {lead.customerPhone && (
                               <DropdownMenuItem>
-                                <Phone className="h-4 w-4 mr-2" />
+                                <Phone className="mr-2 h-4 w-4" />
                                 Call Customer
                               </DropdownMenuItem>
                             )}

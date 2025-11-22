@@ -113,11 +113,11 @@ export function EnhancedReportsTab({ data }: EnhancedReportsTabProps) {
 
           <div className="flex gap-3 pt-4 border-t border-border/50">
             <Button className="font-mono">
-              <FileText className="h-4 w-4 mr-2" />
+              <FileText className="mr-2 h-4 w-4" />
               Generate Preview
             </Button>
             <Button variant="outline" className="font-mono">
-              <Calendar className="h-4 w-4 mr-2" />
+              <Calendar className="mr-2 h-4 w-4" />
               Schedule Report
             </Button>
           </div>
@@ -236,19 +236,19 @@ export function EnhancedReportsTab({ data }: EnhancedReportsTabProps) {
         <CardContent>
           <div className="grid gap-3 md:grid-cols-4">
             <Button variant="outline" className="font-mono">
-              <FileText className="h-4 w-4 mr-2" />
+              <FileText className="mr-2 h-4 w-4" />
               PDF
             </Button>
             <Button variant="outline" className="font-mono">
-              <FileText className="h-4 w-4 mr-2" />
+              <FileText className="mr-2 h-4 w-4" />
               Excel
             </Button>
             <Button variant="outline" className="font-mono">
-              <FileText className="h-4 w-4 mr-2" />
+              <FileText className="mr-2 h-4 w-4" />
               CSV
             </Button>
             <Button variant="outline" className="font-mono">
-              <FileText className="h-4 w-4 mr-2" />
+              <FileText className="mr-2 h-4 w-4" />
               JSON
             </Button>
           </div>

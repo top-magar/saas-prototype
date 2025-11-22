@@ -131,7 +131,7 @@ export default function CreateOrderPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <Button variant="ghost" onClick={() => router.back()} className="mb-4">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Orders
           </Button>
           <div className="text-center">
@@ -185,7 +185,7 @@ export default function CreateOrderPage() {
                         onClick={() => setShowProductSearch(!showProductSearch)}
                         size="sm"
                       >
-                        <Plus className="h-4 w-4 mr-2" />
+                        <Plus className="mr-2 h-4 w-4" />
                         Add Product
                       </Button>
                     </div>

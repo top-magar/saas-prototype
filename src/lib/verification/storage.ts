@@ -64,7 +64,7 @@ export async function getVerificationAttempt(
   const { data } = await supabaseAdmin
     .from('domain_verifications')
     .select('*')
-    .eq('tenantId', tenantId)
+    .eq('tenant_id', tenantId)
     .eq('domain', domain)
     .order('created_at', { ascending: false })
     .limit(1)

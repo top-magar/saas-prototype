@@ -142,7 +142,7 @@ export default function CouponsPage() {
       <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex justify-end">
         <Button onClick={() => setShowCreateDialog(true)}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="mr-2 h-4 w-4" />
           Create Coupon
         </Button>
       </div>
@@ -225,7 +225,7 @@ export default function CouponsPage() {
                             transition={{ delay: 0.05 }}
                           >
                             <DropdownMenuItem onClick={() => handleEdit(coupon)}>
-                              <Edit2 className="h-4 w-4 mr-2" />
+                              <Edit2 className="mr-2 h-4 w-4" />
                               Edit
                             </DropdownMenuItem>
                           </motion.div>
@@ -235,7 +235,7 @@ export default function CouponsPage() {
                             transition={{ delay: 0.1 }}
                           >
                             <DropdownMenuItem onClick={() => handleDelete(coupon.id)} className="text-destructive">
-                              <Trash2 className="h-4 w-4 mr-2" />
+                              <Trash2 className="mr-2 h-4 w-4" />
                               Delete
                             </DropdownMenuItem>
                           </motion.div>

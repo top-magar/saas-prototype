@@ -10,7 +10,7 @@ export async function findOrCreateCustomer(data: CustomerData) {
       .from('users')
       .select('*')
       .eq('email', email)
-      .eq('tenantId', tenantId)
+      .eq('tenant_id', tenantId)
       .eq('role', 'user')
       .single();
 

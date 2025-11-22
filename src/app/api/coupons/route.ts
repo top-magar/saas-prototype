@@ -12,7 +12,7 @@ export async function GET() {
     const { data: coupons } = await supabase
       .from('coupons')
       .select('*')
-      .eq('tenantId', tenant.id)
+      .eq('tenant_id', tenant.id)
       .order('created_at', { ascending: false });
 
     return NextResponse.json(coupons);

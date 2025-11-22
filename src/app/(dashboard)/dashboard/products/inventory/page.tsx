@@ -34,6 +34,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Search, Pencil, Eye, Plus } from "lucide-react";
+import { AddProductSheet } from "../_components/add-product-sheet";
 
 interface ProductInventory {
   id: string;
@@ -56,31 +57,32 @@ const allProductsInventory: ProductInventory[] = [
 const ITEMS_PER_PAGE = 5;
 
 export default function InventoryPage() {
-  const [searchTerm, setSearchTerm] = useState(""    
+  const [searchTerm, setSearchTerm] = useState(""
   );
-  const [filterStatus, setFilterStatus] = useState("All"    
+  const [filterStatus, setFilterStatus] = useState("All"
   );
-  const [currentPage, setCurrentPage] = useState(1    
+  const [currentPage, setCurrentPage] = useState(1
   );
-  const [inventory, setInventory] = useState<ProductInventory[]>(allProductsInventory    
+  const [inventory, setInventory] = useState<ProductInventory[]>(allProductsInventory
   );
+  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
 
   const filteredProducts = inventory.filter((product) => {
     const matchesSearch =
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase()    
-  );
+      product.sku.toLowerCase().includes(searchTerm.toLowerCase()
+      );
     const matchesStatus =
       filterStatus === "All" || product.status === filterStatus;
     return matchesSearch && matchesStatus;
-  }    
+  }
   );
 
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE    
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE
   );
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex    
+  const currentProducts = filteredProducts.slice(startIndex, endIndex
   );
 
   const handleStockChange = (id: string, newStock: number) => {
@@ -88,29 +90,29 @@ export default function InventoryPage() {
       inventory.map((product) =>
         product.id === id
           ? {
-              ...product,
-              stock: newStock,
-              status:
-                newStock === 0
-                  ? "Out of Stock"
-                  : newStock <= 10
+            ...product,
+            stock: newStock,
+            status:
+              newStock === 0
+                ? "Out of Stock"
+                : newStock <= 10
                   ? "Low Stock"
                   : "In Stock",
-            }
+          }
           : product
       )
-        
-  );
+
+    );
     console.log('Stock updated successfully');
     // In a real app, this would involve an API call to update stock
   };
 
   return (
-    
+
     <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex justify-end">
-        <Button>
-                      <Plus className="mr-2 h-4 w-4" /> Add Product        </Button>
+        <Button onClick={() => setIsAddProductOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Add Product        </Button>
       </div>
 
       <Card>
@@ -171,8 +173,8 @@ export default function InventoryPage() {
                         product.status === "In Stock"
                           ? "default"
                           : product.status === "Low Stock"
-                          ? "secondary"
-                          : "destructive"
+                            ? "secondary"
+                            : "destructive"
                       }
                     >
                       {product.status}
@@ -217,7 +219,16 @@ export default function InventoryPage() {
           </Pagination>
         </CardContent>
       </Card>
+
+      {/* Add Product Sheet */}
+      <AddProductSheet
+        open={isAddProductOpen}
+        onOpenChange={setIsAddProductOpen}
+        onSuccess={() => {
+          // Optionally refresh inventory
+        }}
+      />
     </div>
-      
+
   );
 }

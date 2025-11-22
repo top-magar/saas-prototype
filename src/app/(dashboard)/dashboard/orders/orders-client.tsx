@@ -79,7 +79,7 @@ export default function OrdersClient({ data }: { data: OrdersData }) {
     <div className="space-y-6">
       <div className="flex justify-end">
         <Button className="font-mono">
-          <Download className="h-4 w-4 mr-2" />
+          <Download className="mr-2 h-4 w-4" />
           Export Report
         </Button>
       </div>

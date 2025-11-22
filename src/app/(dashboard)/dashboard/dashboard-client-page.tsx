@@ -153,7 +153,7 @@ export default function DashboardClientPage({ data }: { data: DashboardData | nu
             </p>
           </div>
           <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hidden md:flex">
-            <ExternalLink className="h-4 w-4 mr-2" />
+            <ExternalLink className="mr-2 h-4 w-4" />
             Visit Website
           </Button>
         </div>

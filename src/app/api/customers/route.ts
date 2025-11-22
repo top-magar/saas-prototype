@@ -15,7 +15,7 @@ export async function GET() {
         *,
         orders(total, created_at)
       `)
-      .eq('tenantId', tenant.id)
+      .eq('tenant_id', tenant.id)
       .eq('role', 'user')
       .order('created_at', { ascending: false });
 

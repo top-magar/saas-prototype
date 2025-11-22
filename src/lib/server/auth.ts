@@ -13,7 +13,7 @@ export async function authorize(tenantId: string, allowedRoles: UserRole[]) {
     .from('users')
     .select('*, tenant:tenants(*)')
     .eq('email', session.user.email)
-    .eq('tenantId', tenantId)
+    .eq('tenant_id', tenantId)
     .single();
 
   if (!dbUser || !dbUser.tenant) {

@@ -31,19 +31,19 @@ async function getDashboardData() {
     const { count: totalSales } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true })
-      .eq('tenantId', tenant.id);
+      .eq('tenant_id', tenant.id);
 
     const { data: revenueData } = await supabase
       .from('orders')
       .select('total')
-      .eq('tenantId', tenant.id)
+      .eq('tenant_id', tenant.id)
       .eq('status', 'completed');
     const totalRevenue = revenueData?.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
 
     const { count: activeCustomers } = await supabase
       .from('users')
       .select('*', { count: 'exact', head: true })
-      .eq('tenantId', tenant.id)
+      .eq('tenant_id', tenant.id)
       .gte('last_login_at', lastWeek.toISOString());
 
     const { count: refundRequests } = await supabase
@@ -55,14 +55,14 @@ async function getDashboardData() {
     const { data: profitData } = await supabase
       .from('orders')
       .select('created_at, total')
-      .eq('tenantId', tenant.id)
+      .eq('tenant_id', tenant.id)
       .eq('status', 'completed')
       .order('created_at', { ascending: true });
 
     const { data: recentOrders } = await supabase
       .from('orders')
       .select('*, users(name)')
-      .eq('tenantId', tenant.id)
+      .eq('tenant_id', tenant.id)
       .order('created_at', { ascending: false })
       .limit(5);
 

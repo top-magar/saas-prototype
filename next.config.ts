@@ -42,7 +42,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   output: 'standalone',
-  
+
   // Security headers
   async headers() {
     return [
@@ -51,7 +51,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.clerk.accounts.dev https://*.clerk.com https://clerk.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://*.clerk.accounts.dev https://*.clerk.com https://clerk.com;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.clerk.accounts.dev https://*.clerk.com https://clerk.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://*.clerk.accounts.dev https://*.clerk.com https://clerk.com; worker-src 'self' blob:;",
           },
           {
             key: 'X-Content-Type-Options',

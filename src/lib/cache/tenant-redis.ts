@@ -42,3 +42,28 @@ export async function deleteTenantCache(identifier: string): Promise<void> {
     logger.error('Cache delete error', error, { identifier });
   }
 }
+
+export async function warmTenantCache(tenants: CachedTenant[]): Promise<void> {
+  const redis = getRedisClient();
+  if (!redis) return;
+
+  try {
+    const pipeline = redis.pipeline();
+
+    tenants.forEach(tenant => {
+      // Cache by subdomain
+      if (tenant.subdomain) {
+        pipeline.setex(`${CACHE_PREFIX}${tenant.subdomain}`, CACHE_TTL, JSON.stringify(tenant));
+      }
+
+      // Cache by custom domain
+      if (tenant.custom_domain) {
+        pipeline.setex(`${CACHE_PREFIX}${tenant.custom_domain}`, CACHE_TTL, JSON.stringify(tenant));
+      }
+    });
+
+    await pipeline.exec();
+  } catch (error) {
+    logger.error('Cache warming error', error);
+  }
+}

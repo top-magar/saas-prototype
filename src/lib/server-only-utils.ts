@@ -17,7 +17,7 @@ export async function getProductsForTenant(tenantId: string) {
   try {
     // Try to use Supabase if available
     const { supabase } = await import("./database/supabase").catch(() => ({ supabase: null }));
-    
+
     if (supabase) {
       const { data: products } = await supabase
         .from('products')
@@ -26,11 +26,11 @@ export async function getProductsForTenant(tenantId: string) {
           media(*),
           product_variants(*)
         `)
-        .eq('tenantId', tenantId)
-        .order('createdAt', { ascending: false });
+        .eq('tenant_id', tenantId)
+        .order('created_at', { ascending: false });
       return products || [];
     }
-    
+
     // Fallback: Return mock data for development
     return [
       {
@@ -59,9 +59,9 @@ export async function getProductsForTenant(tenantId: string) {
       }
     ];
   } catch (error) {
-    ErrorLogger.logServerError(error as Error, { 
-      function: 'getProductsForTenant', 
-      tenantId 
+    ErrorLogger.logServerError(error as Error, {
+      function: 'getProductsForTenant',
+      tenantId
     });
     // Return empty array instead of throwing to prevent page crash
     return [];
@@ -72,16 +72,16 @@ export async function getCategoriesForTenant(tenantId: string) {
   try {
     // Try to use Supabase if available
     const { supabase } = await import("./database/supabase").catch(() => ({ supabase: null }));
-    
+
     if (supabase) {
       const { data: categories } = await supabase
         .from('categories')
         .select('*')
-        .eq('tenantId', tenantId)
+        .eq('tenant_id', tenantId)
         .order('name', { ascending: true });
       return categories || [];
     }
-    
+
     // Fallback: Return mock categories
     return [
       { id: '1', name: 'Electronics' },
@@ -90,9 +90,9 @@ export async function getCategoriesForTenant(tenantId: string) {
       { id: '4', name: 'Home & Garden' }
     ];
   } catch (error) {
-    ErrorLogger.logServerError(error as Error, { 
-      function: 'getCategoriesForTenant', 
-      tenantId 
+    ErrorLogger.logServerError(error as Error, {
+      function: 'getCategoriesForTenant',
+      tenantId
     });
     return [];
   }
@@ -103,25 +103,25 @@ export async function calculateAnalytics(tenantId: string, timeRange: string) {
   try {
     // Try to use Supabase if available
     const { supabase } = await import("./database/supabase").catch(() => ({ supabase: null }));
-    
+
     if (supabase) {
       const dateFilter = getDateFilter(timeRange);
-      
+
       const [salesResult, revenueResult, customersResult] = await Promise.all([
-        supabase.from('orders').select('*', { count: 'exact', head: true }).eq('tenantId', tenantId).gte('createdAt', dateFilter.gte.toISOString()),
-        supabase.from('orders').select('total').eq('tenantId', tenantId).gte('createdAt', dateFilter.gte.toISOString()),
-        supabase.from('users').select('*', { count: 'exact', head: true }).eq('tenantId', tenantId).gte('createdAt', dateFilter.gte.toISOString())
+        supabase.from('orders').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).gte('created_at', dateFilter.gte.toISOString()),
+        supabase.from('orders').select('total').eq('tenant_id', tenantId).gte('created_at', dateFilter.gte.toISOString()),
+        supabase.from('users').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).gte('created_at', dateFilter.gte.toISOString())
       ]);
-      
+
       const revenue = revenueResult.data?.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
-      
+
       return {
         totalSales: salesResult.count || 0,
         revenue,
         customers: customersResult.count || 0
       };
     }
-    
+
     // Fallback: Return mock analytics data
     return {
       totalSales: 42,
@@ -129,10 +129,10 @@ export async function calculateAnalytics(tenantId: string, timeRange: string) {
       customers: 28
     };
   } catch (error) {
-    ErrorLogger.logServerError(error as Error, { 
-      function: 'calculateAnalytics', 
-      tenantId, 
-      timeRange 
+    ErrorLogger.logServerError(error as Error, {
+      function: 'calculateAnalytics',
+      tenantId,
+      timeRange
     });
     // Return fallback data instead of throwing
     return {
@@ -147,7 +147,7 @@ function getDateFilter(timeRange: string) {
   const now = new Date();
   const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
   const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-  
+
   return {
     gte: startDate
   };

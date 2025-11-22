@@ -41,7 +41,7 @@ export default function ProductsPageClient({ initialProducts, categories }: Prod
                     <p className="text-sm text-muted-foreground mt-1">Manage your products and inventory</p>
                 </div>
                 <Button onClick={() => setIsAddProductOpen(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="mr-2 h-4 w-4" />
                     Add Product
                 </Button>
             </div>
